@@ -25,7 +25,7 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
     private String mContent = "Empty";
     private Context mContext;
     private int mAppWidgetId;
-    private String mUrl = null;
+    private String mSelectedItemUrl = null;
 
     //private ConnectivityManager mConnectivityManager;
     
@@ -38,8 +38,8 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
         mAppWidgetId = intent.getIntExtra(
                 AppWidgetManager.EXTRA_APPWIDGET_ID,
                 AppWidgetManager.INVALID_APPWIDGET_ID);
-        mUrl = intent.getStringExtra(Constants.EXTRA_ITEM_URL);
-        Log.i(TAG, "constructor - mUrl[" + mUrl + "]");
+        mSelectedItemUrl = intent.getStringExtra(Constants.EXTRA_ITEM_URL);
+        Log.i(TAG, "constructor - mSelectedItemUrl[" + mSelectedItemUrl + "]");
         
         //mConnectivityManager =  (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         
@@ -48,7 +48,7 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
 
     @Override
     public RemoteViews getViewAt(int position) {
-        Log.i(TAG, "getViewAt");
+        //Log.i(TAG, "getViewAt - position[" + position + "]");
 
         RemoteViews rv = new RemoteViews(mContext.getPackageName(), R.layout.content_row);
         rv.setTextViewText(android.R.id.text2, mContent);
@@ -66,10 +66,10 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
         // We check internet connection when BaseballWidgetProvider receives intent ACTION_SHOW_ITEM.
         // So just skip to check it here.
         //if (Utils.checkInternetConnectivity(mConnectivityManager)) {
-        if (mUrl != null) {
+        if (mSelectedItemUrl != null) {
             // Parse MLBPark html data and add items to the widget item array list.
             try {
-                parseMLBParkHtmlData(mUrl);
+                parseMLBParkHtmlData(mSelectedItemUrl);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -140,8 +140,9 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
             mIntentListener = new BroadcastReceiver() {
                 @Override
                 public void onReceive(Context context, Intent intent) {
-                    // Update mUrl through Broadcast Intent.
-                    mUrl = intent.getStringExtra(Constants.EXTRA_ITEM_URL);
+                    // Update mSelectedItemUrl through Broadcast Intent.
+                    Log.i(TAG, "onReceive - update mSelectedItemUrl[" + mSelectedItemUrl + "]");
+                    mSelectedItemUrl = intent.getStringExtra(Constants.EXTRA_ITEM_URL);
                 }
             };
             IntentFilter filter = new IntentFilter();

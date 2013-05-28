@@ -59,7 +59,7 @@ public class BullpenListViewFactory implements RemoteViewsService.RemoteViewsFac
 
     @Override
     public RemoteViews getViewAt(int position) {
-        Log.i(TAG, "getViewAt - position[" + position + "]");
+        //Log.i(TAG, "getViewAt - position[" + position + "]");
 
         // Create a RemoteView and set widget item array list to the RemoteView.
         RemoteViews rv = new RemoteViews(mContext.getPackageName(),
