@@ -1,0 +1,36 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.smilo.bullpen"
+    android:versionCode="1"
+    android:versionName="1.0" >
+
+    <uses-sdk
+        android:minSdkVersion="13"
+        android:targetSdkVersion="17" />
+
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@style/AppTheme" >
+
+        <receiver android:name="BullpenWidgetProvider" android:label="@string/app_name">
+            <intent-filter >
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.smilo.bullpen.SHOW_LIST" />
+                <action android:name="com.smilo.bullpen.SHOW_ITEM" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_configuration" />
+        </receiver>
+
+        <service android:name="BullpenListViewService"
+             android:permission="android.permission.BIND_REMOTEVIEWS" />
+        
+        <service android:name="BullpenContentService"
+             android:permission="android.permission.BIND_REMOTEVIEWS" />
+        </application>
+</manifest>
