@@ -15,13 +15,17 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.net.Uri;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.Iterator;
 import java.util.List;
 
@@ -29,14 +33,14 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
 
     private static final String TAG = "BullpenContentFactory";
 
-    private contentItem mContentItem;
+    private contentItem mContentItem = null;;
     private Context mContext;
     private int mAppWidgetId;
     private String mSelectedItemUrl = null;
+    private BroadcastReceiver mIntentListener;
+    private Bitmap mBitmap = null;
 
     //private ConnectivityManager mConnectivityManager;
-    
-    private BroadcastReceiver mIntentListener;
     
     private class contentItem {
         String itemBody = null;
@@ -100,8 +104,17 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
         RemoteViews rv = new RemoteViews(mContext.getPackageName(), R.layout.content_row);
         if (mContentItem.isEmptyBody() == false)
             rv.setTextViewText(R.id.contentRowBodyText, mContentItem.getBody());
-        if (mContentItem.isEmptyImgUrl() == false)
-            rv.setImageViewUri(R.id.contentRowImage, Uri.parse(mContentItem.getImgUrl()));
+
+        if (mContentItem.isEmptyImgUrl() == false) {
+            mBitmap = getImageBitmap(mContentItem.getImgUrl());
+            if (mBitmap != null)
+                rv.setImageViewBitmap(R.id.contentRowImage, mBitmap);
+            else
+                rv.setImageViewResource(R.id.contentRowImage, 0);
+        } else {
+            rv.setImageViewResource(R.id.contentRowImage, 0);
+        }
+
         if (mContentItem.isEmptyComment() == false)
             rv.setTextViewText(R.id.contentRowCommentText, mContentItem.getComment());
 
@@ -115,6 +128,10 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
     public void onDataSetChanged() {
         Log.i(TAG, "onDataSetChanged");
 
+        if (mBitmap != null) {
+            mBitmap.recycle();
+        }
+        
         // We check internet connection when BaseballWidgetProvider receives intent ACTION_SHOW_ITEM.
         // So just skip to check it here.
         //if (Utils.checkInternetConnectivity(mConnectivityManager)) {
@@ -168,7 +185,6 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
         Source source = new Source(new URL(urlAddress));
         source.fullSequentialParse();
 
-        // Initialize widget item array list here.
         String itemBody = "";
         String itemImgUrl = "";
         String itemComment = "";
@@ -289,6 +305,23 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
         return;
     }
 
+    private Bitmap getImageBitmap(String url) { 
+        Bitmap bm = null; 
+        try { 
+            URL aURL = new URL(url); 
+            URLConnection conn = aURL.openConnection(); 
+            conn.connect(); 
+            InputStream is = conn.getInputStream(); 
+            BufferedInputStream bis = new BufferedInputStream(is); 
+            bm = BitmapFactory.decodeStream(bis); 
+            bis.close(); 
+            is.close(); 
+       } catch (IOException e) { 
+           Log.e(TAG, "Error getting bitmap", e); 
+       } 
+       return bm; 
+    } 
+    
     private void setupIntentListener() {
         if (mIntentListener == null) {
             mIntentListener = new BroadcastReceiver() {
