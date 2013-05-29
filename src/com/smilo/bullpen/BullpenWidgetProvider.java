@@ -30,8 +30,8 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
     private static String mSelectedItemUrl = null;
     
     // Flag to skip notifyAppWidgetViewDataChanged() call on boot.
-    private static boolean mFirstCallListViewService = true;
-    private static boolean mFirstCallContentService = true;
+    private static boolean mIsSkipFirstCallListViewService = true;
+    private static boolean mIsSkipFirstCallContentService = true;
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -54,7 +54,7 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
                 removePreviousAlarm();
                 setNewAlarm(context);
 
-                setRemoteViewToShowList(context, awm, appWidgetIds[i] );
+                setRemoteViewToShowList(context, awm, appWidgetIds[i], true);
     
             // APPWIDGET_DISABLED intent ////////////////////
             // This intent will be called when Bullpen widget removed. 
@@ -88,7 +88,7 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
                     removePreviousAlarm();
                     setNewAlarm(context);
         
-                    setRemoteViewToShowList(context, awm, appWidgetIds[i]);
+                    setRemoteViewToShowList(context, awm, appWidgetIds[i], false);
                 } else {
                     Toast.makeText(context, R.string.internet_not_connected_msg, Toast.LENGTH_SHORT).show();
                 }
@@ -96,7 +96,7 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
         }
     }
 
-    private void setRemoteViewToShowList(Context context, AppWidgetManager awm, int appWidgetId) {
+    private void setRemoteViewToShowList(Context context, AppWidgetManager awm, int appWidgetId, boolean isNotifyDataChanged) {
         
         Intent serviceIntent, clickIntent;
         
@@ -117,11 +117,16 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
     
         Log.i(TAG, "updateAppWidget[BaseballListViewService]");
         awm.updateAppWidget(appWidgetId, rv);
-        if (mFirstCallListViewService) {
-            mFirstCallListViewService = false;
+        
+        // On first call, we need not execute notifyAppWidgetViewDataChanged()
+        // because onDataSetChanged() is called automatically after BullpenListViewFactory is created.
+        if (mIsSkipFirstCallListViewService) {
+            mIsSkipFirstCallListViewService = false;
         } else {
-            Log.i(TAG, "notifyAppWidgetViewDataChanged[BaseballListViewService]");
-            awm.notifyAppWidgetViewDataChanged(appWidgetId, R.id.listView);
+        	if (isNotifyDataChanged) {
+	            Log.i(TAG, "notifyAppWidgetViewDataChanged[BaseballListViewService]");
+	            awm.notifyAppWidgetViewDataChanged(appWidgetId, R.id.listView);
+        	}
         }
     }
     
@@ -147,8 +152,11 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
     
         Log.i(TAG, "updateAppWidget[BaseballContentService]");
         awm.updateAppWidget(appWidgetId, rv);
-        if (mFirstCallContentService) {
-            mFirstCallContentService = false;
+        
+        // On first call, we need not execute notifyAppWidgetViewDataChanged()
+        // because onDataSetChanged() is called automatically after BullpenContentFactory is created.
+        if (mIsSkipFirstCallContentService) {
+            mIsSkipFirstCallContentService = false;
         } else {
             Log.i(TAG, "notifyAppWidgetViewDataChanged[BaseballContentService]");
             awm.notifyAppWidgetViewDataChanged(appWidgetId, R.id.contentView);

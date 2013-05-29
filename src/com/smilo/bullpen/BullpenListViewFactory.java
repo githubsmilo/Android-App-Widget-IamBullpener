@@ -27,6 +27,8 @@ public class BullpenListViewFactory implements RemoteViewsService.RemoteViewsFac
     private Context mContext;
     private int mAppWidgetId;
     private ConnectivityManager mConnectivityManager;
+
+    private static boolean mIsSkipFirstCallOfGetViewAt = true;
     
     private class listItem {
         String itemTitle;
@@ -60,7 +62,12 @@ public class BullpenListViewFactory implements RemoteViewsService.RemoteViewsFac
     @Override
     public RemoteViews getViewAt(int position) {
         //Log.i(TAG, "getViewAt - position[" + position + "]");
-
+    	
+    	if (mIsSkipFirstCallOfGetViewAt) {
+    		mIsSkipFirstCallOfGetViewAt = false;
+    		return null;
+    	}
+    	
         // Create a RemoteView and set widget item array list to the RemoteView.
         RemoteViews rv = new RemoteViews(mContext.getPackageName(), R.layout.list_row);
         rv.setTextViewText(R.id.listRowText, mlistItems.get(position).getTitle());
@@ -79,7 +86,7 @@ public class BullpenListViewFactory implements RemoteViewsService.RemoteViewsFac
         if (Utils.checkInternetConnectivity(mConnectivityManager)) {
             // Parse MLBPark html data and add items to the widget item array list.
             try {
-                parseMLBParkHtmlData(Constants.mMLBParkUrl_mlbtown);
+                parseMLBParkHtmlData(Constants.mMLBParkUrl_bullpen);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -163,8 +170,7 @@ public class BullpenListViewFactory implements RemoteViewsService.RemoteViewsFac
                     strBuf.append(url);
                     url = strBuf.toString();
                 }
-                Log.i(TAG, "parseMLBParkHtmlData - title[" + title + "],url["
-                        + url + "]");
+                //Log.i(TAG, "parseMLBParkHtmlData - title[" + title + "],url[" + url + "]");
 
                 // Add widget item array list
                 listItem item = new listItem(title, url);
@@ -172,6 +178,7 @@ public class BullpenListViewFactory implements RemoteViewsService.RemoteViewsFac
                 addedItemCount++;
 
                 if (addedItemCount == Constants.LISTVIEW_MAX_ITEM_COUNT) {
+                	Log.i(TAG, "parseMLBParkHtmlData - done!");
                     return;
                 }
             }

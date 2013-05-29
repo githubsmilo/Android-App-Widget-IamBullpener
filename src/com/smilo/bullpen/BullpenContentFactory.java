@@ -40,6 +40,9 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
     private BroadcastReceiver mIntentListener;
     private Bitmap mBitmap = null;
 
+    private static boolean mIsSkipFirstCallOfGetViewAt = true;
+    private static boolean mIsUpdateRemoteView = false;
+
     //private ConnectivityManager mConnectivityManager;
     
     private class contentItem {
@@ -100,38 +103,49 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
     @Override
     public RemoteViews getViewAt(int position) {
         //Log.i(TAG, "getViewAt - position[" + position + "]");
+        
+    	if (mIsSkipFirstCallOfGetViewAt) {
+    		mIsSkipFirstCallOfGetViewAt = false;
+    		return null;
+    	}
 
-        RemoteViews rv = new RemoteViews(mContext.getPackageName(), R.layout.content_row);
-        if (mContentItem.isEmptyBody() == false)
-            rv.setTextViewText(R.id.contentRowBodyText, mContentItem.getBody());
+        if (mIsUpdateRemoteView) {
+        	RemoteViews rv = new RemoteViews(mContext.getPackageName(), R.layout.content_row);
+            if (mContentItem.isEmptyBody() == false)
+                rv.setTextViewText(R.id.contentRowBodyText, mContentItem.getBody());
 
-        if (mContentItem.isEmptyImgUrl() == false) {
-            mBitmap = getImageBitmap(mContentItem.getImgUrl());
-            if (mBitmap != null)
-                rv.setImageViewBitmap(R.id.contentRowImage, mBitmap);
-            else
-                rv.setImageViewResource(R.id.contentRowImage, 0);
-        } else {
-            rv.setImageViewResource(R.id.contentRowImage, 0);
+            if (mContentItem.isEmptyImgUrl() == false) {
+                mBitmap = getImageBitmap(mContentItem.getImgUrl());
+                if (mBitmap != null) {
+                	//Log.i(TAG, "setImageViewBitmap - given bitmap");
+                    rv.setImageViewBitmap(R.id.contentRowImage, mBitmap);
+                } else {
+                	//Log.i(TAG, "setImageViewBitmap - null1");
+                	rv.setImageViewBitmap(R.id.contentRowImage, null);
+                }
+            } else {
+            	//Log.i(TAG, "setImageViewBitmap - null2");
+            	rv.setImageViewBitmap(R.id.contentRowImage, null);
+            }
+
+            if (mContentItem.isEmptyComment() == false)
+                rv.setTextViewText(R.id.contentRowCommentText, mContentItem.getComment());
+
+            Intent fillInIntent = new Intent();
+            rv.setOnClickFillInIntent(R.id.contentRowLayout, fillInIntent);
+
+            mIsUpdateRemoteView = false;
+            return rv;
         }
-
-        if (mContentItem.isEmptyComment() == false)
-            rv.setTextViewText(R.id.contentRowCommentText, mContentItem.getComment());
-
-        Intent fillInIntent = new Intent();
-        rv.setOnClickFillInIntent(R.id.contentRowLayout, fillInIntent);
-
-        return rv;
+        
+        return null;
+    	
     }
     
     @Override
     public void onDataSetChanged() {
         Log.i(TAG, "onDataSetChanged");
-
-        if (mBitmap != null) {
-            mBitmap.recycle();
-        }
-        
+                
         // We check internet connection when BaseballWidgetProvider receives intent ACTION_SHOW_ITEM.
         // So just skip to check it here.
         //if (Utils.checkInternetConnectivity(mConnectivityManager)) {
@@ -139,6 +153,8 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
             // Parse MLBPark html data and add items to the widget item array list.
             try {
                 parseMLBParkHtmlData(mSelectedItemUrl);
+                mIsSkipFirstCallOfGetViewAt = true;
+                mIsUpdateRemoteView = true;
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -185,6 +201,11 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
         Source source = new Source(new URL(urlAddress));
         source.fullSequentialParse();
 
+        if (mBitmap != null) {
+            mBitmap.recycle();
+            mBitmap = null;
+        }
+        
         String itemBody = "";
         String itemImgUrl = "";
         String itemComment = "";
@@ -300,8 +321,9 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
         }
         
         mContentItem = new contentItem(itemBody, itemImgUrl, itemComment);
-        Log.i(TAG, "mContentItem[" + mContentItem.toString() + "]");
+        //Log.i(TAG, "mContentItem[" + mContentItem.toString() + "]");
 
+        Log.i(TAG, "parseMLBParkHtmlData - done!");
         return;
     }
 
