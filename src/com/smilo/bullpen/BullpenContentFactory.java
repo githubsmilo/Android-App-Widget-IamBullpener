@@ -1,11 +1,6 @@
 
 package com.smilo.bullpen;
 
-import java.io.IOException;
-import java.net.URL;
-import java.util.Iterator;
-import java.util.List;
-
 import net.htmlparser.jericho.CharacterReference;
 import net.htmlparser.jericho.Element;
 import net.htmlparser.jericho.EndTag;
@@ -14,20 +9,27 @@ import net.htmlparser.jericho.Segment;
 import net.htmlparser.jericho.Source;
 import net.htmlparser.jericho.StartTag;
 import net.htmlparser.jericho.Tag;
+
 import android.appwidget.AppWidgetManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.Uri;
 import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
+
+import java.io.IOException;
+import java.net.URL;
+import java.util.Iterator;
+import java.util.List;
 
 public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFactory {
 
     private static final String TAG = "BullpenContentFactory";
 
-    private String mContent = "Empty";
+    private contentItem mContentItem;
     private Context mContext;
     private int mAppWidgetId;
     private String mSelectedItemUrl = null;
@@ -35,6 +37,42 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
     //private ConnectivityManager mConnectivityManager;
     
     private BroadcastReceiver mIntentListener;
+    
+    private class contentItem {
+        String itemBody = null;
+        String itemImgUrl = null;
+        String itemComment = null;
+
+        contentItem(String body, String imgUrl, String comment) {
+            itemBody = body;
+            itemImgUrl = imgUrl;
+            itemComment = comment;
+        }
+
+        public String getBody() {
+            return itemBody;
+        }
+
+        public String getImgUrl() {
+            return itemImgUrl;    
+        }
+        
+        public String getComment() {
+            return itemComment;
+        }
+        
+        public boolean isEmptyImgUrl() {
+            return ((itemImgUrl == null) || (itemImgUrl == ""));
+        }
+        
+        public boolean isEmptyComment() {
+            return ((itemComment == null) || (itemImgUrl == ""));
+        }
+        
+        public String toString() {
+            return ("itemBody[" + itemBody + "], itemImgUrl[" + itemImgUrl + "], itemComment[" + itemComment + "]");
+        }
+    }
 
     public BullpenContentFactory(Context context, Intent intent) {
         Log.i(TAG, "constructor");
@@ -56,8 +94,11 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
         //Log.i(TAG, "getViewAt - position[" + position + "]");
 
         RemoteViews rv = new RemoteViews(mContext.getPackageName(), R.layout.content_row);
-        rv.setTextViewText(R.id.contentRowBodyText, mContent);
-        rv.setTextViewText(R.id.contentRowCommentText, "Comment here");
+        rv.setTextViewText(R.id.contentRowBodyText, mContentItem.getBody());
+        if (mContentItem.isEmptyImgUrl() == false)
+            rv.setImageViewUri(R.id.contentRowImage, Uri.parse(mContentItem.getImgUrl()));
+        if (mContentItem.isEmptyComment() == false)
+            rv.setTextViewText(R.id.contentRowCommentText, mContentItem.getComment());
 
         Intent fillInIntent = new Intent();
         rv.setOnClickFillInIntent(R.id.contentRowLayout, fillInIntent);
@@ -123,7 +164,9 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
         source.fullSequentialParse();
 
         // Initialize widget item array list here.
-        mContent = "";
+        String itemBody = "";
+        String itemImgUrl = "";
+        String itemComment = "";
 
         // Find the same pattern with <div align="justify". This means the body of this article.
         List<Element> divs = source.getAllElements(HTMLElementName.DIV);
@@ -140,23 +183,26 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
                     Segment nodeSegment = nodeIterator.next();
                     
                     // If article body has <head>...</head>, just skip!
-                    // If <br> tag, add new line to mContent.
+                    // If <br> tag, add new line to itemBody.
+                    // if <img> tag, add img address to itemImgUrl.
                     if (nodeSegment instanceof StartTag) {
                         String tagName = ((Tag)nodeSegment).getName();
                         if (tagName.equals("head")) {
                             isSkipSegment = true;
                         } else if (!isSkipSegment && tagName.equals("br")) {
-                            mContent += "\n";
+                            itemBody += "\n";
+                        } else if (!isSkipSegment && tagName.equals("img")) {
+                            itemImgUrl = ((StartTag) nodeSegment).getAttributeValue("src");
                         }
                         continue;
                         
-                    // If </p> or </div> tag, add new line to mContent.
+                    // If </p> or </div> tag, add new line to itemBody.
                     } else if (nodeSegment instanceof EndTag) {
                         String tagName = ((Tag)nodeSegment).getName();
                         if (tagName.equals("head")) {
                             isSkipSegment = false;
                         } else if (!isSkipSegment && (tagName.equals("p") || tagName.equals("div"))) {
-                            mContent += "\n";
+                            itemBody += "\n";
                         }
                         continue;
                         
@@ -164,18 +210,25 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
                     } else if (nodeSegment instanceof CharacterReference) {
                         continue;
                         
-                    // If plain text, add it to mContent.
+                    // If plain text, add it to itemBody.
                     } else {
                         if (!isSkipSegment && (nodeSegment.isWhiteSpace() == false)) {
-                            mContent += nodeSegment.toString();
+                            itemBody += nodeSegment.toString();
                         }
                     }
                 }
-                Log.i(TAG, "mContent[" + mContent + "]");
-
-                return;
+                // After parsing article body, exit loop.
+                break;
             }
         }
+        
+        // Parse comment
+        // TODO
+        
+        mContentItem = new contentItem(itemBody, itemImgUrl, itemComment);
+        Log.i(TAG, "mContentItem[" + mContentItem.toString() + "]");
+
+        return;
     }
 
     private void setupIntentListener() {

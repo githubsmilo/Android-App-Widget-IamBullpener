@@ -23,26 +23,26 @@ public class BullpenListViewFactory implements RemoteViewsService.RemoteViewsFac
 
     private static final String TAG = "BullpenListViewFactory";
 
-    private List<widgetItem> mWidgetItems = new ArrayList<widgetItem>();
+    private List<listItem> mlistItems = new ArrayList<listItem>();
     private Context mContext;
     private int mAppWidgetId;
     private ConnectivityManager mConnectivityManager;
     
-    private class widgetItem {
-        String widgetTitle;
-        String widgetUrl;
+    private class listItem {
+        String itemTitle;
+        String itemUrl;
 
-        widgetItem(String title, String url) {
-            widgetTitle = title;
-            widgetUrl = url;
+        listItem(String title, String url) {
+            itemTitle = title;
+            itemUrl = url;
         }
 
         public String getTitle() {
-            return widgetTitle;
+            return itemTitle;
         }
 
         public String getUrl() {
-            return widgetUrl;
+            return itemUrl;
         }
     }
 
@@ -63,10 +63,10 @@ public class BullpenListViewFactory implements RemoteViewsService.RemoteViewsFac
 
         // Create a RemoteView and set widget item array list to the RemoteView.
         RemoteViews rv = new RemoteViews(mContext.getPackageName(), R.layout.list_row);
-        rv.setTextViewText(R.id.listRowText, mWidgetItems.get(position).getTitle());
+        rv.setTextViewText(R.id.listRowText, mlistItems.get(position).getTitle());
 
         Intent fillInIntent = new Intent();
-        fillInIntent.putExtra(Constants.EXTRA_ITEM_URL, mWidgetItems.get(position).getUrl());
+        fillInIntent.putExtra(Constants.EXTRA_ITEM_URL, mlistItems.get(position).getUrl());
         rv.setOnClickFillInIntent(R.id.listRowText, fillInIntent);
 
         return rv;
@@ -128,7 +128,7 @@ public class BullpenListViewFactory implements RemoteViewsService.RemoteViewsFac
         source.fullSequentialParse();
 
         // Initialize widget item array list here.
-        mWidgetItems.clear();
+        mlistItems.clear();
 
         List<Element> tables = source.getAllElements(HTMLElementName.TABLE);
         int addedItemCount = 0;
@@ -157,8 +157,8 @@ public class BullpenListViewFactory implements RemoteViewsService.RemoteViewsFac
                         + url + "]");
 
                 // Add widget item array list
-                widgetItem item = new widgetItem(title, url);
-                mWidgetItems.add(item);
+                listItem item = new listItem(title, url);
+                mlistItems.add(item);
                 addedItemCount++;
 
                 if (addedItemCount == Constants.LISTVIEW_MAX_ITEM_COUNT) {

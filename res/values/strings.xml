@@ -4,5 +4,6 @@
     <string name="internet_not_connected_msg">Internet not connected</string>
     <string name="listViewTitle">Bullpen</string>
     <string name="contentViewTitle">Content</string>
+    <string name="imgContentDescription">content image</string>
 
 </resources>

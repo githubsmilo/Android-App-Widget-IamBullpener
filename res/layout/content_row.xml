@@ -5,6 +5,12 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+    <ImageView
+	        android:id="@+id/contentRowImage"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:contentDescription="@string/imgContentDescription" />
+        
     <TextView
             android:id="@+id/contentRowBodyText"
             android:layout_width="match_parent"
@@ -13,7 +19,7 @@
             android:gravity="center_vertical"
             android:paddingLeft="6dip"
             android:minHeight="?android:attr/listPreferredItemHeight" />
-    
+
     <TextView
             android:id="@+id/contentRowCommentText"
             android:layout_width="match_parent"
