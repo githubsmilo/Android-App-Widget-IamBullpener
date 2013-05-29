@@ -136,10 +136,14 @@ public class BullpenListViewFactory implements RemoteViewsService.RemoteViewsFac
             Element table = tables.get(i);
 
             // Find the same pattern with <table width='100%' border='0' cellspacing='6' cellpadding='0'
-            if (table.getAttributeValue("width").equals("100%")
-                    && table.getAttributeValue("border").equals("0")
-                    && table.getAttributeValue("cellspacing").equals("6")
-                    && table.getAttributeValue("cellpadding").equals("0")) {
+            String widthAttr = table.getAttributeValue("width");
+            String borderAttr = table.getAttributeValue("border");
+            String cellspacingAttr = table.getAttributeValue("cellspacing");
+            String cellpaddingAttr = table.getAttributeValue("cellpadding");
+            if ((widthAttr != null && widthAttr.equals("100%"))
+                    && (borderAttr != null && borderAttr.equals("0"))
+                    && (cellspacingAttr != null && cellspacingAttr.equals("6"))
+                    && (cellpaddingAttr != null && cellpaddingAttr.equals("0"))) {
 
                 Segment content;
                 
