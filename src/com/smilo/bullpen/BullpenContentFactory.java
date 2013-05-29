@@ -61,12 +61,16 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
             return itemComment;
         }
         
+        public boolean isEmptyBody() {
+            return ((itemBody == null) || (itemBody.equals("")));
+        }
+        
         public boolean isEmptyImgUrl() {
-            return ((itemImgUrl == null) || (itemImgUrl == ""));
+            return ((itemImgUrl == null) || (itemImgUrl.equals("")));
         }
         
         public boolean isEmptyComment() {
-            return ((itemComment == null) || (itemImgUrl == ""));
+            return ((itemComment == null) || (itemComment.equals("")));
         }
         
         public String toString() {
@@ -94,7 +98,8 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
         //Log.i(TAG, "getViewAt - position[" + position + "]");
 
         RemoteViews rv = new RemoteViews(mContext.getPackageName(), R.layout.content_row);
-        rv.setTextViewText(R.id.contentRowBodyText, mContentItem.getBody());
+        if (mContentItem.isEmptyBody() == false)
+            rv.setTextViewText(R.id.contentRowBodyText, mContentItem.getBody());
         if (mContentItem.isEmptyImgUrl() == false)
             rv.setImageViewUri(R.id.contentRowImage, Uri.parse(mContentItem.getImgUrl()));
         if (mContentItem.isEmptyComment() == false)
@@ -168,15 +173,17 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
         String itemImgUrl = "";
         String itemComment = "";
 
-        // Find the same pattern with <div align="justify". This means the body of this article.
         List<Element> divs = source.getAllElements(HTMLElementName.DIV);
         for (int i = 0; i < divs.size(); i++) {
             Element div = divs.get(i);
-            String value = div.getAttributeValue("align");
+            String value;
+            
+            // Find the same pattern with <div align="justify". This means the body of this article.
+            value = div.getAttributeValue("align");
             if (value != null && value.equals("justify")) {
                 Segment seg = div.getContent();
                 boolean isSkipSegment = false;
-                Log.i(TAG, "content segment[" + seg.toString() + "]");
+                //Log.i(TAG, "content segment[" + seg.toString() + "]");
                 
                 // Parse article body.
                 for (Iterator<Segment> nodeIterator = seg.getNodeIterator() ; nodeIterator.hasNext();) {
@@ -213,17 +220,68 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
                     // If plain text, add it to itemBody.
                     } else {
                         if (!isSkipSegment && (nodeSegment.isWhiteSpace() == false)) {
-                            itemBody += nodeSegment.toString();
+                            itemBody += nodeSegment.getTextExtractor().toString();
                         }
                     }
                 }
-                // After parsing article body, exit loop.
+            }
+            
+            // Find the same pattern with <div id="myArea". This means the comment of this article.
+            value = div.getAttributeValue("id");
+            if (value != null && value.equals("myArea")) {
+                Segment seg = div.getContent();
+                boolean isSkipSegment = false, isAddNick = false, isAddComment = false;;
+                //Log.i(TAG, "comment segment[" + seg.toString() + "]");
+                
+                // Parse article comment.
+                for (Iterator<Segment> nodeIterator = seg.getNodeIterator() ; nodeIterator.hasNext();) {
+                    Segment nodeSegment = nodeIterator.next();
+                    
+                    // If article body has <script>...</script>, just skip!
+                    // If <a> tag, prepare to add nick.
+                    // if <tv class="G12"> tag, prepare to add comment.
+                    if (nodeSegment instanceof StartTag) {
+                        String tagName = ((Tag)nodeSegment).getName();
+                        if (tagName.equals("script")) {
+                            isSkipSegment = true;
+                        } else if (tagName.equals("a")) {
+                            isAddNick = true;
+                        } else if (tagName.equals("td")) {
+                            String classAttr = ((StartTag)nodeSegment).getAttributeValue("class");
+                            if (classAttr != null && classAttr.equals("G12"))
+                                isAddComment = true;
+                        }
+                        continue;
+                    
+                    } else if (nodeSegment instanceof EndTag) {
+                        String tagName = ((Tag)nodeSegment).getName();
+                        if (tagName.equals("script")) {
+                            isSkipSegment = false;
+                        }
+                        continue;
+                        
+                    // Ignore &bnsp;
+                    } else if (nodeSegment instanceof CharacterReference) {
+                        continue;
+                        
+                    // If plain text, add it to itemComment.
+                    } else {
+                        if (!isSkipSegment) {
+                            if (isAddNick) {
+                                itemComment += ("[" + nodeSegment.getTextExtractor().toString() + "] : ");
+                                isAddNick = false;
+                            } else if (isAddComment) {
+                                itemComment += (nodeSegment.getTextExtractor().toString() + "\n\n");
+                                isAddComment = false;
+                            }
+                        }
+                    }
+                }
+
+                // Finish!
                 break;
             }
         }
-        
-        // Parse comment
-        // TODO
         
         mContentItem = new contentItem(itemBody, itemImgUrl, itemComment);
         Log.i(TAG, "mContentItem[" + mContentItem.toString() + "]");
