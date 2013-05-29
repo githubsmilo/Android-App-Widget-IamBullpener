@@ -62,13 +62,12 @@ public class BullpenListViewFactory implements RemoteViewsService.RemoteViewsFac
         //Log.i(TAG, "getViewAt - position[" + position + "]");
 
         // Create a RemoteView and set widget item array list to the RemoteView.
-        RemoteViews rv = new RemoteViews(mContext.getPackageName(),
-                R.layout.list_row);
-        rv.setTextViewText(android.R.id.text1, mWidgetItems.get(position).getTitle());
+        RemoteViews rv = new RemoteViews(mContext.getPackageName(), R.layout.list_row);
+        rv.setTextViewText(R.id.listRowText, mWidgetItems.get(position).getTitle());
 
         Intent fillInIntent = new Intent();
         fillInIntent.putExtra(Constants.EXTRA_ITEM_URL, mWidgetItems.get(position).getUrl());
-        rv.setOnClickFillInIntent(android.R.id.text1, fillInIntent);
+        rv.setOnClickFillInIntent(R.id.listRowText, fillInIntent);
 
         return rv;
     }

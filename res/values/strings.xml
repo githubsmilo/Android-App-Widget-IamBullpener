@@ -2,5 +2,7 @@
 
     <string name="app_name">IamBullpener</string>
     <string name="internet_not_connected_msg">Internet not connected</string>
+    <string name="listViewTitle">Bullpen</string>
+    <string name="contentViewTitle">Content</string>
 
 </resources>

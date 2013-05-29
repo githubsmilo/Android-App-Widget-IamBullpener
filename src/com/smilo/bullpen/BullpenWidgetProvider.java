@@ -109,11 +109,11 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
     
         RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.list);
         // views.setRemoteAdapter(R.id.list, serviceIntent); // For API14+
-        rv.setRemoteAdapter(appWidgetId, R.id.list1, serviceIntent);
+        rv.setRemoteAdapter(appWidgetId, R.id.listView, serviceIntent);
     
         PendingIntent linkPendingIntent = PendingIntent.getBroadcast(
                 context, 0, clickIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        rv.setPendingIntentTemplate(R.id.list1, linkPendingIntent);
+        rv.setPendingIntentTemplate(R.id.listView, linkPendingIntent);
     
         Log.i(TAG, "updateAppWidget[BaseballListViewService]");
         awm.updateAppWidget(appWidgetId, rv);
@@ -121,7 +121,7 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
             mFirstCallListViewService = false;
         } else {
             Log.i(TAG, "notifyAppWidgetViewDataChanged[BaseballListViewService]");
-            awm.notifyAppWidgetViewDataChanged(appWidgetId, R.id.list1);
+            awm.notifyAppWidgetViewDataChanged(appWidgetId, R.id.listView);
         }
     }
     
@@ -139,11 +139,11 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
     
         RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.content);
         // views.setRemoteAdapter(R.id.list, serviceIntent); // For API14+
-        rv.setRemoteAdapter(appWidgetId, R.id.list2, serviceIntent);
+        rv.setRemoteAdapter(appWidgetId, R.id.contentView, serviceIntent);
     
         PendingIntent linkPendingIntent = PendingIntent.getBroadcast(
                 context, 0, clickIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        rv.setPendingIntentTemplate(R.id.list2, linkPendingIntent);
+        rv.setPendingIntentTemplate(R.id.contentView, linkPendingIntent);
     
         Log.i(TAG, "updateAppWidget[BaseballContentService]");
         awm.updateAppWidget(appWidgetId, rv);
@@ -151,7 +151,7 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
             mFirstCallContentService = false;
         } else {
             Log.i(TAG, "notifyAppWidgetViewDataChanged[BaseballContentService]");
-            awm.notifyAppWidgetViewDataChanged(appWidgetId, R.id.list2);
+            awm.notifyAppWidgetViewDataChanged(appWidgetId, R.id.contentView);
         }
     }
     
