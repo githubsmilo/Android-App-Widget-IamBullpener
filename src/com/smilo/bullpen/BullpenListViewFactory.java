@@ -141,8 +141,14 @@ public class BullpenListViewFactory implements RemoteViewsService.RemoteViewsFac
                     && table.getAttributeValue("cellspacing").equals("6")
                     && table.getAttributeValue("cellpadding").equals("0")) {
 
-                Segment content = table.getFirstElementByClass("G12read")
-                        .getContent();
+                Segment content;
+                
+                // Skip Notice
+                content= table.getFirstElementByClass("A11gray").getContent();
+                if (content.getTextExtractor().toString().equals("공지"))
+                    continue;
+                
+                content = table.getFirstElementByClass("G12read").getContent();
 
                 // Get title and url
                 String title = content.getTextExtractor().toString();
