@@ -20,6 +20,5 @@ public final class Constants {
 
     public static final String mMLBParkUrl_base = "http://mlbpark.donga.com";
     public static final String mMLBParkUrl_mlbtown = "http://mlbpark.donga.com/mbs/articleL.php?mbsC=mlbtown";
-    public static final String mMLBParkUrl_lg = "http://mlbpark.donga.com/mbs/articleL.php?mbsC=kbotown&mbsW=search&select=spf&keyword=19";
-
+    public static final String mMLBParkUrl_bullpen = "http://mlbpark.donga.com/mbs/articleL.php?mbsC=bullpen";
 }
