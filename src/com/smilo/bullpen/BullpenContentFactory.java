@@ -125,43 +125,50 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
         // Initialize widget item array list here.
         mContent = "";
 
+        // Find the same pattern with <div align="justify". This means the body of this article.
         List<Element> divs = source.getAllElements(HTMLElementName.DIV);
-
         for (int i = 0; i < divs.size(); i++) {
             Element div = divs.get(i);
-
             String value = div.getAttributeValue("align");
-            // Find the same pattern with <div align="justify"
             if (value != null && value.equals("justify")) {
                 Segment seg = div.getContent();
-                boolean isSkip = false;
-                //Log.i(TAG, "content segment[" + seg.toString() + "]");
+                boolean isSkipSegment = false;
+                Log.i(TAG, "content segment[" + seg.toString() + "]");
+                
+                // Parse article body.
                 for (Iterator<Segment> nodeIterator = seg.getNodeIterator() ; nodeIterator.hasNext();) {
                     Segment nodeSegment = nodeIterator.next();
+                    
+                    // If article body has <head>...</head>, just skip!
+                    // If <br> tag, add new line to mContent.
                     if (nodeSegment instanceof StartTag) {
                         String tagName = ((Tag)nodeSegment).getName();
                         if (tagName.equals("head")) {
-                            isSkip = true;
-                        } else if (!isSkip && tagName.equals("br")) {
+                            isSkipSegment = true;
+                        } else if (!isSkipSegment && tagName.equals("br")) {
                             mContent += "\n";
                         }
                         continue;
+                        
+                    // If </p> or </div> tag, add new line to mContent.
                     } else if (nodeSegment instanceof EndTag) {
                         String tagName = ((Tag)nodeSegment).getName();
                         if (tagName.equals("head")) {
-                            isSkip = false;
-                        } else if (!isSkip && (tagName.equals("p") || tagName.equals("div"))) {
+                            isSkipSegment = false;
+                        } else if (!isSkipSegment && (tagName.equals("p") || tagName.equals("div"))) {
                             mContent += "\n";
                         }
                         continue;
+                        
+                    // Ignore &bnsp;
                     } else if (nodeSegment instanceof CharacterReference) {
-                        // Ignore &nbsp;
                         continue;
-                    } else { // plain text
-                        if (!isSkip && (nodeSegment.isWhiteSpace() == false)) {
+                        
+                    // If plain text, add it to mContent.
+                    } else {
+                        if (!isSkipSegment && (nodeSegment.isWhiteSpace() == false)) {
                             mContent += nodeSegment.toString();
                         }
-                        continue;
                     }
                 }
                 Log.i(TAG, "mContent[" + mContent + "]");
