@@ -68,14 +68,14 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
                 if (Utils.checkInternetConnectivity(cm)) {
                     removePreviousAlarm();
                     mSelectedItemUrl = intent.getStringExtra(Constants.EXTRA_ITEM_URL);
-                    
-                    setRemoteViewToShowItem(context, awm, appWidgetIds[i]);
-        
+
                     // Send broadcast intent to update mSelectedItemUrl variable on the BullpenContentFactory.
                     // On the first time to show some item, this intent does not operate.
                     Intent broadcastIntent = new Intent(Constants.ACTION_UPDATE_URL);
                     broadcastIntent.putExtra(Constants.EXTRA_ITEM_URL, mSelectedItemUrl);
                     context.sendBroadcast(broadcastIntent);
+                    
+                    setRemoteViewToShowItem(context, awm, appWidgetIds[i]);
                 } else {
                     Toast.makeText(context, R.string.internet_not_connected_msg, Toast.LENGTH_SHORT).show();
                 }
