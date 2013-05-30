@@ -33,7 +33,7 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
 
     private static final String TAG = "BullpenContentFactory";
 
-    private contentItem mContentItem = null;;
+    private contentItem mContentItem = null;
     private Context mContext;
     private int mAppWidgetId;
     private String mSelectedItemUrl = null;
