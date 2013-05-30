@@ -152,7 +152,7 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
         if (mSelectedItemUrl != null) {
             // Parse MLBPark html data and add items to the widget item array list.
             try {
-                parseMLBParkHtmlData(mSelectedItemUrl);
+                parseMLBParkHtmlDataFullVer(mSelectedItemUrl);
                 mIsSkipFirstCallOfGetViewAt = true;
                 mIsUpdateRemoteView = true;
             } catch (IOException e) {
@@ -197,7 +197,7 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
         teardownIntentListener();
     }
 
-    private void parseMLBParkHtmlData(String urlAddress) throws IOException {
+    private void parseMLBParkHtmlDataFullVer(String urlAddress) throws IOException {
         Source source = new Source(new URL(urlAddress));
         source.fullSequentialParse();
 
@@ -327,6 +327,15 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
         return;
     }
 
+
+    private void parseMLBParkHtmlDataMobileVer(String urlAddress) throws IOException {
+     
+        // TODO : implement this!
+        
+        Log.i(TAG, "parseMLBParkHtmlData - done!");
+        return;
+    }
+    
     private Bitmap getImageBitmap(String url) { 
         Bitmap bm = null; 
         try { 
