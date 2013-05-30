@@ -46,26 +46,20 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
     //private ConnectivityManager mConnectivityManager;
     
     private class contentItem {
-        String itemBody = null;
-        String itemImgUrl = null;
-        String itemComment = null;
+        public String itemTitle = null;
+        public String itemBody = null;
+        public String itemImgUrl = null;
+        public String itemComment = null;
 
-        contentItem(String body, String imgUrl, String comment) {
+        contentItem(String title, String body, String imgUrl, String comment) {
+            itemTitle = title;
             itemBody = body;
             itemImgUrl = imgUrl;
             itemComment = comment;
         }
 
-        public String getBody() {
-            return itemBody;
-        }
-
-        public String getImgUrl() {
-            return itemImgUrl;    
-        }
-        
-        public String getComment() {
-            return itemComment;
+        public boolean isEmptyTitle() {
+            return ((itemTitle == null) || (itemTitle.equals("")));
         }
         
         public boolean isEmptyBody() {
@@ -81,7 +75,7 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
         }
         
         public String toString() {
-            return ("itemBody[" + itemBody + "], itemImgUrl[" + itemImgUrl + "], itemComment[" + itemComment + "]");
+            return ("itemTitle[" + itemTitle + "], itemBody[" + itemBody + "], itemImgUrl[" + itemImgUrl + "], itemComment[" + itemComment + "]");
         }
     }
 
@@ -112,10 +106,10 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
         if (mIsUpdateRemoteView) {
         	RemoteViews rv = new RemoteViews(mContext.getPackageName(), R.layout.content_row);
             if (mContentItem.isEmptyBody() == false)
-                rv.setTextViewText(R.id.contentRowBodyText, mContentItem.getBody());
+                rv.setTextViewText(R.id.contentRowBodyText, mContentItem.itemBody);
 
             if (mContentItem.isEmptyImgUrl() == false) {
-                mBitmap = getImageBitmap(mContentItem.getImgUrl());
+                mBitmap = getImageBitmap(mContentItem.itemImgUrl);
                 if (mBitmap != null) {
                 	//Log.i(TAG, "setImageViewBitmap - given bitmap");
                     rv.setImageViewBitmap(R.id.contentRowImage, mBitmap);
@@ -129,7 +123,7 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
             }
 
             if (mContentItem.isEmptyComment() == false)
-                rv.setTextViewText(R.id.contentRowCommentText, mContentItem.getComment());
+                rv.setTextViewText(R.id.contentRowCommentText, mContentItem.itemComment);
 
             Intent fillInIntent = new Intent();
             rv.setOnClickFillInIntent(R.id.contentRowLayout, fillInIntent);
@@ -152,7 +146,7 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
         if (mSelectedItemUrl != null) {
             // Parse MLBPark html data and add items to the widget item array list.
             try {
-                parseMLBParkHtmlDataFullVer(mSelectedItemUrl);
+                parseMLBParkHtmlDataMobileVer(mSelectedItemUrl);
                 mIsSkipFirstCallOfGetViewAt = true;
                 mIsUpdateRemoteView = true;
             } catch (IOException e) {
@@ -206,6 +200,8 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
             mBitmap = null;
         }
         
+        // TODO : parse itemTitle!
+        String itemTitle = "";
         String itemBody = "";
         String itemImgUrl = "";
         String itemComment = "";
@@ -320,7 +316,7 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
             }
         }
         
-        mContentItem = new contentItem(itemBody, itemImgUrl, itemComment);
+        mContentItem = new contentItem(itemTitle, itemBody, itemImgUrl, itemComment);
         //Log.i(TAG, "mContentItem[" + mContentItem.toString() + "]");
 
         Log.i(TAG, "parseMLBParkHtmlData - done!");
@@ -329,9 +325,132 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
 
 
     private void parseMLBParkHtmlDataMobileVer(String urlAddress) throws IOException {
-     
-        // TODO : implement this!
+        Source source = new Source(new URL(urlAddress));
+        source.fullSequentialParse();
+
+        if (mBitmap != null) {
+            mBitmap.recycle();
+            mBitmap = null;
+        }
         
+        String itemTitle = "";
+        String itemBody = "";
+        String itemImgUrl = "";
+        String itemComment = "";
+
+        List<Element> divs = source.getAllElements(HTMLElementName.DIV);
+        for (int i = 0; i < divs.size(); i++) {
+            Element div = divs.get(i);
+            String value;
+            
+            // Find the same pattern with <div align="justify". This means the body of this article.
+            value = div.getAttributeValue("align");
+            if (value != null && value.equals("justify")) {
+                Segment seg = div.getContent();
+                boolean isSkipSegment = false;
+                //Log.i(TAG, "content segment[" + seg.toString() + "]");
+                
+                // Parse article body.
+                for (Iterator<Segment> nodeIterator = seg.getNodeIterator() ; nodeIterator.hasNext();) {
+                    Segment nodeSegment = nodeIterator.next();
+                    
+                    // If article body has <head>...</head>, just skip!
+                    // If <br> tag, add new line to itemBody.
+                    // if <img> tag, add img address to itemImgUrl.
+                    if (nodeSegment instanceof StartTag) {
+                        String tagName = ((Tag)nodeSegment).getName();
+                        if (tagName.equals("head")) {
+                            isSkipSegment = true;
+                        } else if (!isSkipSegment && tagName.equals("br")) {
+                            itemBody += "\n";
+                        } else if (!isSkipSegment && tagName.equals("img")) {
+                            itemImgUrl = ((StartTag) nodeSegment).getAttributeValue("src");
+                        }
+                        continue;
+                        
+                    // If </p> or </div> tag, add new line to itemBody.
+                    } else if (nodeSegment instanceof EndTag) {
+                        String tagName = ((Tag)nodeSegment).getName();
+                        if (tagName.equals("head")) {
+                            isSkipSegment = false;
+                        } else if (!isSkipSegment && (tagName.equals("p") || tagName.equals("div"))) {
+                            itemBody += "\n";
+                        }
+                        continue;
+                        
+                    // Ignore &bnsp;
+                    } else if (nodeSegment instanceof CharacterReference) {
+                        continue;
+                        
+                    // If plain text, add it to itemBody.
+                    } else {
+                        if (!isSkipSegment && (nodeSegment.isWhiteSpace() == false)) {
+                            itemBody += nodeSegment.getTextExtractor().toString();
+                        }
+                    }
+                }
+            }
+            
+            // Find the same pattern with <div id="myArea". This means the comment of this article.
+            value = div.getAttributeValue("id");
+            if (value != null && value.equals("myArea")) {
+                Segment seg = div.getContent();
+                boolean isSkipSegment = false, isAddNick = false, isAddComment = false;;
+                //Log.i(TAG, "comment segment[" + seg.toString() + "]");
+                
+                // Parse article comment.
+                for (Iterator<Segment> nodeIterator = seg.getNodeIterator() ; nodeIterator.hasNext();) {
+                    Segment nodeSegment = nodeIterator.next();
+                    
+                    // If article body has <script>...</script>, just skip!
+                    // If <a> tag, prepare to add nick.
+                    // if <tv class="G12"> tag, prepare to add comment.
+                    if (nodeSegment instanceof StartTag) {
+                        String tagName = ((Tag)nodeSegment).getName();
+                        if (tagName.equals("script")) {
+                            isSkipSegment = true;
+                        } else if (tagName.equals("a")) {
+                            isAddNick = true;
+                        } else if (tagName.equals("td")) {
+                            String classAttr = ((StartTag)nodeSegment).getAttributeValue("class");
+                            if (classAttr != null && classAttr.equals("G12"))
+                                isAddComment = true;
+                        }
+                        continue;
+                    
+                    } else if (nodeSegment instanceof EndTag) {
+                        String tagName = ((Tag)nodeSegment).getName();
+                        if (tagName.equals("script")) {
+                            isSkipSegment = false;
+                        }
+                        continue;
+                        
+                    // Ignore &bnsp;
+                    } else if (nodeSegment instanceof CharacterReference) {
+                        continue;
+                        
+                    // If plain text, add it to itemComment.
+                    } else {
+                        if (!isSkipSegment) {
+                            if (isAddNick) {
+                                itemComment += ("[" + nodeSegment.getTextExtractor().toString() + "] : ");
+                                isAddNick = false;
+                            } else if (isAddComment) {
+                                itemComment += (nodeSegment.getTextExtractor().toString() + "\n\n");
+                                isAddComment = false;
+                            }
+                        }
+                    }
+                }
+
+                // Finish!
+                break;
+            }
+        }
+        
+        mContentItem = new contentItem(itemTitle, itemBody, itemImgUrl, itemComment);
+        //Log.i(TAG, "mContentItem[" + mContentItem.toString() + "]");
+
         Log.i(TAG, "parseMLBParkHtmlData - done!");
         return;
     }

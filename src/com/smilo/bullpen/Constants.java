@@ -16,7 +16,7 @@ public final class Constants {
     public static final String EXTRA_ITEM_URL = PACKAGE_NAME + ".EXTRA_ITEM_URL";
 
     public static final int WIDGET_UPDATE_INTERVAL_AT_MILLIS = 20000;
-    public static final int LISTVIEW_MAX_ITEM_COUNT = 10;
+    public static final int LISTVIEW_MAX_ITEM_COUNT = 20;
 
     public static final String mMLBParkUrl_base = "http://mlbpark.donga.com";
     public static final String mMLBParkUrl_mlbtown = "http://mlbpark.donga.com/mbs/articleL.php?mbsC=mlbtown";

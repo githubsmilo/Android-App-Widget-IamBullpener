@@ -36,20 +36,12 @@ public class BullpenListViewFactory implements RemoteViewsService.RemoteViewsFac
     private static boolean mIsSkipFirstCallOfGetViewAt = true;
     
     private class listItem {
-        String itemTitle;
-        String itemUrl;
+        public String itemTitle;
+        public String itemUrl;
 
         listItem(String title, String url) {
             itemTitle = title;
             itemUrl = url;
-        }
-
-        public String getTitle() {
-            return itemTitle;
-        }
-
-        public String getUrl() {
-            return itemUrl;
         }
     }
 
@@ -75,10 +67,10 @@ public class BullpenListViewFactory implements RemoteViewsService.RemoteViewsFac
 
         // Create a RemoteView and set widget item array list to the RemoteView.
         RemoteViews rv = new RemoteViews(mContext.getPackageName(), R.layout.list_row);
-        rv.setTextViewText(R.id.listRowText, mlistItems.get(position).getTitle());
+        rv.setTextViewText(R.id.listRowText, mlistItems.get(position).itemTitle);
 
         Intent fillInIntent = new Intent();
-        fillInIntent.putExtra(Constants.EXTRA_ITEM_URL, mlistItems.get(position).getUrl());
+        fillInIntent.putExtra(Constants.EXTRA_ITEM_URL, mlistItems.get(position).itemUrl);
         rv.setOnClickFillInIntent(R.id.listRowText, fillInIntent);
 
         return rv;
