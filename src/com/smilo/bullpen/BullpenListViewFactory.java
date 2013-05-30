@@ -1,10 +1,14 @@
 
 package com.smilo.bullpen;
 
+import net.htmlparser.jericho.CharacterReference;
 import net.htmlparser.jericho.Element;
+import net.htmlparser.jericho.EndTag;
 import net.htmlparser.jericho.HTMLElementName;
 import net.htmlparser.jericho.Segment;
 import net.htmlparser.jericho.Source;
+import net.htmlparser.jericho.StartTag;
+import net.htmlparser.jericho.Tag;
 
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
@@ -17,6 +21,7 @@ import android.widget.RemoteViewsService;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class BullpenListViewFactory implements RemoteViewsService.RemoteViewsFactory {
@@ -131,8 +136,6 @@ public class BullpenListViewFactory implements RemoteViewsService.RemoteViewsFac
     }
 
     private void parseMLBParkHtmlDataFullVer(String urlAddress) throws IOException {
-        Log.i(TAG, "parseMLBParkHtmlDataFullVer - start!");
-        
         Source source = new Source(new URL(urlAddress));
         source.fullSequentialParse();
 
@@ -188,8 +191,85 @@ public class BullpenListViewFactory implements RemoteViewsService.RemoteViewsFac
     }
 
     private void parseMLBParkHtmlDataMobileVer(String urlAddress) throws IOException {
-        Log.i(TAG, "parseMLBParkHtmlDataMobileVer - start!");
-        
-        // TODO : implement here!
+        Source source = new Source(new URL(urlAddress));
+        source.fullSequentialParse();
+
+        // Initialize widget item array list here.
+        mlistItems.clear();
+
+        // Find the same pattern with <ul id="mNewsList">. This means the body of this article.
+        Element ul = source.getFirstElement(HTMLElementName.UL);
+        String attrValue = ul.getAttributeValue("id");
+        if (attrValue != null && attrValue.equals("mNewsList")) {
+            List<Element> lis = ul.getAllElements(HTMLElementName.LI);
+            int addedItemCount = 0;
+            
+            for (int i = 0 ; i < lis.size() ; i++ ) {
+                Segment seg = lis.get(i).getContent();
+                String title = null, url = null;
+                boolean isAddTitle = false, isAddCommentNum = false;
+                //Log.i(TAG, "seg[" + seg.toString() + "]");
+
+                // Parse title
+                for (Iterator<Segment> nodeIterator = seg.getNodeIterator() ; nodeIterator.hasNext();) {
+                    Segment nodeSeg = nodeIterator.next();
+                    
+                    // If <a href> tag, add address to url.
+                    // if <strong> tag, prepare to add title.
+                    // If <span class="r"> tag, prepare to add comment number.
+                    if (nodeSeg instanceof StartTag) {
+                        String tagName = ((Tag)nodeSeg).getName();
+                        if (tagName.equals("a")) {
+                           url = ((StartTag) nodeSeg).getAttributeValue("href");
+                           if (url.startsWith("/")) {
+                               StringBuffer strBuf = new StringBuffer();
+                               strBuf.append(Constants.mMLBParkUrl_base);
+                               strBuf.append(url);
+                               url = strBuf.toString();
+                           }
+                        } else if (tagName.equals("strong")) {
+                            isAddTitle = true;
+                        } else if (tagName.equals("span")) {
+                            String spanClass = ((StartTag) nodeSeg).getAttributeValue("class");
+                            if (spanClass != null && spanClass.equals("r")) {
+                                isAddCommentNum = true;
+                            }
+                        }
+                        continue;
+                        
+                    } else if (nodeSeg instanceof EndTag) {
+                        // Do nothing
+                        continue;
+                        
+                     // Ignore &bnsp;
+                    } else if (nodeSeg instanceof CharacterReference) {
+                        continue;
+                        
+                    // If plain text, add it to title.
+                    } else {
+                        if (isAddTitle) {
+                            title = nodeSeg.getTextExtractor().toString();
+                            isAddTitle = false;
+                        } else if (isAddCommentNum) {
+                            title += (" [" + nodeSeg.getTextExtractor().toString() + "]");
+                            isAddCommentNum = false;
+                        }
+                    }
+                }
+                //Log.i(TAG, "parseMLBParkHtmlDataMobileVer - title[" + title + "],url[" + url + "]");
+                
+                // Add widget item array list
+                listItem item = new listItem(title, url);
+                mlistItems.add(item);
+                addedItemCount++;
+
+                if (addedItemCount == Constants.LISTVIEW_MAX_ITEM_COUNT) {
+                    Log.i(TAG, "parseMLBParkHtmlDataMobileVer - done!");
+                    return;
+                }
+            }
+        } else {
+            Log.e(TAG, "parseMLBParkHtmlDataMobileVer - Cannot find article list.");
+        }
     }
 }
