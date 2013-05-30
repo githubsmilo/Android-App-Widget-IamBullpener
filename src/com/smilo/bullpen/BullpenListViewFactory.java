@@ -248,7 +248,7 @@ public class BullpenListViewFactory implements RemoteViewsService.RemoteViewsFac
                         }
                     }
                 }
-                //Log.i(TAG, "parseMLBParkHtmlDataMobileVer - title[" + title + "],url[" + url + "]");
+                Log.i(TAG, "parseMLBParkHtmlDataMobileVer - title[" + title + "],url[" + url + "]");
                 
                 // Add widget item array list
                 listItem item = new listItem(title, url);

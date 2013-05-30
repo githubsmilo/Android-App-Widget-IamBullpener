@@ -96,7 +96,7 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
 
     @Override
     public RemoteViews getViewAt(int position) {
-        //Log.i(TAG, "getViewAt - position[" + position + "]");
+        Log.i(TAG, "getViewAt - position[" + position + "]");
         
     	if (mIsSkipFirstCallOfGetViewAt) {
     		mIsSkipFirstCallOfGetViewAt = false;
@@ -105,6 +105,9 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
 
         if (mIsUpdateRemoteView) {
         	RemoteViews rv = new RemoteViews(mContext.getPackageName(), R.layout.content_row);
+        	if (mContentItem.isEmptyTitle() == false)
+        		rv.setTextViewText(R.id.contentRowTitleText, mContentItem.itemTitle);
+        	
             if (mContentItem.isEmptyBody() == false)
                 rv.setTextViewText(R.id.contentRowBodyText, mContentItem.itemBody);
 
@@ -220,25 +223,25 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
                 
                 // Parse article body.
                 for (Iterator<Segment> nodeIterator = seg.getNodeIterator() ; nodeIterator.hasNext();) {
-                    Segment nodeSegment = nodeIterator.next();
+                    Segment nodeSeg = nodeIterator.next();
                     
                     // If article body has <head>...</head>, just skip!
                     // If <br> tag, add new line to itemBody.
                     // if <img> tag, add img address to itemImgUrl.
-                    if (nodeSegment instanceof StartTag) {
-                        String tagName = ((Tag)nodeSegment).getName();
+                    if (nodeSeg instanceof StartTag) {
+                        String tagName = ((Tag)nodeSeg).getName();
                         if (tagName.equals("head")) {
                             isSkipSegment = true;
                         } else if (!isSkipSegment && tagName.equals("br")) {
                             itemBody += "\n";
                         } else if (!isSkipSegment && tagName.equals("img")) {
-                            itemImgUrl = ((StartTag) nodeSegment).getAttributeValue("src");
+                            itemImgUrl = ((StartTag) nodeSeg).getAttributeValue("src");
                         }
                         continue;
                         
                     // If </p> or </div> tag, add new line to itemBody.
-                    } else if (nodeSegment instanceof EndTag) {
-                        String tagName = ((Tag)nodeSegment).getName();
+                    } else if (nodeSeg instanceof EndTag) {
+                        String tagName = ((Tag)nodeSeg).getName();
                         if (tagName.equals("head")) {
                             isSkipSegment = false;
                         } else if (!isSkipSegment && (tagName.equals("p") || tagName.equals("div"))) {
@@ -247,13 +250,13 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
                         continue;
                         
                     // Ignore &bnsp;
-                    } else if (nodeSegment instanceof CharacterReference) {
+                    } else if (nodeSeg instanceof CharacterReference) {
                         continue;
                         
                     // If plain text, add it to itemBody.
                     } else {
-                        if (!isSkipSegment && (nodeSegment.isWhiteSpace() == false)) {
-                            itemBody += nodeSegment.getTextExtractor().toString();
+                        if (!isSkipSegment && (nodeSeg.isWhiteSpace() == false)) {
+                            itemBody += nodeSeg.getTextExtractor().toString();
                         }
                     }
                 }
@@ -268,43 +271,43 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
                 
                 // Parse article comment.
                 for (Iterator<Segment> nodeIterator = seg.getNodeIterator() ; nodeIterator.hasNext();) {
-                    Segment nodeSegment = nodeIterator.next();
+                    Segment nodeSeg = nodeIterator.next();
                     
                     // If article body has <script>...</script>, just skip!
                     // If <a> tag, prepare to add nick.
                     // if <tv class="G12"> tag, prepare to add comment.
-                    if (nodeSegment instanceof StartTag) {
-                        String tagName = ((Tag)nodeSegment).getName();
+                    if (nodeSeg instanceof StartTag) {
+                        String tagName = ((Tag)nodeSeg).getName();
                         if (tagName.equals("script")) {
                             isSkipSegment = true;
                         } else if (tagName.equals("a")) {
                             isAddNick = true;
                         } else if (tagName.equals("td")) {
-                            String classAttr = ((StartTag)nodeSegment).getAttributeValue("class");
+                            String classAttr = ((StartTag)nodeSeg).getAttributeValue("class");
                             if (classAttr != null && classAttr.equals("G12"))
                                 isAddComment = true;
                         }
                         continue;
                     
-                    } else if (nodeSegment instanceof EndTag) {
-                        String tagName = ((Tag)nodeSegment).getName();
+                    } else if (nodeSeg instanceof EndTag) {
+                        String tagName = ((Tag)nodeSeg).getName();
                         if (tagName.equals("script")) {
                             isSkipSegment = false;
                         }
                         continue;
                         
                     // Ignore &bnsp;
-                    } else if (nodeSegment instanceof CharacterReference) {
+                    } else if (nodeSeg instanceof CharacterReference) {
                         continue;
                         
                     // If plain text, add it to itemComment.
                     } else {
                         if (!isSkipSegment) {
                             if (isAddNick) {
-                                itemComment += ("[" + nodeSegment.getTextExtractor().toString() + "] : ");
+                                itemComment += ("[" + nodeSeg.getTextExtractor().toString() + "] : ");
                                 isAddNick = false;
                             } else if (isAddComment) {
-                                itemComment += (nodeSegment.getTextExtractor().toString() + "\n\n");
+                                itemComment += (nodeSeg.getTextExtractor().toString() + "\n\n");
                                 isAddComment = false;
                             }
                         }
@@ -323,7 +326,6 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
         return;
     }
 
-
     private void parseMLBParkHtmlDataMobileVer(String urlAddress) throws IOException {
         Source source = new Source(new URL(urlAddress));
         source.fullSequentialParse();
@@ -334,6 +336,7 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
         }
         
         String itemTitle = "";
+        String itemWriter = "";
         String itemBody = "";
         String itemImgUrl = "";
         String itemComment = "";
@@ -341,56 +344,118 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
         List<Element> divs = source.getAllElements(HTMLElementName.DIV);
         for (int i = 0; i < divs.size(); i++) {
             Element div = divs.get(i);
-            String value;
+            String value = div.getAttributeValue("class");
             
-            // Find the same pattern with <div align="justify". This means the body of this article.
-            value = div.getAttributeValue("align");
-            if (value != null && value.equals("justify")) {
-                Segment seg = div.getContent();
-                boolean isSkipSegment = false;
-                //Log.i(TAG, "content segment[" + seg.toString() + "]");
+            // Find the same pattern with <div class='article'>. This means the title of this article.
+            if (value != null && value.equals("article")) {
+                Element h3 = div.getContent().getFirstElement("h3");
+                itemTitle = h3.getTextExtractor().toString();
+                continue;
+            
+            // Find the same pattern with <div class='w'>. This means the writer of this article.
+            } else if (value != null && value.equals("w")) {
+            	Segment seg = div.getContent();
+            	boolean isAddWriter = false;
+            	for (Iterator<Segment> nodeIterator = seg.getNodeIterator() ; nodeIterator.hasNext();) {
+            		Segment nodeSeg = nodeIterator.next();
+            		if (nodeSeg instanceof StartTag) {
+            			;
+            		} else if (nodeSeg instanceof EndTag) {
+            			if (((Tag) nodeSeg).getName().equals("strong")) {
+            				isAddWriter = true;
+            			}
+            		} else if (nodeSeg instanceof CharacterReference) {
+            			;
+            		} else {
+            			if (isAddWriter) {
+            				itemWriter = nodeSeg.getTextExtractor().toString();
+            				isAddWriter = false;
+            				break;
+            			}
+            		}
+            	}
+            	continue;
+            	
+            // Find the same pattern with <div class='ar_txt'>. This means the body of this article.
+            } else if (value != null && value.equals("ar_txt")) {
+            	Segment seg = div.getContent();
+            	boolean isSkipSegment = false, isSkipImgUrl = false;
+            	for (Iterator<Segment> nodeIterator = seg.getNodeIterator() ; nodeIterator.hasNext();) {
+            		Segment nodeSeg = nodeIterator.next();
+            		if (nodeSeg instanceof StartTag) {
+            			String tagName = ((Tag)nodeSeg).getName();
+            			if (tagName.equals("style")) {
+            				isSkipSegment = true;
+            			} else if (!isSkipSegment && tagName.equals("br")) {
+            				itemBody += "\n";
+                        } else if (!isSkipSegment && !isSkipImgUrl && tagName.equals("img")) {
+                            itemImgUrl = ((StartTag) nodeSeg).getAttributeValue("src");
+                            isSkipImgUrl = true;
+            			}
+            		} else if (nodeSeg instanceof EndTag) {
+            			String tagName = ((Tag)nodeSeg).getName();
+            			if (tagName.equals("style")) {
+            				isSkipSegment = false;
+            			} else if (!isSkipSegment && (tagName.equals("p") || tagName.equals("div"))) {
+                            itemBody += "\n";
+                        }
+            		} else if (nodeSeg instanceof CharacterReference) {
+            			;
+            		} else {
+            			if (!isSkipSegment && (nodeSeg.isWhiteSpace() == false)) {
+                            itemBody += nodeSeg.getTextExtractor().toString();
+                        }
+            		}
+            	}
+            	continue;
+            	
+            }
                 
+                
+                /*
                 // Parse article body.
                 for (Iterator<Segment> nodeIterator = seg.getNodeIterator() ; nodeIterator.hasNext();) {
-                    Segment nodeSegment = nodeIterator.next();
+                    Segment nodeSeg = nodeIterator.next();
                     
-                    // If article body has <head>...</head>, just skip!
-                    // If <br> tag, add new line to itemBody.
-                    // if <img> tag, add img address to itemImgUrl.
-                    if (nodeSegment instanceof StartTag) {
-                        String tagName = ((Tag)nodeSegment).getName();
-                        if (tagName.equals("head")) {
-                            isSkipSegment = true;
-                        } else if (!isSkipSegment && tagName.equals("br")) {
-                            itemBody += "\n";
-                        } else if (!isSkipSegment && tagName.equals("img")) {
-                            itemImgUrl = ((StartTag) nodeSegment).getAttributeValue("src");
-                        }
-                        continue;
-                        
-                    // If </p> or </div> tag, add new line to itemBody.
-                    } else if (nodeSegment instanceof EndTag) {
-                        String tagName = ((Tag)nodeSegment).getName();
-                        if (tagName.equals("head")) {
-                            isSkipSegment = false;
-                        } else if (!isSkipSegment && (tagName.equals("p") || tagName.equals("div"))) {
-                            itemBody += "\n";
-                        }
-                        continue;
-                        
+                    if (nodeSeg instanceof StartTag) {
+                    	String tagName = ((Tag) nodeSeg).getName();
+                    	if (tagName.equals("h3")) {
+                    		isAddTitle = true;
+                    	} else if (tagName.equals("img")) {
+                    		itemImgUrl = ((StartTag) nodeSeg).getAttributeValue("src");
+                    	}
+                    	continue;
+                    	
+                    } else if (nodeSeg instanceof EndTag) {
+                    	String tagName = ((Tag) nodeSeg).getName();
+                    	if (tagName.equals("strong")) {
+                    		isAddWriter = true;
+                    	}
+                    	continue;
+                    
                     // Ignore &bnsp;
-                    } else if (nodeSegment instanceof CharacterReference) {
+                    } else if (nodeSeg instanceof CharacterReference) {
                         continue;
-                        
-                    // If plain text, add it to itemBody.
+                    
+                     // If plain text, add it to ......
                     } else {
-                        if (!isSkipSegment && (nodeSegment.isWhiteSpace() == false)) {
-                            itemBody += nodeSegment.getTextExtractor().toString();
-                        }
+                    	if (isAddTitle) {
+                    		itemTitle = nodeSeg.getTextExtractor().toString();
+                    		isAddTitle = false;
+                    	} else if (isAddWriter) {
+                    		itemTitle = ("[" + nodeSeg.getTextExtractor().toString() + "] ") + itemTitle;
+                    		isAddWriter = false;
+                    	}
                     }
                 }
-            }
-            
+                
+            } else if (value != null && value.equals("ar_txt")) {
+            	Segment seg = div.getContent();
+            	
+            	itemBody = seg.getTextExtractor().toString();
+        	}
+        	*/
+            /*
             // Find the same pattern with <div id="myArea". This means the comment of this article.
             value = div.getAttributeValue("id");
             if (value != null && value.equals("myArea")) {
@@ -400,43 +465,43 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
                 
                 // Parse article comment.
                 for (Iterator<Segment> nodeIterator = seg.getNodeIterator() ; nodeIterator.hasNext();) {
-                    Segment nodeSegment = nodeIterator.next();
+                    Segment nodeSeg = nodeIterator.next();
                     
                     // If article body has <script>...</script>, just skip!
                     // If <a> tag, prepare to add nick.
                     // if <tv class="G12"> tag, prepare to add comment.
-                    if (nodeSegment instanceof StartTag) {
-                        String tagName = ((Tag)nodeSegment).getName();
+                    if (nodeSeg instanceof StartTag) {
+                        String tagName = ((Tag)nodeSeg).getName();
                         if (tagName.equals("script")) {
                             isSkipSegment = true;
                         } else if (tagName.equals("a")) {
                             isAddNick = true;
                         } else if (tagName.equals("td")) {
-                            String classAttr = ((StartTag)nodeSegment).getAttributeValue("class");
+                            String classAttr = ((StartTag)nodeSeg).getAttributeValue("class");
                             if (classAttr != null && classAttr.equals("G12"))
                                 isAddComment = true;
                         }
                         continue;
                     
-                    } else if (nodeSegment instanceof EndTag) {
-                        String tagName = ((Tag)nodeSegment).getName();
+                    } else if (nodeSeg instanceof EndTag) {
+                        String tagName = ((Tag)nodeSeg).getName();
                         if (tagName.equals("script")) {
                             isSkipSegment = false;
                         }
                         continue;
                         
                     // Ignore &bnsp;
-                    } else if (nodeSegment instanceof CharacterReference) {
+                    } else if (nodeSeg instanceof CharacterReference) {
                         continue;
                         
                     // If plain text, add it to itemComment.
                     } else {
                         if (!isSkipSegment) {
                             if (isAddNick) {
-                                itemComment += ("[" + nodeSegment.getTextExtractor().toString() + "] : ");
+                                itemComment += ("[" + nodeSeg.getTextExtractor().toString() + "] : ");
                                 isAddNick = false;
                             } else if (isAddComment) {
-                                itemComment += (nodeSegment.getTextExtractor().toString() + "\n\n");
+                                itemComment += (nodeSeg.getTextExtractor().toString() + "\n\n");
                                 isAddComment = false;
                             }
                         }
@@ -446,10 +511,11 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
                 // Finish!
                 break;
             }
+                    */
         }
         
-        mContentItem = new contentItem(itemTitle, itemBody, itemImgUrl, itemComment);
-        //Log.i(TAG, "mContentItem[" + mContentItem.toString() + "]");
+        mContentItem = new contentItem((itemTitle + " by " + itemWriter), itemBody, itemImgUrl, itemComment);
+        Log.i(TAG, "mContentItem[" + mContentItem.toString() + "]");
 
         Log.i(TAG, "parseMLBParkHtmlData - done!");
         return;
