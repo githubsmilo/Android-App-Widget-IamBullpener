@@ -6,4 +6,9 @@
   android:initialLayout="@layout/list"
   android:autoAdvanceViewId="@+id/listView"
   android:resizeMode="horizontal|vertical" >
+  <!--
+  android:configure=
+  android:previewImage=
+  -->
+  <!-- android:widgetCategory="home_screen|keyguard" for Android 4.2-->
 </appwidget-provider>
