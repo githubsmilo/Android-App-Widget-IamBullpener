@@ -190,10 +190,19 @@ public class BullpenListViewFactory implements RemoteViewsService.RemoteViewsFac
         mlistItems.clear();
 
         // Find the same pattern with <ul id="mNewsList">. This means the body of this article.
-        Element ul = source.getFirstElement(HTMLElementName.UL);
-        String attrValue = ul.getAttributeValue("id");
-        if (attrValue != null && attrValue.equals("mNewsList")) {
-            List<Element> lis = ul.getAllElements(HTMLElementName.LI);
+        List<Element> uls = source.getAllElements(HTMLElementName.UL);
+        Element targetUl = null;
+        for (int i = 0 ; i < uls.size() ; i++ ) {
+            Element ul = uls.get(i);
+            String idAttr = ul.getAttributeValue("id");
+            if (idAttr != null && idAttr.equals("mNewsList")) {
+                targetUl = ul;
+                break;
+            }
+        }
+
+        if (targetUl.isEmpty() == false) {
+            List<Element> lis = targetUl.getAllElements(HTMLElementName.LI);
             int addedItemCount = 0;
             
             for (int i = 0 ; i < lis.size() ; i++ ) {
@@ -248,7 +257,7 @@ public class BullpenListViewFactory implements RemoteViewsService.RemoteViewsFac
                         }
                     }
                 }
-                Log.i(TAG, "parseMLBParkHtmlDataMobileVer - title[" + title + "],url[" + url + "]");
+                //Log.i(TAG, "parseMLBParkHtmlDataMobileVer - title[" + title + "],url[" + url + "]");
                 
                 // Add widget item array list
                 listItem item = new listItem(title, url);
