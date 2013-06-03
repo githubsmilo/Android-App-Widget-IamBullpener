@@ -98,31 +98,31 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
     public RemoteViews getViewAt(int position) {
         Log.i(TAG, "getViewAt - position[" + position + "]");
         
-    	if (mIsSkipFirstCallOfGetViewAt) {
-    		mIsSkipFirstCallOfGetViewAt = false;
-    		return null;
-    	}
+        if (mIsSkipFirstCallOfGetViewAt) {
+            mIsSkipFirstCallOfGetViewAt = false;
+            return null;
+        }
 
         if (mIsUpdateRemoteView) {
-        	RemoteViews rv = new RemoteViews(mContext.getPackageName(), R.layout.content_row);
-        	if (mContentItem.isEmptyTitle() == false)
-        		rv.setTextViewText(R.id.contentRowTitleText, mContentItem.itemTitle);
-        	
+            RemoteViews rv = new RemoteViews(mContext.getPackageName(), R.layout.content_row);
+            if (mContentItem.isEmptyTitle() == false)
+                rv.setTextViewText(R.id.contentRowTitleText, mContentItem.itemTitle);
+            
             if (mContentItem.isEmptyBody() == false)
                 rv.setTextViewText(R.id.contentRowBodyText, mContentItem.itemBody);
 
             if (mContentItem.isEmptyImgUrl() == false) {
                 mBitmap = getImageBitmap(mContentItem.itemImgUrl);
                 if (mBitmap != null) {
-                	//Log.i(TAG, "setImageViewBitmap - given bitmap");
+                    //Log.i(TAG, "setImageViewBitmap - given bitmap");
                     rv.setImageViewBitmap(R.id.contentRowImage, mBitmap);
                 } else {
-                	//Log.i(TAG, "setImageViewBitmap - null1");
-                	rv.setImageViewBitmap(R.id.contentRowImage, null);
+                    //Log.i(TAG, "setImageViewBitmap - null1");
+                    rv.setImageViewBitmap(R.id.contentRowImage, null);
                 }
             } else {
-            	//Log.i(TAG, "setImageViewBitmap - null2");
-            	rv.setImageViewBitmap(R.id.contentRowImage, null);
+                //Log.i(TAG, "setImageViewBitmap - null2");
+                rv.setImageViewBitmap(R.id.contentRowImage, null);
             }
 
             if (mContentItem.isEmptyComment() == false)
@@ -136,7 +136,7 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
         }
         
         return null;
-    	
+        
     }
     
     @Override
@@ -354,92 +354,97 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
             
             // Find the same pattern with <div class='w'>. This means the writer of this article.
             } else if (value != null && value.equals("w")) {
-            	Segment seg = div.getContent();
-            	boolean isAddWriter = false;
-            	for (Iterator<Segment> nodeIterator = seg.getNodeIterator() ; nodeIterator.hasNext();) {
-            		Segment nodeSeg = nodeIterator.next();
-            		if (nodeSeg instanceof StartTag) {
-            			;
-            		} else if (nodeSeg instanceof EndTag) {
-            			if (((Tag) nodeSeg).getName().equals("strong")) {
-            				isAddWriter = true;
-            			}
-            		} else if (nodeSeg instanceof CharacterReference) {
-            			;
-            		} else {
-            			if (isAddWriter) {
-            				itemWriter = nodeSeg.getTextExtractor().toString();
-            				isAddWriter = false;
-            				break;
-            			}
-            		}
-            	}
-            	continue;
-            	
+                Segment seg = div.getContent();
+                boolean isAddWriter = false;
+                for (Iterator<Segment> nodeIterator = seg.getNodeIterator() ; nodeIterator.hasNext();) {
+                    Segment nodeSeg = nodeIterator.next();
+                    if (nodeSeg instanceof StartTag) {
+                        ;
+                    } else if (nodeSeg instanceof EndTag) {
+                        if (((Tag) nodeSeg).getName().equals("strong")) {
+                            isAddWriter = true;
+                        }
+                    } else if (nodeSeg instanceof CharacterReference) {
+                        ;
+                    } else {
+                        if (isAddWriter) {
+                            itemWriter = nodeSeg.getTextExtractor().toString();
+                            isAddWriter = false;
+                            break;
+                        }
+                    }
+                }
+                continue;
+                
             // Find the same pattern with <div class='ar_txt'>. This means the body of this article.
             } else if (value != null && value.equals("ar_txt")) {
-            	Segment seg = div.getContent();
-            	boolean isSkipSegment = false, isSkipImgUrl = false;
-            	for (Iterator<Segment> nodeIterator = seg.getNodeIterator() ; nodeIterator.hasNext();) {
-            		Segment nodeSeg = nodeIterator.next();
-            		if (nodeSeg instanceof StartTag) {
-            			String tagName = ((Tag)nodeSeg).getName();
-            			if (tagName.equals("style")) {
-            				isSkipSegment = true;
-            			} else if (!isSkipSegment && (tagName.equals("br") || tagName.equals("div"))) {
-            				itemBody += "\n";
+                Segment seg = div.getContent();
+                boolean isSkipSegment = false, isSkipImgUrl = false;
+                for (Iterator<Segment> nodeIterator = seg.getNodeIterator() ; nodeIterator.hasNext();) {
+                    Segment nodeSeg = nodeIterator.next();
+                    if (nodeSeg instanceof StartTag) {
+                        String tagName = ((Tag)nodeSeg).getName();
+                        if (tagName.equals("style")) {
+                            isSkipSegment = true;
+                        } else if (!isSkipSegment && (tagName.equals("br") || tagName.equals("div"))) {
+                            itemBody += "\n";
                         } else if (!isSkipSegment && !isSkipImgUrl && tagName.equals("img")) {
                             itemImgUrl = ((StartTag) nodeSeg).getAttributeValue("src");
                             isSkipImgUrl = true;
-            			}
-            		} else if (nodeSeg instanceof EndTag) {
-            			String tagName = ((Tag)nodeSeg).getName();
-            			if (tagName.equals("style")) {
-            				isSkipSegment = false;
-            			} else if (!isSkipSegment && tagName.equals("p")) {
+                        }
+                    } else if (nodeSeg instanceof EndTag) {
+                        String tagName = ((Tag)nodeSeg).getName();
+                        if (tagName.equals("style")) {
+                            isSkipSegment = false;
+                        } else if (!isSkipSegment && tagName.equals("p")) {
                             itemBody += "\n";
                         }
-            		} else if (nodeSeg instanceof CharacterReference) {
-            			;
-            		} else {
-            			if (!isSkipSegment && (nodeSeg.isWhiteSpace() == false)) {
+                    } else if (nodeSeg instanceof CharacterReference) {
+                        ;
+                    } else {
+                        if (!isSkipSegment && (nodeSeg.isWhiteSpace() == false)) {
                             itemBody += nodeSeg.getTextExtractor().toString();
                         }
-            		}
-            	}
-            	continue;
-            	
+                    }
+                }
+                continue;
+                
             // Find the same pattern with <div class='reply'>. This means the comment of this article.
             } else if (value != null && value.equals("reply")) {
-            	Element ul = div.getFirstElement("ul");
-            	boolean isSkipSegment = false, isAddNick = false, isAddComment = false;
-            	String tmpComment = null;
-            	for (Iterator<Segment> nodeIterator = ul.getNodeIterator() ; nodeIterator.hasNext();) {
-            		Segment nodeSeg = nodeIterator.next();
-            		if (nodeSeg instanceof StartTag) {
-            			String tagName = ((Tag)nodeSeg).getName();
-            			if (tagName.equals("strong")) {
-            				isAddComment = true;
-            			} else if (tagName.equals("span")) {
-            				String classAttr = ((StartTag) nodeSeg).getAttributeValue("class");
-            				if (classAttr != null && classAttr.equals("ti")) {
-            					isAddNick = true;
-            				}
-            			}
-            		} else if (nodeSeg instanceof EndTag) {
-            			;
-            		} else if (nodeSeg instanceof CharacterReference) {
-            			;
-            		} else {
-            			if (!isSkipSegment && isAddComment) {
-            				tmpComment = nodeSeg.getTextExtractor().toString();
-            				isAddComment = false;
-            			} else if (!isSkipSegment && isAddNick) {
-            				itemComment += ("[" + nodeSeg.getTextExtractor().toString() + "] : " + tmpComment + "\n\n");
-            				isAddNick = false;
-            			}
-            		}
-            	}
+                Element ul = div.getFirstElement("ul");
+                boolean isSkipSegment = false, isAddNick = false, isAddComment = false;
+                String tmpComment = "";
+                for (Iterator<Segment> nodeIterator = ul.getNodeIterator() ; nodeIterator.hasNext();) {
+                    Segment nodeSeg = nodeIterator.next();
+                    if (nodeSeg instanceof StartTag) {
+                        String tagName = ((Tag)nodeSeg).getName();
+                        if (tagName.equals("strong")) {
+                            isAddComment = true;
+                        } else if (tagName.equals("br")) {
+                            tmpComment += "\n";
+                        } else if (tagName.equals("span")) {
+                            String classAttr = ((StartTag) nodeSeg).getAttributeValue("class");
+                            if (classAttr != null && classAttr.equals("ti")) {
+                                isAddNick = true;
+                            }
+                        }
+                    } else if (nodeSeg instanceof EndTag) {
+                        String tagName = ((Tag)nodeSeg).getName();
+                        if (tagName.equals("strong")) {
+                            isAddComment = false;
+                        }
+                    } else if (nodeSeg instanceof CharacterReference) {
+                        ;
+                    } else {
+                        if (!isSkipSegment && isAddComment) {
+                            tmpComment += nodeSeg.getTextExtractor().toString();
+                        } else if (!isSkipSegment && isAddNick) {
+                            itemComment += ("[" + nodeSeg.getTextExtractor().toString() + "] : " + tmpComment + "\n\n");
+                            tmpComment = "";
+                            isAddNick = false;
+                        }
+                    }
+                }
 
                 // Finish!
                 break;
