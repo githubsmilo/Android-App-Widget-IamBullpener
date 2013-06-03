@@ -4,10 +4,11 @@
   android:minHeight="220dp"
   android:updatePeriodMillis="0"
   android:initialLayout="@layout/list"
+  android:configure="com.smilo.bullpen.BullpenConfigurationActivity"
   android:autoAdvanceViewId="@+id/listView"
   android:resizeMode="horizontal|vertical" >
   <!--
-  android:configure=
+  TODO :
   android:previewImage=
   -->
   <!-- android:widgetCategory="home_screen|keyguard" for Android 4.2-->

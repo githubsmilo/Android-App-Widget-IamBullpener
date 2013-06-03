@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
 
     <string name="app_name">나는 불펜人이다</string>
@@ -5,5 +6,8 @@
     <string name="listViewTitle">Bullpen</string>
     <string name="contentViewTitle">Content</string>
     <string name="imgContentDescription">content image</string>
+    <string name="title_activity_bullpen_configuration">BullpenConfigurationActivity</string>
+    <string name="action_settings">Settings</string>
+    <string name="hello_world">Hello world!</string>
 
 </resources>
