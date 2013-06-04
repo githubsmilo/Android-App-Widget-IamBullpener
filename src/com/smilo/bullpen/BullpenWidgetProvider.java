@@ -50,7 +50,7 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
             
             // This intent will be called periodically.
             if (action.equals(Constants.ACTION_APPWIDGET_UPDATE)) {
-            	updateAppWidgetToShowList(context, awm, appWidgetId);
+            	updateAppWidgetToShowList(context, awm, appWidgetId, true);
     
             // This intent will be called when some item selected.
             // EXTRA_ITEM_URL was already filled in the BullpenListViewFactory - getViewAt().
@@ -74,7 +74,7 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
             // This intent will be called when current item pressed.
             } else if (action.equals(Constants.ACTION_SHOW_LIST)) {
                 if (Utils.checkInternetConnectivity(cm)) {
-                	updateAppWidgetToShowList(context, awm, appWidgetId);
+                	updateAppWidgetToShowList(context, awm, appWidgetId, false);
                 } else {
                     Toast.makeText(context, R.string.internet_not_connected_msg, Toast.LENGTH_SHORT).show();
                 }
@@ -82,7 +82,7 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
         }
     }
 
-    private static void setRemoteViewToShowList(Context context, AppWidgetManager awm, int appWidgetId) {
+    private static void setRemoteViewToShowList(Context context, AppWidgetManager awm, int appWidgetId, boolean isNotifyDataChanged) {
         
         Intent serviceIntent, clickIntent;
         
@@ -109,8 +109,10 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
         if (mIsSkipFirstCallListViewService) {
             mIsSkipFirstCallListViewService = false;
         } else {
-            Log.i(TAG, "notifyAppWidgetViewDataChanged[BaseballListViewService]");
-            awm.notifyAppWidgetViewDataChanged(appWidgetId, R.id.listView);
+            if (isNotifyDataChanged) {
+                Log.i(TAG, "notifyAppWidgetViewDataChanged[BaseballListViewService]");
+                awm.notifyAppWidgetViewDataChanged(appWidgetId, R.id.listView);
+            }
         }
     }
     
@@ -170,13 +172,13 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
         }
     }
     
-    public static void updateAppWidgetToShowList(Context context, AppWidgetManager awm, int appWidgetId) {
-    	Log.i(TAG, "updateAppWidgetToShowList - appWidgetId[" + appWidgetId + "]");
+    public static void updateAppWidgetToShowList(Context context, AppWidgetManager awm, int appWidgetId, boolean isNotifyDataChanged) {
+    	Log.i(TAG, "updateAppWidgetToShowList - appWidgetId[" + appWidgetId + "], isNotifyDataChanged[" + isNotifyDataChanged + "]");
     	
     	removePreviousAlarm();
         setNewAlarm(context, appWidgetId);
         
-        setRemoteViewToShowList(context, awm, appWidgetId);
+        setRemoteViewToShowList(context, awm, appWidgetId, isNotifyDataChanged);
     }
     
     @Override

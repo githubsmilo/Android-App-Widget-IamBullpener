@@ -47,7 +47,7 @@ public class BullpenConfigurationActivity extends Activity {
             final Context context = BullpenConfigurationActivity.this;
 
             AppWidgetManager awm = AppWidgetManager.getInstance(context);
-            BullpenWidgetProvider.updateAppWidgetToShowList(context, awm, mAppWidgetId);
+            BullpenWidgetProvider.updateAppWidgetToShowList(context, awm, mAppWidgetId, true);
             
             Intent resultValue = new Intent();
             resultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, mAppWidgetId);
