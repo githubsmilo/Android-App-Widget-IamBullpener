@@ -172,7 +172,7 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
         clickIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
     
         RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.list);
-        rv.setTextViewText(R.id.listTitleText, getRemoteViewTitle(context));
+        rv.setTextViewText(R.id.textListTitle, getRemoteViewTitle(context));
         // views.setRemoteAdapter(R.id.list, serviceIntent); // For API14+
         rv.setRemoteAdapter(appWidgetId, R.id.listView, serviceIntent);
     
@@ -206,7 +206,7 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
         clickIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
     
         RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.content);
-        rv.setTextViewText(R.id.contentTitleText, getRemoteViewTitle(context));
+        rv.setTextViewText(R.id.textContentTitle, getRemoteViewTitle(context));
         // views.setRemoteAdapter(R.id.list, serviceIntent); // For API14+
         rv.setRemoteAdapter(appWidgetId, R.id.contentView, serviceIntent);
     

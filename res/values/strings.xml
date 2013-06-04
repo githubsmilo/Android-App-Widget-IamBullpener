@@ -6,14 +6,15 @@
     <string name="imgContentDescription">content image</string>
     <string name="action_settings">Settings</string>
 
-    <!-- Bullpen ListView -->
+    <!-- Bullpen ListView & Content -->
     <string name="remoteViewTitle_Default">RemoteView title default</string>
     <string name="remoteViewTitle_MlbTown">MLB Town</string>
     <string name="remoteViewTitle_KboTown">KBO Town</string>
     <string name="remoteViewTitle_Bullpen">Bullpen</string>
     <string name="remoteViewTitle_Bullpen1000">Bullpen 최다조회 1000 이상</string>
     <string name="remoteViewTitle_Bullpen2000">Bullpen 최다조회 2000 이상</string>
-        
+    <string name="btn_setting">Setting</string>
+    
     <!-- Bullpen configuration activity -->
     <string name="prompt_refreshTime">새로고침 시간</string>
     <string name="prompt_bullpenBoard">게시판 목록</string>
