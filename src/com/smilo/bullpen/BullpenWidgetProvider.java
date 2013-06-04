@@ -148,10 +148,12 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
     		return res.getString(R.string.remoteViewTitle_MlbTown);
     	} else if (mSelectedBullpenBoardUrl.equals(Constants.mMLBParkUrl_kbotown)) {
     		return res.getString(R.string.remoteViewTitle_KboTown);
-    	} else if (mSelectedBullpenBoardUrl.equals(Constants.mMLBParkUrl_bullpen) ||
-    			   mSelectedBullpenBoardUrl.equals(Constants.mMLBParkUrl_bullpen1000) ||
-    			   mSelectedBullpenBoardUrl.equals(Constants.mMLBParkUrl_bullpen2000)) {
+    	} else if (mSelectedBullpenBoardUrl.equals(Constants.mMLBParkUrl_bullpen)) {
     		return res.getString(R.string.remoteViewTitle_Bullpen);
+    	} else if (mSelectedBullpenBoardUrl.equals(Constants.mMLBParkUrl_bullpen1000)) {
+    		return res.getString(R.string.remoteViewTitle_Bullpen1000);
+    	} else if (mSelectedBullpenBoardUrl.equals(Constants.mMLBParkUrl_bullpen2000)) {
+    		return res.getString(R.string.remoteViewTitle_Bullpen2000);
     	} else {
     		return null;
     	}
