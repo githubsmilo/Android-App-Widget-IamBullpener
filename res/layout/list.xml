@@ -3,7 +3,7 @@
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/dark_blue_gray_background"
+        android:background="@drawable/baseball_field_grass_design"
         android:padding="@dimen/widget_margin" > 
 
     <TextView
@@ -19,3 +19,5 @@
             android:cacheColorHint="#00000000" />
 
 </LinearLayout>
+
+<!-- background image url : http://www.hdwallpapersdesktop.com/iPad/Miscellaneous/imagepages/image2.htm -->
