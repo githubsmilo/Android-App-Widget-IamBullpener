@@ -11,8 +11,10 @@ import net.htmlparser.jericho.StartTag;
 import net.htmlparser.jericho.Tag;
 
 import android.appwidget.AppWidgetManager;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.util.Log;
 import android.widget.RemoteViews;
@@ -31,6 +33,9 @@ public class BullpenListViewFactory implements RemoteViewsService.RemoteViewsFac
     private List<listItem> mlistItems = new ArrayList<listItem>();
     private Context mContext;
     private int mAppWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID;
+    private String mSelectedBullpenBoardUrl = null;
+    private BroadcastReceiver mIntentListener;
+    
     private ConnectivityManager mConnectivityManager;
 
     private static boolean mIsSkipFirstCallOfGetViewAt = true;
@@ -48,12 +53,16 @@ public class BullpenListViewFactory implements RemoteViewsService.RemoteViewsFac
     public BullpenListViewFactory(Context context, Intent intent) {
         Log.i(TAG, "constructor");
 
+        mContext = context;
         mAppWidgetId = intent.getIntExtra(
                 AppWidgetManager.EXTRA_APPWIDGET_ID,
                 AppWidgetManager.INVALID_APPWIDGET_ID);
-        mContext = context;
+        mSelectedBullpenBoardUrl = intent.getStringExtra(Constants.EXTRA_LIST_URL);
+        Log.i(TAG, "constructor - mSelectedBullpenBoardUrl[" + mSelectedBullpenBoardUrl + "]");
         
         mConnectivityManager =  (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        
+        setupIntentListener();
     }
 
     @Override
@@ -83,7 +92,7 @@ public class BullpenListViewFactory implements RemoteViewsService.RemoteViewsFac
         if (Utils.checkInternetConnectivity(mConnectivityManager)) {
             // Parse MLBPark html data and add items to the widget item array list.
             try {
-                parseMLBParkHtmlDataMobileVer(Constants.mMLBParkUrl_mlbtown);
+                parseMLBParkHtmlDataMobileVer(mSelectedBullpenBoardUrl);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -124,7 +133,7 @@ public class BullpenListViewFactory implements RemoteViewsService.RemoteViewsFac
     
     @Override
     public void onDestroy() {
-        // no-op
+        teardownIntentListener();
     }
 
     private void parseMLBParkHtmlDataFullVer(String urlAddress) throws IOException {
@@ -271,6 +280,31 @@ public class BullpenListViewFactory implements RemoteViewsService.RemoteViewsFac
             }
         } else {
             Log.e(TAG, "parseMLBParkHtmlDataMobileVer - Cannot find article list.");
+        }
+    }
+    
+
+    private void setupIntentListener() {
+        if (mIntentListener == null) {
+            mIntentListener = new BroadcastReceiver() {
+                @Override
+                public void onReceive(Context context, Intent intent) {
+                    // Update mSelectedBullpenBoardUrl through Broadcast Intent.
+                    mAppWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
+                    mSelectedBullpenBoardUrl = intent.getStringExtra(Constants.EXTRA_LIST_URL);
+                    Log.i(TAG, "onReceive - update mSelectedBullpenBoardUrl[" + mSelectedBullpenBoardUrl + "], mAppWidgetId[" + mAppWidgetId + "]");
+                }
+            };
+            IntentFilter filter = new IntentFilter();
+            filter.addAction(Constants.ACTION_UPDATE_LIST_URL);
+            mContext.registerReceiver(mIntentListener, filter);
+        }
+    }
+
+    private void teardownIntentListener() {
+        if (mIntentListener != null) {
+            mContext.unregisterReceiver(mIntentListener);
+            mIntentListener = null;
         }
     }
 }

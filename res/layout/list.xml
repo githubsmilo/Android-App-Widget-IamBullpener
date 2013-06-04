@@ -10,6 +10,7 @@
 	        android:id="@+id/listTitleText"
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
+	        android:textAppearance="?android:attr/textAppearanceLarge"
 	        android:paddingBottom="10dp"
 	        android:paddingLeft="10dp"
 	        android:paddingTop="10dp"

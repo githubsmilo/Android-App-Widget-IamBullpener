@@ -12,13 +12,18 @@ public final class Constants {
     // Actions defined by BaseballWidget
     public static final String ACTION_SHOW_LIST = PACKAGE_NAME + ".SHOW_LIST";
     public static final String ACTION_SHOW_ITEM = PACKAGE_NAME + ".SHOW_ITEM";
-    public static final String ACTION_UPDATE_URL = PACKAGE_NAME + ".UPDATE_URL";
+    public static final String ACTION_UPDATE_LIST_URL = PACKAGE_NAME + ".UPDATE_LIST_URL";
+    public static final String ACTION_UPDATE_ITEM_URL = PACKAGE_NAME + ".UPDATE_ITEM_URL";
     public static final String EXTRA_ITEM_URL = PACKAGE_NAME + ".EXTRA_ITEM_URL";
+    public static final String EXTRA_LIST_URL = PACKAGE_NAME + ".EXTRA_LIST_URL"; 
 
-    public static final int WIDGET_UPDATE_INTERVAL_AT_MILLIS = 20000;
+    public static final int DEFAULT_INTERVAL_AT_MILLIS = 20000;
     public static final int LISTVIEW_MAX_ITEM_COUNT = 20;
 
     public static final String mMLBParkUrl_base = "http://mlbpark.donga.com";
     public static final String mMLBParkUrl_mlbtown = "http://mlbpark.donga.com/mbs/articleL.php?mbsC=mlbtown";
+    public static final String mMLBParkUrl_kbotown = "http://mlbpark.donga.com/mbs/articleL.php?mbsC=kbotown";
     public static final String mMLBParkUrl_bullpen = "http://mlbpark.donga.com/mbs/articleL.php?mbsC=bullpen";
+    public static final String mMLBParkUrl_bullpen1000 = "http://mlbpark.donga.com/mbs/articleL.php?mbsC=bullpen&mbsW=search&select=hit&opt=1&keyword=1000";
+    public static final String mMLBParkUrl_bullpen2000 = "http://mlbpark.donga.com/mbs/articleL.php?mbsC=bullpen&mbsW=search&select=hit&opt=1&keyword=2000";
 }

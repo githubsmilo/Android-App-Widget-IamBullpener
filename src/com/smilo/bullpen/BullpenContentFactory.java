@@ -487,7 +487,7 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
                 }
             };
             IntentFilter filter = new IntentFilter();
-            filter.addAction(Constants.ACTION_UPDATE_URL);
+            filter.addAction(Constants.ACTION_UPDATE_ITEM_URL);
             mContext.registerReceiver(mIntentListener, filter);
         }
     }

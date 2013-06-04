@@ -12,7 +12,7 @@
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:gravity="center_vertical"
-            android:paddingLeft="6dip"
+            android:paddingLeft="10dip"
             android:minHeight="?android:attr/listPreferredItemHeight" />
         
     <ImageView
@@ -27,7 +27,7 @@
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:gravity="center_vertical"
-            android:paddingLeft="6dip"
+            android:paddingLeft="10dip"
             android:minHeight="?android:attr/listPreferredItemHeight" />
 
     <TextView
@@ -36,7 +36,7 @@
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:gravity="center_vertical"
-            android:paddingLeft="6dip"
+            android:paddingLeft="10dip"
             android:minHeight="?android:attr/listPreferredItemHeight" />
 
 </LinearLayout>

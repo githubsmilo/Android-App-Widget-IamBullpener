@@ -9,12 +9,18 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
+import android.widget.TextView;
 
 public class BullpenConfigurationActivity extends Activity {
 
     private static final String TAG = "BullpenConfigurationActivity";
     
     private int mAppWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID;
+    
+    private int mSelectedRefreshTimeType = -1, mSelectedBullpenBoardType = -1;
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,9 +32,6 @@ public class BullpenConfigurationActivity extends Activity {
         
         setContentView(R.layout.activity_bullpen_configuration);
         
-        findViewById(R.id.btnOk).setOnClickListener(mBtnOkOnClickListener);
-        findViewById(R.id.btnCancel).setOnClickListener(mBtnCancelOnClickListener);
-        
         Intent intent = getIntent();
         Bundle extras = intent.getExtras();
         if (extras != null) {
@@ -39,14 +42,48 @@ public class BullpenConfigurationActivity extends Activity {
         if (mAppWidgetId == AppWidgetManager.INVALID_APPWIDGET_ID) {
             finish();
         }
+        
+        initializeButtons();
+        initializeSpinners();
+    }
+
+    private void initializeButtons() {
+        findViewById(R.id.btnOk).setOnClickListener(mBtnOkOnClickListener);
+        findViewById(R.id.btnCancel).setOnClickListener(mBtnCancelOnClickListener);
+    }
+
+    private void initializeSpinners() {
+        Spinner spinRefreshTime = (Spinner)findViewById(R.id.spinRefreshTime);
+        ArrayAdapter<CharSequence> adapterRefreshTime = ArrayAdapter.createFromResource(this, R.array.refreshTime, android.R.layout.simple_spinner_item);
+        adapterRefreshTime.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinRefreshTime.setAdapter(adapterRefreshTime);
+        spinRefreshTime.setOnItemSelectedListener(mSpinRefreshTimeSelectedListener);
+
+        Spinner spinBullpenBoard = (Spinner)findViewById(R.id.spinBullpenBoard);
+        ArrayAdapter<CharSequence> adapterBullpenBoard = ArrayAdapter.createFromResource(this, R.array.bullpenBoard, android.R.layout.simple_spinner_item);
+        adapterBullpenBoard.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinBullpenBoard.setAdapter(adapterBullpenBoard);
+        spinBullpenBoard.setOnItemSelectedListener(mSpinBullpenBoardSelectedListener);
+        
     }
 
     View.OnClickListener mBtnOkOnClickListener = new View.OnClickListener() {
         public void onClick(View v) {
             Log.i(TAG, "Button OK clicked");
+
+            if (mSelectedRefreshTimeType < 0) {
+                mSelectedRefreshTimeType = 0;
+            }
+            if (mSelectedBullpenBoardType < 0) {
+                mSelectedBullpenBoardType = 0;
+            }
+            
+            Log.i(TAG, "mSelectedRefreshTimeType[" + mSelectedRefreshTimeType + "], mSelectedBullpenBoardType[" + mSelectedBullpenBoardType + "]");
+            
             final Context context = BullpenConfigurationActivity.this;
             AppWidgetManager awm = AppWidgetManager.getInstance(context);
-            BullpenWidgetProvider.updateAppWidgetToShowList(context, awm, mAppWidgetId, true);
+            BullpenWidgetProvider.updateAppWidgetToShowList(context, awm, mAppWidgetId, true,
+                    mSelectedRefreshTimeType, mSelectedBullpenBoardType);
             
             Intent resultValue = new Intent();
             resultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, mAppWidgetId);
@@ -65,11 +102,30 @@ public class BullpenConfigurationActivity extends Activity {
         }
     };
     
+    Spinner.OnItemSelectedListener mSpinRefreshTimeSelectedListener = new AdapterView.OnItemSelectedListener() {
+        public void onItemSelected(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
+            mSelectedRefreshTimeType = arg2;
+        }
+
+        public void onNothingSelected(AdapterView<?> arg0) {
+            // Do nothing
+        }
+    };
+    
+    Spinner.OnItemSelectedListener mSpinBullpenBoardSelectedListener = new AdapterView.OnItemSelectedListener() {
+        public void onItemSelected(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
+            mSelectedBullpenBoardType = arg2;
+        }
+
+        public void onNothingSelected(AdapterView<?> arg0) {
+            // Do nothing
+        }
+    };
+    
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.bullpen_configuration, menu);
         return true;
     }
-
 }
