@@ -3,11 +3,15 @@
 
     <string name="app_name">나는 불펜人이다</string>
     <string name="internet_not_connected_msg">Internet not connected</string>
-    <string name="listViewTitle">Bullpen</string>
-    <string name="contentViewTitle">Content</string>
     <string name="imgContentDescription">content image</string>
     <string name="action_settings">Settings</string>
 
+    <!-- Bullpen ListView -->
+    <string name="remoteViewTitle_Default">RemoteView title default</string>
+    <string name="remoteViewTitle_MlbTown">MLB Town</string>
+    <string name="remoteViewTitle_KboTown">KBO Town</string>
+    <string name="remoteViewTitle_Bullpen">Bullpen</string>
+        
     <!-- Bullpen configuration activity -->
     <string name="refreshtime_prompt">새로고침 시간</string>
     <string name="board_prompt">게시판 목록</string>

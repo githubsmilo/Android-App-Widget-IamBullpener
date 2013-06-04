@@ -9,6 +9,7 @@ import android.appwidget.AppWidgetProvider;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.net.ConnectivityManager;
 import android.util.Log;
 import android.widget.RemoteViews;
@@ -105,7 +106,6 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
 
                 removePreviousAlarm();
                 setNewAlarm(context, appWidgetId, false);
-                
                 setRemoteViewToShowList(context, awm, appWidgetId);
                 
             // This intent will be called when some item selected.
@@ -140,6 +140,23 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
         }
     }
 
+    private String getRemoteViewTitle(Context context) {
+    	Resources res = context.getResources();
+    	if (mSelectedBullpenBoardUrl == null) {
+    		return res.getString(R.string.remoteViewTitle_Default);
+    	} else if (mSelectedBullpenBoardUrl.equals(Constants.mMLBParkUrl_mlbtown)) {
+    		return res.getString(R.string.remoteViewTitle_MlbTown);
+    	} else if (mSelectedBullpenBoardUrl.equals(Constants.mMLBParkUrl_kbotown)) {
+    		return res.getString(R.string.remoteViewTitle_KboTown);
+    	} else if (mSelectedBullpenBoardUrl.equals(Constants.mMLBParkUrl_bullpen) ||
+    			   mSelectedBullpenBoardUrl.equals(Constants.mMLBParkUrl_bullpen1000) ||
+    			   mSelectedBullpenBoardUrl.equals(Constants.mMLBParkUrl_bullpen2000)) {
+    		return res.getString(R.string.remoteViewTitle_Bullpen);
+    	} else {
+    		return null;
+    	}
+    }
+    
     private void setRemoteViewToShowList(Context context, AppWidgetManager awm, int appWidgetId) {
         
         Intent serviceIntent, clickIntent;
@@ -153,6 +170,7 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
         clickIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
     
         RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.list);
+        rv.setTextViewText(R.id.listTitleText, getRemoteViewTitle(context));
         // views.setRemoteAdapter(R.id.list, serviceIntent); // For API14+
         rv.setRemoteAdapter(appWidgetId, R.id.listView, serviceIntent);
     
@@ -186,6 +204,7 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
         clickIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
     
         RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.content);
+        rv.setTextViewText(R.id.contentTitleText, getRemoteViewTitle(context));
         // views.setRemoteAdapter(R.id.list, serviceIntent); // For API14+
         rv.setRemoteAdapter(appWidgetId, R.id.contentView, serviceIntent);
     
