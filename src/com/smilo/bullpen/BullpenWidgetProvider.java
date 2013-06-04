@@ -50,14 +50,70 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
             return;
         }
         
-        for (int i=0 ; i<appWidgetIds.length ; i++) {
+        for (int id : appWidgetIds) {
             
             // This intent will be called periodically.
             if (action.equals(Constants.ACTION_APPWIDGET_UPDATE)) {
-            	updateAppWidgetToShowList(context, awm, appWidgetId, true);
+
+                removePreviousAlarm();
+                setNewAlarm(context, appWidgetId, false);
+                setRemoteViewToShowList(context, awm, appWidgetId, true);
     
-            } else if (action.equals("android.appwidget.action.APPWIDGET_DELETED")) {
-                removeWidget(context, appWidgetId);
+            } else if (action.equals(Constants.ACTION_INIT_LIST)) {
+                int selectedRefreshTimeType = intent.getIntExtra(Constants.EXTRA_REFRESH_TIME_TYPE, -1);
+                int selectedBullpenBoardType = intent.getIntExtra(Constants.EXTRA_BULLPEN_BOARD_TYPE, -1);
+
+                switch (selectedRefreshTimeType) {
+                    case 0: // 30 sec
+                        mSelectedRefreshTime = 60000 / 2;
+                        break;
+                    case 1: // 1 min
+                        mSelectedRefreshTime = 60000;
+                        break;
+                    case 2: // 5 min
+                        mSelectedRefreshTime = 60000 * 5;
+                        break;
+                    case 3: // 10 min
+                        mSelectedRefreshTime = 60000 * 10;
+                        break;
+                    case 4: // 30 min
+                        mSelectedRefreshTime = 60000 * 30;
+                        break; 
+                    default:
+                        mSelectedRefreshTime = Constants.DEFAULT_INTERVAL_AT_MILLIS;
+                }
+                
+                switch (selectedBullpenBoardType) {
+                    case 0 : // MLB 타운
+                        mSelectedBullpenBoardUrl = Constants.mMLBParkUrl_mlbtown;
+                        break;
+                    case 1 : // 한국야구 타운
+                        mSelectedBullpenBoardUrl = Constants.mMLBParkUrl_kbotown;
+                        break;
+                    case 2 : // BULLPEN
+                        mSelectedBullpenBoardUrl = Constants.mMLBParkUrl_bullpen;
+                        break;
+                    case 3 : // BULLPEN 조회수 1000 이상
+                        mSelectedBullpenBoardUrl = Constants.mMLBParkUrl_bullpen1000;
+                        break;
+                    case 4 : // BULLPEN 조회수 2000 이상
+                        mSelectedBullpenBoardUrl = Constants.mMLBParkUrl_bullpen2000;
+                        break;
+                    default:
+                        mSelectedBullpenBoardUrl = Constants.mMLBParkUrl_mlbtown;
+                }
+
+                removePreviousAlarm();
+                setNewAlarm(context, appWidgetId, true);
+                
+                // Send broadcast intent to update mSelectedBullpenBoardUrl variable on the BullpenListViewFactory.
+                // On the first time to show some item, this intent does not operate.
+                Intent broadcastIntent = new Intent(Constants.ACTION_UPDATE_LIST_URL);
+                broadcastIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
+                broadcastIntent.putExtra(Constants.EXTRA_LIST_URL, mSelectedBullpenBoardUrl);
+                context.sendBroadcast(broadcastIntent);
+
+                setRemoteViewToShowList(context, awm, appWidgetId, false);
                 
             // This intent will be called when some item selected.
             // EXTRA_ITEM_URL was already filled in the BullpenListViewFactory - getViewAt().
@@ -81,7 +137,9 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
             // This intent will be called when current item pressed.
             } else if (action.equals(Constants.ACTION_SHOW_LIST)) {
                 if (Utils.checkInternetConnectivity(cm)) {
-                	updateAppWidgetToShowList(context, awm, appWidgetId, false);
+                    removePreviousAlarm();
+                    setNewAlarm(context, appWidgetId, false);
+                    setRemoteViewToShowList(context, awm, appWidgetId, false);
                 } else {
                     Toast.makeText(context, R.string.internet_not_connected_msg, Toast.LENGTH_SHORT).show();
                 }
@@ -89,7 +147,7 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
         }
     }
 
-    private static void setRemoteViewToShowList(Context context, AppWidgetManager awm, int appWidgetId, boolean isNotifyDataChanged) {
+    private void setRemoteViewToShowList(Context context, AppWidgetManager awm, int appWidgetId, boolean isNotifyDataChanged) {
         
         Intent serviceIntent, clickIntent;
         
@@ -124,13 +182,13 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
         }
     }
     
-    private static void setRemoteViewToShowItem(Context context, AppWidgetManager awm, int appWidgetId) {
+    private void setRemoteViewToShowItem(Context context, AppWidgetManager awm, int appWidgetId) {
     
         Intent serviceIntent, clickIntent;
         
         serviceIntent = new Intent(context, BullpenContentService.class);
         serviceIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
-        serviceIntent.putExtra(Constants.EXTRA_ITEM_URL, mSelectedItemUrl); // Store mSelectedItemUrl to the serviceIntent
+        serviceIntent.putExtra(Constants.EXTRA_ITEM_URL, mSelectedItemUrl);
     
         clickIntent = new Intent(context, BullpenWidgetProvider.class);
         clickIntent.setAction(Constants.ACTION_SHOW_LIST);
@@ -157,87 +215,28 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
         }
     }
     
-    private static void setNewAlarm(Context context, int appWidgetId) {
-        Log.i(TAG, "setNewAlarm - appWidgetId[" + appWidgetId + "]");
+    private void setNewAlarm(Context context, int appWidgetId, boolean isUrgent) {
+        Log.i(TAG, "setNewAlarm - appWidgetId[" + appWidgetId + "], isUrgent[" + isUrgent + "]");
 
         Intent updateIntent = new Intent();
         updateIntent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
         updateIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
         updateIntent.setClass(context, BullpenWidgetProvider.class);
-    	
-        long firstTime = System.currentTimeMillis() + (mSelectedRefreshTime <= 0 ? Constants.DEFAULT_INTERVAL_AT_MILLIS : mSelectedRefreshTime);
+        
+        long alarmTime = System.currentTimeMillis() + (mSelectedRefreshTime <= 0 ? Constants.DEFAULT_INTERVAL_AT_MILLIS : mSelectedRefreshTime);
+        if (isUrgent) alarmTime = 0;
         mSender = PendingIntent.getBroadcast(context, 0, updateIntent, 0);
         mManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        mManager.set(AlarmManager.RTC, firstTime, mSender);
+        mManager.set(AlarmManager.RTC, alarmTime, mSender);
     }
 
-    private static void removePreviousAlarm() {
+    private void removePreviousAlarm() {
         Log.i(TAG, "removePreviousAlarm");
 
         if (mManager != null && mSender != null) {
             mSender.cancel();
             mManager.cancel(mSender);
         }
-    }
-    
-    public static void updateAppWidgetToShowList(Context context, AppWidgetManager awm, int appWidgetId, boolean isNotifyDataChanged) {
-    	Log.i(TAG, "updateAppWidgetToShowList - appWidgetId[" + appWidgetId + "], isNotifyDataChanged[" + isNotifyDataChanged + "]");
-    	
-    	removePreviousAlarm();
-        setNewAlarm(context, appWidgetId);
-        
-        setRemoteViewToShowList(context, awm, appWidgetId, isNotifyDataChanged);
-    }
-    
-    public static void updateAppWidgetToShowList(Context context, AppWidgetManager awm, int appWidgetId, boolean isNotifyDataChanged,
-            int selectedRefreshTimeType, int selectedBullpenBoardType) {
-        Log.i(TAG, "updateAppWidgetToShowList - appWidgetId[" + appWidgetId + "], isNotifyDataChanged[" + isNotifyDataChanged +
-                "], selectedRefreshTimeType[" + selectedRefreshTimeType + "], selectedBullpenBoardType[" + selectedBullpenBoardType + "]");
-        
-        switch (selectedRefreshTimeType) {
-            case 0: // 30 sec
-                mSelectedRefreshTime = 60000 / 2;
-                break;
-            case 1: // 1 min
-                mSelectedRefreshTime = 60000;
-                break;
-            case 2: // 5 min
-                mSelectedRefreshTime = 60000 * 5;
-                break;
-            case 3: // 10 min
-                mSelectedRefreshTime = 60000 * 10;
-                break;
-            case 4: // 30 min
-                mSelectedRefreshTime = 60000 * 30;
-                break; 
-        }
-        
-        switch (selectedBullpenBoardType) {
-            case 0 : // MLB 타운
-                mSelectedBullpenBoardUrl = Constants.mMLBParkUrl_mlbtown;
-                break;
-            case 1 : // 한국야구 타운
-                mSelectedBullpenBoardUrl = Constants.mMLBParkUrl_kbotown;
-                break;
-            case 2 : // BULLPEN
-                mSelectedBullpenBoardUrl = Constants.mMLBParkUrl_bullpen;
-                break;
-            case 3 : // BULLPEN 조회수 1000 이상
-                mSelectedBullpenBoardUrl = Constants.mMLBParkUrl_bullpen1000;
-                break;
-            case 4 : // BULLPEN 조회수 2000 이상
-                mSelectedBullpenBoardUrl = Constants.mMLBParkUrl_bullpen2000;
-                break;
-        }
-        
-        // Send broadcast intent to update mSelectedBullpenBoardUrl variable on the BullpenListViewFactory.
-        // On the first time to show some item, this intent does not operate.
-        Intent broadcastIntent = new Intent(Constants.ACTION_UPDATE_LIST_URL);
-        broadcastIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
-        broadcastIntent.putExtra(Constants.EXTRA_LIST_URL, mSelectedBullpenBoardUrl);
-        context.sendBroadcast(broadcastIntent);
-        
-        updateAppWidgetToShowList(context, awm, appWidgetId, isNotifyDataChanged);
     }
     
     public static void removeWidget(Context context, int appWidgetId) {

@@ -36,9 +36,9 @@ public class BullpenListViewFactory implements RemoteViewsService.RemoteViewsFac
     private String mSelectedBullpenBoardUrl = null;
     private BroadcastReceiver mIntentListener;
     
-    private ConnectivityManager mConnectivityManager;
-
     private static boolean mIsSkipFirstCallOfGetViewAt = true;
+
+    private ConnectivityManager mConnectivityManager;
     
     private class listItem {
         public String itemTitle;

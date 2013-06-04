@@ -136,7 +136,6 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
         }
         
         return null;
-        
     }
     
     @Override
