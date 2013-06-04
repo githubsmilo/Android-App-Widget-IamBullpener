@@ -30,7 +30,7 @@ public class BullpenListViewFactory implements RemoteViewsService.RemoteViewsFac
 
     private List<listItem> mlistItems = new ArrayList<listItem>();
     private Context mContext;
-    private int mAppWidgetId;
+    private int mAppWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID;
     private ConnectivityManager mConnectivityManager;
 
     private static boolean mIsSkipFirstCallOfGetViewAt = true;

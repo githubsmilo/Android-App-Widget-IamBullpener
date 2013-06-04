@@ -6,8 +6,8 @@ public final class Constants {
     public static final String PACKAGE_NAME = "com.smilo.bullpen";
 
     // Actions predefined by Google
+    public static final String ACTION_APPWIDGET_ENABLD = "android.appwidget.action.APPWIDGET_ENABLED";
     public static final String ACTION_APPWIDGET_UPDATE = "android.appwidget.action.APPWIDGET_UPDATE";
-    public static final String ACTION_APPWIDGET_DISABLED = "android.appwidget.action.APPWIDGET_DISABLED";
     
     // Actions defined by BaseballWidget
     public static final String ACTION_SHOW_LIST = PACKAGE_NAME + ".SHOW_LIST";

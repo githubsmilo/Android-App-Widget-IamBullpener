@@ -35,7 +35,7 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
 
     private contentItem mContentItem = null;
     private Context mContext;
-    private int mAppWidgetId;
+    private int mAppWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID;
     private String mSelectedItemUrl = null;
     private BroadcastReceiver mIntentListener;
     private Bitmap mBitmap = null;
@@ -452,7 +452,7 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
         }
         
         mContentItem = new contentItem((itemTitle + " by " + itemWriter), itemBody, itemImgUrl, itemComment);
-        Log.i(TAG, "mContentItem[" + mContentItem.toString() + "]");
+        //Log.i(TAG, "mContentItem[" + mContentItem.toString() + "]");
 
         Log.i(TAG, "parseMLBParkHtmlData - done!");
         return;
@@ -481,8 +481,9 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
                 @Override
                 public void onReceive(Context context, Intent intent) {
                     // Update mSelectedItemUrl through Broadcast Intent.
-                    Log.i(TAG, "onReceive - update mSelectedItemUrl[" + mSelectedItemUrl + "]");
+                    mAppWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
                     mSelectedItemUrl = intent.getStringExtra(Constants.EXTRA_ITEM_URL);
+                    Log.i(TAG, "onReceive - update mSelectedItemUrl[" + mSelectedItemUrl + "], mAppWidgetId[" + mAppWidgetId + "]");
                 }
             };
             IntentFilter filter = new IntentFilter();

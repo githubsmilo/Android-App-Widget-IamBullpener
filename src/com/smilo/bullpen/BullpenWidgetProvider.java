@@ -22,9 +22,6 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
     
     // the alarm manager to refresh bullpen widget periodically.
     private static AlarmManager mManager;
-
-    // the intent to save [android.appwidget.action.APPWIDGET_UPDATE] intent.
-    private static Intent mAppWidgetUpdateIntent;
     
     // the url string to show selected item.
     private static String mSelectedItemUrl = null;
@@ -41,27 +38,20 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
         AppWidgetManager awm = AppWidgetManager.getInstance(context);
 
         String action = intent.getAction();
+        int appWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,  AppWidgetManager.INVALID_APPWIDGET_ID);
         int[] appWidgetIds = awm.getAppWidgetIds(new ComponentName(context, getClass()));
-        Log.i(TAG, "onReceive - action[" + action + "], appWidgetsNum[" + appWidgetIds.length + "]");
+        Log.i(TAG, "onReceive - action[" + action + "], appWidgetId[" + appWidgetId + "], appWidgetsNum[" + appWidgetIds.length + "]");
 
+        if (appWidgetId <= AppWidgetManager.INVALID_APPWIDGET_ID) {
+            return;
+        }
+        
         for (int i=0 ; i<appWidgetIds.length ; i++) {
             
-            // APPWIDGET_UPDATE intent ////////////////////
             // This intent will be called periodically.
             if (action.equals(Constants.ACTION_APPWIDGET_UPDATE)) {
-                // Refresh alarm setting
-                mAppWidgetUpdateIntent = intent;
-                removePreviousAlarm();
-                setNewAlarm(context);
-
-                setRemoteViewToShowList(context, awm, appWidgetIds[i], true);
+            	updateAppWidgetToShowList(context, awm, appWidgetId);
     
-            // APPWIDGET_DISABLED intent ////////////////////
-            // This intent will be called when Bullpen widget removed. 
-            } else if (action.equals(Constants.ACTION_APPWIDGET_DISABLED)) {
-                removePreviousAlarm();
-
-            // ACTION_SHOW_ITEM intent ////////////////////
             // This intent will be called when some item selected.
             // EXTRA_ITEM_URL was already filled in the BullpenListViewFactory - getViewAt().
             } else if (action.equals(Constants.ACTION_SHOW_ITEM)) {
@@ -72,23 +62,19 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
                     // Send broadcast intent to update mSelectedItemUrl variable on the BullpenContentFactory.
                     // On the first time to show some item, this intent does not operate.
                     Intent broadcastIntent = new Intent(Constants.ACTION_UPDATE_URL);
+                    broadcastIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
                     broadcastIntent.putExtra(Constants.EXTRA_ITEM_URL, mSelectedItemUrl);
                     context.sendBroadcast(broadcastIntent);
                     
-                    setRemoteViewToShowItem(context, awm, appWidgetIds[i]);
+                    setRemoteViewToShowItem(context, awm, appWidgetId);
                 } else {
                     Toast.makeText(context, R.string.internet_not_connected_msg, Toast.LENGTH_SHORT).show();
                 }
 
-            // ACTION_SHOW_LIST intent ////////////////////
             // This intent will be called when current item pressed.
             } else if (action.equals(Constants.ACTION_SHOW_LIST)) {
                 if (Utils.checkInternetConnectivity(cm)) {
-                    // Refresh alarm setting
-                    removePreviousAlarm();
-                    setNewAlarm(context);
-        
-                    setRemoteViewToShowList(context, awm, appWidgetIds[i], false);
+                	updateAppWidgetToShowList(context, awm, appWidgetId);
                 } else {
                     Toast.makeText(context, R.string.internet_not_connected_msg, Toast.LENGTH_SHORT).show();
                 }
@@ -96,7 +82,7 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
         }
     }
 
-    private void setRemoteViewToShowList(Context context, AppWidgetManager awm, int appWidgetId, boolean isNotifyDataChanged) {
+    private static void setRemoteViewToShowList(Context context, AppWidgetManager awm, int appWidgetId) {
         
         Intent serviceIntent, clickIntent;
         
@@ -123,14 +109,12 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
         if (mIsSkipFirstCallListViewService) {
             mIsSkipFirstCallListViewService = false;
         } else {
-        	if (isNotifyDataChanged) {
-	            Log.i(TAG, "notifyAppWidgetViewDataChanged[BaseballListViewService]");
-	            awm.notifyAppWidgetViewDataChanged(appWidgetId, R.id.listView);
-        	}
+            Log.i(TAG, "notifyAppWidgetViewDataChanged[BaseballListViewService]");
+            awm.notifyAppWidgetViewDataChanged(appWidgetId, R.id.listView);
         }
     }
     
-    private void setRemoteViewToShowItem(Context context, AppWidgetManager awm, int appWidgetId) {
+    private static void setRemoteViewToShowItem(Context context, AppWidgetManager awm, int appWidgetId) {
     
         Intent serviceIntent, clickIntent;
         
@@ -163,16 +147,21 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
         }
     }
     
-    private void setNewAlarm(Context context) {
-        Log.i(TAG, "setNewAlarm");
+    private static void setNewAlarm(Context context, int appWidgetId) {
+        Log.i(TAG, "setNewAlarm - appWidgetId[" + appWidgetId + "]");
 
+        Intent updateIntent = new Intent();
+        updateIntent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
+        updateIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
+        updateIntent.setClass(context, BullpenWidgetProvider.class);
+    	
         long firstTime = System.currentTimeMillis() + Constants.WIDGET_UPDATE_INTERVAL_AT_MILLIS;
-        mSender = PendingIntent.getBroadcast(context, 0, mAppWidgetUpdateIntent, 0);
+        mSender = PendingIntent.getBroadcast(context, 0, updateIntent, 0);
         mManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         mManager.set(AlarmManager.RTC, firstTime, mSender);
     }
 
-    private void removePreviousAlarm() {
+    private static void removePreviousAlarm() {
         Log.i(TAG, "removePreviousAlarm");
 
         if (mManager != null && mSender != null) {
@@ -181,29 +170,38 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
         }
     }
     
+    public static void updateAppWidgetToShowList(Context context, AppWidgetManager awm, int appWidgetId) {
+    	Log.i(TAG, "updateAppWidgetToShowList - appWidgetId[" + appWidgetId + "]");
+    	
+    	removePreviousAlarm();
+        setNewAlarm(context, appWidgetId);
+        
+        setRemoteViewToShowList(context, awm, appWidgetId);
+    }
+    
     @Override
     public void onUpdate(Context context, AppWidgetManager awm, int[] appWidgetIds) {
         Log.i(TAG, "onUpdate");
-
         super.onUpdate(context, awm, appWidgetIds);
     }
 
     @Override
     public void onDeleted(Context context, int[] appWidgetIds) {
         Log.i(TAG, "onDeleted");
-
         super.onDeleted(context, appWidgetIds);
     }
 
     @Override
     public void onDisabled(Context context) {
         Log.i(TAG, "onDisabled");
+        removePreviousAlarm();
         super.onDisabled(context);
     }
 
     @Override
     public void onEnabled(Context context) {
         Log.i(TAG, "onEnabled");
+        removePreviousAlarm();
         super.onEnabled(context);
     }
 }
