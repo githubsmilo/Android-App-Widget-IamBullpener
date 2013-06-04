@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="refreshTime">
+        <item>30초</item>
+        <item>1분</item>
+        <item>5분</item>
+        <item>10분</item>
+        <item>30분</item>
+    </string-array>
+    <string-array name="bullpenBoard">
+        <item>MLB 타운</item>
+        <item>한국야구 타운</item>
+        <item>BULLPEN</item>
+        <item>BULLPEN 조회수 1000 이상</item>
+        <item>BULLPEN 조회수 2000 이상</item>
+    </string-array>
+</resources>
