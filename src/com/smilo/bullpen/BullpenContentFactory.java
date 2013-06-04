@@ -96,7 +96,7 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
 
     @Override
     public RemoteViews getViewAt(int position) {
-        Log.i(TAG, "getViewAt - position[" + position + "]");
+        //Log.i(TAG, "getViewAt - position[" + position + "]");
         
         if (mIsSkipFirstCallOfGetViewAt) {
             mIsSkipFirstCallOfGetViewAt = false;

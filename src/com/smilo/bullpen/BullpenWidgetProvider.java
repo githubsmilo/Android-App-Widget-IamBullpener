@@ -3,6 +3,7 @@ package com.smilo.bullpen;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
+import android.appwidget.AppWidgetHost;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.ComponentName;
@@ -181,6 +182,11 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
         setRemoteViewToShowList(context, awm, appWidgetId, isNotifyDataChanged);
     }
     
+    public static void removeWidget(Context context, int appWidgetId) {
+        AppWidgetHost host = new AppWidgetHost(context, 1);
+        host.deleteAppWidgetId(appWidgetId);
+    }
+
     @Override
     public void onUpdate(Context context, AppWidgetManager awm, int[] appWidgetIds) {
         Log.i(TAG, "onUpdate");

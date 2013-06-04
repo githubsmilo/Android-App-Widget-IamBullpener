@@ -45,7 +45,6 @@ public class BullpenConfigurationActivity extends Activity {
         public void onClick(View v) {
             Log.i(TAG, "Button OK clicked");
             final Context context = BullpenConfigurationActivity.this;
-
             AppWidgetManager awm = AppWidgetManager.getInstance(context);
             BullpenWidgetProvider.updateAppWidgetToShowList(context, awm, mAppWidgetId, true);
             
@@ -59,10 +58,9 @@ public class BullpenConfigurationActivity extends Activity {
     View.OnClickListener mBtnCancelOnClickListener = new View.OnClickListener() {
         public void onClick(View v) {
             Log.i(TAG, "Button Cancel clicked");
+            final Context context = BullpenConfigurationActivity.this;
 
-            Intent resultValue = new Intent();
-            resultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, mAppWidgetId);
-            setResult(RESULT_CANCELED);
+            BullpenWidgetProvider.removeWidget(context, mAppWidgetId);
             finish();
         }
     };
