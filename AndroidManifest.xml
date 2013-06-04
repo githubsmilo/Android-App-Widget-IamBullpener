@@ -39,7 +39,8 @@
 
         <activity
             android:name="com.smilo.bullpen.BullpenConfigurationActivity"
-            android:label="@string/title_activity_bullpen_configuration" >
+            android:theme="@android:style/Theme.Dialog"
+            android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
             </intent-filter>
