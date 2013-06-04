@@ -51,18 +51,14 @@ public class BullpenListViewFactory implements RemoteViewsService.RemoteViewsFac
     }
 
     public BullpenListViewFactory(Context context, Intent intent) {
-        Log.i(TAG, "constructor");
-
         mContext = context;
         mAppWidgetId = intent.getIntExtra(
                 AppWidgetManager.EXTRA_APPWIDGET_ID,
                 AppWidgetManager.INVALID_APPWIDGET_ID);
         mSelectedBullpenBoardUrl = intent.getStringExtra(Constants.EXTRA_LIST_URL);
-        Log.i(TAG, "constructor - mSelectedBullpenBoardUrl[" + mSelectedBullpenBoardUrl + "]");
+        Log.i(TAG, "constructor - mSelectedBullpenBoardUrl[" + mSelectedBullpenBoardUrl + "], mAppWidgetId[" + mAppWidgetId + "]");
         
         mConnectivityManager =  (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        
-        setupIntentListener();
     }
 
     @Override
@@ -133,7 +129,6 @@ public class BullpenListViewFactory implements RemoteViewsService.RemoteViewsFac
     
     @Override
     public void onDestroy() {
-        teardownIntentListener();
     }
 
     private void parseMLBParkHtmlDataFullVer(String urlAddress) throws IOException {
@@ -280,31 +275,6 @@ public class BullpenListViewFactory implements RemoteViewsService.RemoteViewsFac
             }
         } else {
             Log.e(TAG, "parseMLBParkHtmlDataMobileVer - Cannot find article list.");
-        }
-    }
-    
-
-    private void setupIntentListener() {
-        if (mIntentListener == null) {
-            mIntentListener = new BroadcastReceiver() {
-                @Override
-                public void onReceive(Context context, Intent intent) {
-                    // Update mSelectedBullpenBoardUrl through Broadcast Intent.
-                    mAppWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
-                    mSelectedBullpenBoardUrl = intent.getStringExtra(Constants.EXTRA_LIST_URL);
-                    Log.i(TAG, "onReceive - update mSelectedBullpenBoardUrl[" + mSelectedBullpenBoardUrl + "], mAppWidgetId[" + mAppWidgetId + "]");
-                }
-            };
-            IntentFilter filter = new IntentFilter();
-            filter.addAction(Constants.ACTION_UPDATE_LIST_URL);
-            mContext.registerReceiver(mIntentListener, filter);
-        }
-    }
-
-    private void teardownIntentListener() {
-        if (mIntentListener != null) {
-            mContext.unregisterReceiver(mIntentListener);
-            mIntentListener = null;
         }
     }
 }

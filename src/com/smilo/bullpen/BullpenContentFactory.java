@@ -80,14 +80,12 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
     }
 
     public BullpenContentFactory(Context context, Intent intent) {
-        Log.i(TAG, "constructor");
-
         mContext = context;
         mAppWidgetId = intent.getIntExtra(
                 AppWidgetManager.EXTRA_APPWIDGET_ID,
                 AppWidgetManager.INVALID_APPWIDGET_ID);
         mSelectedItemUrl = intent.getStringExtra(Constants.EXTRA_ITEM_URL);
-        Log.i(TAG, "constructor - mSelectedItemUrl[" + mSelectedItemUrl + "]");
+        Log.i(TAG, "constructor - mSelectedItemUrl[" + mSelectedItemUrl + "], mAppWidgetId[" + mAppWidgetId + "]");
         
         //mConnectivityManager =  (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         

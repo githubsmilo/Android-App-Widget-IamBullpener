@@ -57,7 +57,7 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
 
                 removePreviousAlarm();
                 setNewAlarm(context, appWidgetId, false);
-                setRemoteViewToShowList(context, awm, appWidgetId, true);
+                setRemoteViewToShowList(context, awm, appWidgetId);
     
             } else if (action.equals(Constants.ACTION_INIT_LIST)) {
                 int selectedRefreshTimeType = intent.getIntExtra(Constants.EXTRA_REFRESH_TIME_TYPE, -1);
@@ -104,16 +104,9 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
                 }
 
                 removePreviousAlarm();
-                setNewAlarm(context, appWidgetId, true);
+                setNewAlarm(context, appWidgetId, false);
                 
-                // Send broadcast intent to update mSelectedBullpenBoardUrl variable on the BullpenListViewFactory.
-                // On the first time to show some item, this intent does not operate.
-                Intent broadcastIntent = new Intent(Constants.ACTION_UPDATE_LIST_URL);
-                broadcastIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
-                broadcastIntent.putExtra(Constants.EXTRA_LIST_URL, mSelectedBullpenBoardUrl);
-                context.sendBroadcast(broadcastIntent);
-
-                setRemoteViewToShowList(context, awm, appWidgetId, false);
+                setRemoteViewToShowList(context, awm, appWidgetId);
                 
             // This intent will be called when some item selected.
             // EXTRA_ITEM_URL was already filled in the BullpenListViewFactory - getViewAt().
@@ -139,7 +132,7 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
                 if (Utils.checkInternetConnectivity(cm)) {
                     removePreviousAlarm();
                     setNewAlarm(context, appWidgetId, false);
-                    setRemoteViewToShowList(context, awm, appWidgetId, false);
+                    setRemoteViewToShowList(context, awm, appWidgetId);
                 } else {
                     Toast.makeText(context, R.string.internet_not_connected_msg, Toast.LENGTH_SHORT).show();
                 }
@@ -147,7 +140,7 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
         }
     }
 
-    private void setRemoteViewToShowList(Context context, AppWidgetManager awm, int appWidgetId, boolean isNotifyDataChanged) {
+    private void setRemoteViewToShowList(Context context, AppWidgetManager awm, int appWidgetId) {
         
         Intent serviceIntent, clickIntent;
         
@@ -175,10 +168,8 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
         if (mIsSkipFirstCallListViewService) {
             mIsSkipFirstCallListViewService = false;
         } else {
-            if (isNotifyDataChanged) {
-                Log.i(TAG, "notifyAppWidgetViewDataChanged[BaseballListViewService]");
-                awm.notifyAppWidgetViewDataChanged(appWidgetId, R.id.listView);
-            }
+            Log.i(TAG, "notifyAppWidgetViewDataChanged[BaseballListViewService]");
+            awm.notifyAppWidgetViewDataChanged(appWidgetId, R.id.listView);
         }
     }
     
