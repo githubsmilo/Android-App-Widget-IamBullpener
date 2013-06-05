@@ -35,75 +35,43 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
     
     private static int mSelectedRefreshTime = -1;
     private static String mSelectedBullpenBoardUrl = null;
-
+    
     @Override
     public void onReceive(Context context, Intent intent) {
         super.onReceive(context, intent);
 
-        ConnectivityManager cm =  (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        AppWidgetManager awm = AppWidgetManager.getInstance(context);
-
+        if (isInternetConnected(context) == false) {
+            Log.e(TAG, "onReceive - Internet is not connected!");
+            // TODO : internet not connected remoteview
+            return;
+        }
+        
         String action = intent.getAction();
         int appWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,  AppWidgetManager.INVALID_APPWIDGET_ID);
+        AppWidgetManager awm = AppWidgetManager.getInstance(context);
         int[] appWidgetIds = awm.getAppWidgetIds(new ComponentName(context, getClass()));
-        Log.i(TAG, "onReceive - action[" + action + "], appWidgetId[" + appWidgetId + "], appWidgetsNum[" + appWidgetIds.length + "]");
 
         if (appWidgetId <= AppWidgetManager.INVALID_APPWIDGET_ID) {
+            Log.e(TAG, "onReceive - action[" + action + "], Invalid appWidgetId[" + appWidgetId + "], appWidgetsNum[" + appWidgetIds.length + "]");
             return;
+        } else {
+            Log.i(TAG, "onReceive - action[" + action + "], appWidgetId[" + appWidgetId + "], appWidgetsNum[" + appWidgetIds.length + "]");
         }
         
         for (int id : appWidgetIds) {
             
             // This intent will be called periodically.
             if (action.equals(Constants.ACTION_APPWIDGET_UPDATE)) {
-
                 removePreviousAlarm();
                 setNewAlarm(context, appWidgetId, false);
+                
                 setRemoteViewToShowList(context, awm, appWidgetId);
     
             } else if (action.equals(Constants.ACTION_INIT_LIST)) {
                 int selectedRefreshTimeType = intent.getIntExtra(Constants.EXTRA_REFRESH_TIME_TYPE, -1);
                 int selectedBullpenBoardType = intent.getIntExtra(Constants.EXTRA_BULLPEN_BOARD_TYPE, -1);
-
-                switch (selectedRefreshTimeType) {
-                    case 0: // 30 sec
-                        mSelectedRefreshTime = 60000 / 2;
-                        break;
-                    case 1: // 1 min
-                        mSelectedRefreshTime = 60000;
-                        break;
-                    case 2: // 5 min
-                        mSelectedRefreshTime = 60000 * 5;
-                        break;
-                    case 3: // 10 min
-                        mSelectedRefreshTime = 60000 * 10;
-                        break;
-                    case 4: // 30 min
-                        mSelectedRefreshTime = 60000 * 30;
-                        break; 
-                    default:
-                        mSelectedRefreshTime = Constants.DEFAULT_INTERVAL_AT_MILLIS;
-                }
-                
-                switch (selectedBullpenBoardType) {
-                    case 0 : // MLB 타운
-                        mSelectedBullpenBoardUrl = Constants.mMLBParkUrl_mlbtown;
-                        break;
-                    case 1 : // 한국야구 타운
-                        mSelectedBullpenBoardUrl = Constants.mMLBParkUrl_kbotown;
-                        break;
-                    case 2 : // BULLPEN
-                        mSelectedBullpenBoardUrl = Constants.mMLBParkUrl_bullpen;
-                        break;
-                    case 3 : // BULLPEN 조회수 1000 이상
-                        mSelectedBullpenBoardUrl = Constants.mMLBParkUrl_bullpen1000;
-                        break;
-                    case 4 : // BULLPEN 조회수 2000 이상
-                        mSelectedBullpenBoardUrl = Constants.mMLBParkUrl_bullpen2000;
-                        break;
-                    default:
-                        mSelectedBullpenBoardUrl = Constants.mMLBParkUrl_mlbtown;
-                }
+                mSelectedRefreshTime = Utils.getRefreshTime(selectedRefreshTimeType);
+                mSelectedBullpenBoardUrl = Utils.getBullpenBoardUrl(selectedBullpenBoardType);
 
                 removePreviousAlarm();
                 setNewAlarm(context, appWidgetId, false);
@@ -120,31 +88,24 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
             // This intent will be called when some item selected.
             // EXTRA_ITEM_URL was already filled in the BullpenListViewFactory - getViewAt().
             } else if (action.equals(Constants.ACTION_SHOW_ITEM)) {
-                if (Utils.checkInternetConnectivity(cm)) {
-                    removePreviousAlarm();
-                    mSelectedItemUrl = intent.getStringExtra(Constants.EXTRA_ITEM_URL);
+                removePreviousAlarm();
+                mSelectedItemUrl = intent.getStringExtra(Constants.EXTRA_ITEM_URL);
 
-                    // Send broadcast intent to update mSelectedItemUrl variable on the BullpenContentFactory.
-                    // On the first time to show some item, this intent does not operate.
-                    Intent broadcastIntent = new Intent(Constants.ACTION_UPDATE_ITEM_URL);
-                    broadcastIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
-                    broadcastIntent.putExtra(Constants.EXTRA_ITEM_URL, mSelectedItemUrl);
-                    context.sendBroadcast(broadcastIntent);
-                    
-                    setRemoteViewToShowItem(context, awm, appWidgetId);
-                } else {
-                    Toast.makeText(context, R.string.internet_not_connected_msg, Toast.LENGTH_SHORT).show();
-                }
+                // Send broadcast intent to update mSelectedItemUrl variable on the BullpenContentFactory.
+                // On the first time to show some item, this intent does not operate.
+                Intent broadcastIntent = new Intent(Constants.ACTION_UPDATE_ITEM_URL);
+                broadcastIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
+                broadcastIntent.putExtra(Constants.EXTRA_ITEM_URL, mSelectedItemUrl);
+                context.sendBroadcast(broadcastIntent);
+                
+                setRemoteViewToShowItem(context, awm, appWidgetId);
 
             // This intent will be called when current item pressed.
             } else if (action.equals(Constants.ACTION_SHOW_LIST)) {
-                if (Utils.checkInternetConnectivity(cm)) {
-                    removePreviousAlarm();
-                    setNewAlarm(context, appWidgetId, false);
-                    setRemoteViewToShowList(context, awm, appWidgetId);
-                } else {
-                    Toast.makeText(context, R.string.internet_not_connected_msg, Toast.LENGTH_SHORT).show();
-                }
+                removePreviousAlarm();
+                setNewAlarm(context, appWidgetId, false);
+                
+                setRemoteViewToShowList(context, awm, appWidgetId);
             }
         }
     }
@@ -267,6 +228,17 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
         if (mManager != null && mSender != null) {
             mSender.cancel();
             mManager.cancel(mSender);
+        }
+    }
+    
+    private boolean isInternetConnected(Context context) {
+        ConnectivityManager cm =  (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        
+        if(Utils.checkInternetConnectivity(cm)) {
+            return true;
+        } else {
+                Toast.makeText(context, R.string.internet_not_connected_msg, Toast.LENGTH_SHORT).show();
+                return false;
         }
     }
     

@@ -139,21 +139,20 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
     @Override
     public void onDataSetChanged() {
         Log.i(TAG, "onDataSetChanged - mSelectedItemUrl[" + mSelectedItemUrl + "]");
-                
-        // We check internet connection when BaseballWidgetProvider receives intent ACTION_SHOW_ITEM.
-        // So just skip to check it here.
-        //if (Utils.checkInternetConnectivity(mConnectivityManager)) {
-        if (mSelectedItemUrl != null) {
-            // Parse MLBPark html data and add items to the widget item array list.
-            try {
-                parseMLBParkHtmlDataMobileVer(mSelectedItemUrl);
-                mIsSkipFirstCallOfGetViewAt = true;
-                mIsUpdateRemoteView = true;
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+
+        if (mSelectedItemUrl == null) {
+            Log.e(TAG, "onDataSetChanged - mSelectedItemUrl is null!");
+            return;
         }
-        //}
+        
+        // Parse MLBPark html data and add items to the widget item array list.
+        try {
+            parseMLBParkHtmlDataMobileVer(mSelectedItemUrl);
+            mIsSkipFirstCallOfGetViewAt = true;
+            mIsUpdateRemoteView = true;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
     
     @Override

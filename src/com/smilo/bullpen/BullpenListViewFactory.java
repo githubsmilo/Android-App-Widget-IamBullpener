@@ -37,6 +37,7 @@ public class BullpenListViewFactory implements RemoteViewsService.RemoteViewsFac
     private BroadcastReceiver mIntentListener;
     
     private static boolean mIsSkipFirstCallOfGetViewAt = true;
+    private static boolean mIsUpdateRemoteView = false;
 
     private ConnectivityManager mConnectivityManager;
     
@@ -72,30 +73,36 @@ public class BullpenListViewFactory implements RemoteViewsService.RemoteViewsFac
             return null;
         }
 
-        // Create a RemoteView and set widget item array list to the RemoteView.
-        RemoteViews rv = new RemoteViews(mContext.getPackageName(), R.layout.list_row);
-        rv.setTextViewText(R.id.listRowText, mlistItems.get(position).itemTitle);
+        if (mIsUpdateRemoteView) {
+            // Create a RemoteView and set widget item array list to the RemoteView.
+            RemoteViews rv = new RemoteViews(mContext.getPackageName(), R.layout.list_row);
+            rv.setTextViewText(R.id.listRowText, mlistItems.get(position).itemTitle);
 
-        Intent fillInIntent = new Intent();
-        fillInIntent.putExtra(Constants.EXTRA_ITEM_URL, mlistItems.get(position).itemUrl);
-        rv.setOnClickFillInIntent(R.id.listRowText, fillInIntent);
+            Intent fillInIntent = new Intent();
+            fillInIntent.putExtra(Constants.EXTRA_ITEM_URL, mlistItems.get(position).itemUrl);
+            rv.setOnClickFillInIntent(R.id.listRowText, fillInIntent);
 
-        return rv;
+            return rv;            
+        }
+
+        return null;
     }
 
     @Override
     public void onDataSetChanged() {
         Log.i(TAG, "onDataSetChanged - mSelectedBullpenBoardUrl[" + mSelectedBullpenBoardUrl + "]");
 
-        if (Utils.checkInternetConnectivity(mConnectivityManager)) {
-            // Parse MLBPark html data and add items to the widget item array list.
-            try {
-                parseMLBParkHtmlDataMobileVer(mSelectedBullpenBoardUrl);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        } else {
-            Log.e(TAG, "onDataSetChanged - Internet net connected!");
+        if (mSelectedBullpenBoardUrl == null) {
+            Log.e(TAG, "onDataSetChanged - mSelectedBullpenBoardUrl is null!");
+            return;
+        }
+        
+        // Parse MLBPark html data and add items to the widget item array list.
+        try {
+            parseMLBParkHtmlDataMobileVer(mSelectedBullpenBoardUrl);
+            mIsUpdateRemoteView = true;
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -195,7 +202,7 @@ public class BullpenListViewFactory implements RemoteViewsService.RemoteViewsFac
 
         // Initialize widget item array list here.
         mlistItems.clear();
-
+        
         // Find the same pattern with <ul id="mNewsList">. This means the body of this article.
         List<Element> uls = source.getAllElements(HTMLElementName.UL);
         Element targetUl = null;
