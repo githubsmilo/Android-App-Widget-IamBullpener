@@ -21,6 +21,8 @@ public class BullpenConfigurationActivity extends Activity {
     
     private int mSelectedRefreshTimeType = -1, mSelectedBullpenBoardType = -1;
     
+    private boolean mIsExecutedBySettingButton = false;
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,9 +43,17 @@ public class BullpenConfigurationActivity extends Activity {
         if (mAppWidgetId == AppWidgetManager.INVALID_APPWIDGET_ID) {
             finish();
         }
+
+        if (extras.containsKey(Constants.EXTRA_REFRESH_TIME_TYPE) &&
+              extras.containsKey(Constants.EXTRA_BULLPEN_BOARD_TYPE)) {
+            mIsExecutedBySettingButton = true;
+        }
+        
+        int refreshTimeType = extras.getInt(Constants.EXTRA_REFRESH_TIME_TYPE, 0);
+        int bullpenBoardType = extras.getInt(Constants.EXTRA_BULLPEN_BOARD_TYPE, 0);
         
         initializeButtons();
-        initializeSpinners();
+        initializeSpinners(refreshTimeType, bullpenBoardType);
     }
 
     private void initializeButtons() {
@@ -51,18 +61,20 @@ public class BullpenConfigurationActivity extends Activity {
         findViewById(R.id.btnCancel).setOnClickListener(mBtnCancelOnClickListener);
     }
 
-    private void initializeSpinners() {
+    private void initializeSpinners(int refreshTypeType, int bullpenBoardType) {
         Spinner spinRefreshTime = (Spinner)findViewById(R.id.spinRefreshTime);
         ArrayAdapter<CharSequence> adapterRefreshTime = ArrayAdapter.createFromResource(this, R.array.refreshTime, android.R.layout.simple_spinner_item);
         adapterRefreshTime.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinRefreshTime.setAdapter(adapterRefreshTime);
         spinRefreshTime.setOnItemSelectedListener(mSpinRefreshTimeSelectedListener);
+        spinRefreshTime.setSelection(refreshTypeType);
 
         Spinner spinBullpenBoard = (Spinner)findViewById(R.id.spinBullpenBoard);
         ArrayAdapter<CharSequence> adapterBullpenBoard = ArrayAdapter.createFromResource(this, R.array.bullpenBoard, android.R.layout.simple_spinner_item);
         adapterBullpenBoard.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinBullpenBoard.setAdapter(adapterBullpenBoard);
         spinBullpenBoard.setOnItemSelectedListener(mSpinBullpenBoardSelectedListener);
+        spinBullpenBoard.setSelection(bullpenBoardType);
     }
 
     View.OnClickListener mBtnOkOnClickListener = new View.OnClickListener() {
@@ -99,7 +111,9 @@ public class BullpenConfigurationActivity extends Activity {
             Log.i(TAG, "Button Cancel clicked");
             final Context context = BullpenConfigurationActivity.this;
 
-            BullpenWidgetProvider.removeWidget(context, mAppWidgetId);
+            if (mIsExecutedBySettingButton == false) {
+                BullpenWidgetProvider.removeWidget(context, mAppWidgetId);
+            }
             finish();
         }
     };

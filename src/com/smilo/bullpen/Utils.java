@@ -19,15 +19,15 @@ public final class Utils {
         if ((niWifi != null) && (niWifi.isConnected() == true)) {
                 return true;
         }
+
+        NetworkInfo mobileWifi = cm.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+        if ((mobileWifi != null) && (mobileWifi.isConnected() == true)) {
+            return true;
+        }
         
         NetworkInfo niEth = cm.getNetworkInfo(ConnectivityManager.TYPE_ETHERNET);
         if ((niEth != null) && (niEth.isConnected() == true)) {
                 return true;
-        }
-        
-        NetworkInfo mobileWifi = cm.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
-        if ((mobileWifi != null) && (mobileWifi.isConnected() == true)) {
-            return true;
         }
         
         return false;
@@ -59,6 +59,32 @@ public final class Utils {
         return result;
     }
     
+    public static int getRefreshTimeType(int time) {
+        int result = -1;
+        
+        switch (time) {
+            case 60000 / 2: // 30 sec
+                result = 0;
+                break;
+            case 60000: // 1 min
+                result = 1;
+                break;
+            case 60000 * 5: // 5 min
+                result = 2;
+                break;
+            case 60000 * 10: // 10 min
+                result = 3;
+                break;
+            case 60000 * 30: // 30 min
+                result = 4;
+                break; 
+            default:
+                result = 0;
+        }
+        
+        return result;
+    }
+    
     public static String getBullpenBoardUrl(int type) {
         String result = null;
         
@@ -81,6 +107,24 @@ public final class Utils {
             default:
                 result = Constants.mMLBParkUrl_mlbtown;
         }
+        
+        return result;
+    }
+    
+    public static int getBullpenBoardType(String url) {
+        int result = -1;
+        if (url.equals(Constants.mMLBParkUrl_mlbtown))
+            result = 0;
+        else if (url.equals(Constants.mMLBParkUrl_kbotown))
+            result = 1;
+        else if (url.equals(Constants.mMLBParkUrl_bullpen))
+            result = 2;
+        else if (url.equals(Constants.mMLBParkUrl_bullpen1000))
+            result = 3;
+        else if (url.equals(Constants.mMLBParkUrl_bullpen2000))
+            result = 4;
+        else
+            result = 0;
         
         return result;
     }

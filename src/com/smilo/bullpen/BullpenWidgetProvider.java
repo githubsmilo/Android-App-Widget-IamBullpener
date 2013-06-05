@@ -40,12 +40,6 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
     public void onReceive(Context context, Intent intent) {
         super.onReceive(context, intent);
 
-        if (isInternetConnected(context) == false) {
-            Log.e(TAG, "onReceive - Internet is not connected!");
-            // TODO : internet not connected remoteview
-            return;
-        }
-        
         String action = intent.getAction();
         int appWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,  AppWidgetManager.INVALID_APPWIDGET_ID);
         AppWidgetManager awm = AppWidgetManager.getInstance(context);
@@ -56,6 +50,16 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
             return;
         } else {
             Log.i(TAG, "onReceive - action[" + action + "], appWidgetId[" + appWidgetId + "], appWidgetsNum[" + appWidgetIds.length + "]");
+        }
+
+        if (isInternetConnected(context) == false) {
+            Log.e(TAG, "onReceive - Internet is not connected!");
+            
+            removePreviousAlarm();
+            setNewAlarm(context, appWidgetId, false);
+            
+            // TODO : internet not connected remoteview
+            return;
         }
         
         for (int id : appWidgetIds) {
@@ -132,6 +136,9 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
     private PendingIntent buildConfigurationActivityIntent(Context context, int appWidgetId) {
         Intent intent = new Intent(context, BullpenConfigurationActivity.class);
         intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
+        intent.putExtra(Constants.EXTRA_REFRESH_TIME_TYPE, Utils.getRefreshTimeType(mSelectedRefreshTime));
+        intent.putExtra(Constants.EXTRA_BULLPEN_BOARD_TYPE, Utils.getBullpenBoardType(mSelectedBullpenBoardUrl));
+
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, appWidgetId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
