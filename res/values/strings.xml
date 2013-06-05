@@ -7,7 +7,7 @@
     <string name="action_settings">Settings</string>
 
     <!-- Bullpen ListView & Content -->
-    <string name="remoteViewTitle_Default">RemoteView title default</string>
+    <string name="remoteViewTitle_Default">Wait..</string>
     <string name="remoteViewTitle_MlbTown">MLB Town</string>
     <string name="remoteViewTitle_KboTown">KBO Town</string>
     <string name="remoteViewTitle_Bullpen">Bullpen</string>

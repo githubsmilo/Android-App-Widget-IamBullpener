@@ -138,7 +138,7 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
     
     @Override
     public void onDataSetChanged() {
-        Log.i(TAG, "onDataSetChanged");
+        Log.i(TAG, "onDataSetChanged - mSelectedItemUrl[" + mSelectedItemUrl + "]");
                 
         // We check internet connection when BaseballWidgetProvider receives intent ACTION_SHOW_ITEM.
         // So just skip to check it here.

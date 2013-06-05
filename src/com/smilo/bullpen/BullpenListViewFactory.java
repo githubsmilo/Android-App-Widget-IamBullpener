@@ -59,6 +59,8 @@ public class BullpenListViewFactory implements RemoteViewsService.RemoteViewsFac
         Log.i(TAG, "constructor - mSelectedBullpenBoardUrl[" + mSelectedBullpenBoardUrl + "], mAppWidgetId[" + mAppWidgetId + "]");
         
         mConnectivityManager =  (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        
+        setupIntentListener();
     }
 
     @Override
@@ -83,7 +85,7 @@ public class BullpenListViewFactory implements RemoteViewsService.RemoteViewsFac
 
     @Override
     public void onDataSetChanged() {
-        Log.i(TAG, "onDataSetChanged");
+        Log.i(TAG, "onDataSetChanged - mSelectedBullpenBoardUrl[" + mSelectedBullpenBoardUrl + "]");
 
         if (Utils.checkInternetConnectivity(mConnectivityManager)) {
             // Parse MLBPark html data and add items to the widget item array list.
@@ -129,6 +131,7 @@ public class BullpenListViewFactory implements RemoteViewsService.RemoteViewsFac
     
     @Override
     public void onDestroy() {
+    	teardownIntentListener();
     }
 
     private void parseMLBParkHtmlDataFullVer(String urlAddress) throws IOException {
@@ -277,4 +280,28 @@ public class BullpenListViewFactory implements RemoteViewsService.RemoteViewsFac
             Log.e(TAG, "parseMLBParkHtmlDataMobileVer - Cannot find article list.");
         }
     }
+    
+    private void setupIntentListener() {
+	    if (mIntentListener == null) {
+	        mIntentListener = new BroadcastReceiver() {
+	            @Override
+	            public void onReceive(Context context, Intent intent) {
+	                // Update mSelectedBullpenBoardUrl through Broadcast Intent.
+	                mAppWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
+	                mSelectedBullpenBoardUrl = intent.getStringExtra(Constants.EXTRA_LIST_URL);
+	                Log.i(TAG, "onReceive - update mSelectedBullpenBoardUrl[" + mSelectedBullpenBoardUrl + "], mAppWidgetId[" + mAppWidgetId + "]");
+	            }
+	        };
+	        IntentFilter filter = new IntentFilter();
+	        filter.addAction(Constants.ACTION_UPDATE_LIST_URL);
+	        mContext.registerReceiver(mIntentListener, filter);
+	    }
+	}
+
+	private void teardownIntentListener() {
+	    if (mIntentListener != null) {
+	        mContext.unregisterReceiver(mIntentListener);
+	        mIntentListener = null;
+	    }
+	}
 }

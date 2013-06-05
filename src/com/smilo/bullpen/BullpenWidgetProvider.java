@@ -11,6 +11,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.net.ConnectivityManager;
+import android.net.Uri;
 import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.Toast;
@@ -106,6 +107,14 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
 
                 removePreviousAlarm();
                 setNewAlarm(context, appWidgetId, false);
+                
+                // Send broadcast intent to update mSelectedBullpenBoardUrl variable on the BullpenListViewFactory.
+                // On the first time to show some item, this intent does not operate.
+                Intent broadcastIntent = new Intent(Constants.ACTION_UPDATE_LIST_URL);
+                broadcastIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
+                broadcastIntent.putExtra(Constants.EXTRA_LIST_URL, mSelectedBullpenBoardUrl);
+                context.sendBroadcast(broadcastIntent);
+                
                 setRemoteViewToShowList(context, awm, appWidgetId);
                 
             // This intent will be called when some item selected.
@@ -159,6 +168,15 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
     	}
     }
     
+    private PendingIntent buildConfigurationActivityIntent(Context context, int appWidgetId) {
+        Intent intent = new Intent(context, BullpenConfigurationActivity.class);
+        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, appWidgetId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        return pendingIntent;
+    }
+
     private void setRemoteViewToShowList(Context context, AppWidgetManager awm, int appWidgetId) {
         
         Intent serviceIntent, clickIntent;
@@ -173,6 +191,7 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
     
         RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.list);
         rv.setTextViewText(R.id.textListTitle, getRemoteViewTitle(context));
+        rv.setOnClickPendingIntent(R.id.btnListSetting, buildConfigurationActivityIntent(context, appWidgetId));
         // views.setRemoteAdapter(R.id.list, serviceIntent); // For API14+
         rv.setRemoteAdapter(appWidgetId, R.id.listView, serviceIntent);
     

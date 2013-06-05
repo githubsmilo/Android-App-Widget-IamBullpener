@@ -14,6 +14,7 @@ public final class Constants {
     public static final String ACTION_SHOW_LIST = PACKAGE_NAME + ".SHOW_LIST";
     public static final String ACTION_SHOW_ITEM = PACKAGE_NAME + ".SHOW_ITEM";
     public static final String ACTION_UPDATE_ITEM_URL = PACKAGE_NAME + ".UPDATE_ITEM_URL";
+    public static final String ACTION_UPDATE_LIST_URL = PACKAGE_NAME + ".UPDATE_LIST_URL";
     public static final String EXTRA_REFRESH_TIME_TYPE = PACKAGE_NAME + ".REFRESH_TIME_TYPE";
     public static final String EXTRA_BULLPEN_BOARD_TYPE = PACKAGE_NAME + ".BULLPEN_BOARD_TYPE";
     public static final String EXTRA_ITEM_URL = PACKAGE_NAME + ".EXTRA_ITEM_URL";
