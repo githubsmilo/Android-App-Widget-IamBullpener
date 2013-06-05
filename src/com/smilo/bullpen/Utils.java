@@ -19,7 +19,7 @@ public final class Utils {
         if ((niWifi != null) && (niWifi.isConnected() == true)) {
                 return true;
         }
-
+/*
         NetworkInfo mobileWifi = cm.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
         if ((mobileWifi != null) && (mobileWifi.isConnected() == true)) {
             return true;
@@ -29,7 +29,7 @@ public final class Utils {
         if ((niEth != null) && (niEth.isConnected() == true)) {
                 return true;
         }
-        
+*/    
         return false;
     }
     
