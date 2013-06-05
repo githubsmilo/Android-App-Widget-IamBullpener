@@ -194,6 +194,7 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
     
         RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.content);
         rv.setTextViewText(R.id.textContentTitle, getRemoteViewTitle(context));
+        rv.setOnClickPendingIntent(R.id.btnContentSetting, buildConfigurationActivityIntent(context, appWidgetId));
         // views.setRemoteAdapter(R.id.list, serviceIntent); // For API14+
         rv.setRemoteAdapter(appWidgetId, R.id.contentView, serviceIntent);
     
