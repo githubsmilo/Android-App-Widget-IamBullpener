@@ -13,13 +13,16 @@
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:gravity="center_vertical"
             android:paddingLeft="10dip"
+            android:paddingRight="10dip"
             android:minHeight="?android:attr/listPreferredItemHeight" />
         
     <ImageView
-	        android:id="@+id/contentRowImage"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:contentDescription="@string/imgContentDescription" />
+            android:id="@+id/contentRowImage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="10dip"
+            android:paddingRight="10dip"
+            android:contentDescription="@string/imgContentDescription" />
         
     <TextView
             android:id="@+id/contentRowBodyText"
@@ -28,6 +31,7 @@
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:gravity="center_vertical"
             android:paddingLeft="10dip"
+            android:paddingRight="10dip"
             android:minHeight="?android:attr/listPreferredItemHeight" />
 
     <TextView
@@ -37,6 +41,7 @@
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:gravity="center_vertical"
             android:paddingLeft="10dip"
+            android:paddingRight="10dip"
             android:minHeight="?android:attr/listPreferredItemHeight" />
 
 </LinearLayout>
