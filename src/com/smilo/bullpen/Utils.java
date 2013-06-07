@@ -1,19 +1,19 @@
 
 package com.smilo.bullpen;
 
+import android.content.Context;
+import android.content.res.Resources;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.Log;
+import android.widget.Toast;
 
 public final class Utils {
 
     private static final String TAG = "BullpenUtils";
     
-    public static boolean checkInternetConnectivity(ConnectivityManager cm) {
-        if (cm == null) {
-            Log.i(TAG, "ConnectivityManager is null!");
-            return false;
-        }
+    public static boolean isInternetConnected(Context context) {
+        ConnectivityManager cm =  (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         
         NetworkInfo niWifi = cm.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
         if ((niWifi != null) && (niWifi.isConnected() == true)) {
@@ -30,8 +30,28 @@ public final class Utils {
                 return true;
         }
 */    
+        Toast.makeText(context, R.string.internet_not_connected_msg, Toast.LENGTH_SHORT).show();
         return false;
     }
+    
+    public static String getRemoteViewTitle(Context context, String selectedUrl) {
+        Resources res = context.getResources();
+        if (selectedUrl == null) {
+                  return res.getString(R.string.remoteViewTitle_Default);
+        } else if (selectedUrl.equals(Constants.mMLBParkUrl_mlbtown)) {
+                  return res.getString(R.string.remoteViewTitle_MlbTown);
+        } else if (selectedUrl.equals(Constants.mMLBParkUrl_kbotown)) {
+                  return res.getString(R.string.remoteViewTitle_KboTown);
+        } else if (selectedUrl.equals(Constants.mMLBParkUrl_bullpen)) {
+                  return res.getString(R.string.remoteViewTitle_Bullpen);
+        } else if (selectedUrl.equals(Constants.mMLBParkUrl_bullpen1000)) {
+                  return res.getString(R.string.remoteViewTitle_Bullpen1000);
+        } else if (selectedUrl.equals(Constants.mMLBParkUrl_bullpen2000)) {
+                  return res.getString(R.string.remoteViewTitle_Bullpen2000);
+        } else {
+                  return null;
+        }
+  }
     
     public static int getRefreshTime(int type) {
         int result = -1;
@@ -52,6 +72,9 @@ public final class Utils {
             case 4: // 30 min
                 result = 60000 * 30;
                 break; 
+            case 5: // do not refresh
+                result = -1;
+                break;
             default:
                 result = Constants.DEFAULT_INTERVAL_AT_MILLIS;
         }
@@ -78,6 +101,9 @@ public final class Utils {
             case 60000 * 30: // 30 min
                 result = 4;
                 break; 
+            case -1: // do not refresh
+                result = 5;
+                break;
             default:
                 result = 0;
         }

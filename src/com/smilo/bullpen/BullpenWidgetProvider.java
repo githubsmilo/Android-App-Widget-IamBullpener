@@ -51,7 +51,7 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
             Log.i(TAG, "onReceive - action[" + action + "], appWidgetId[" + appWidgetId + "], appWidgetsNum[" + appWidgetIds.length + "]");
         }
 
-        if (isInternetConnected(context) == false) {
+        if (Utils.isInternetConnected(context) == false) {
             Log.e(TAG, "onReceive - Internet is not connected!");
             
             //removePreviousAlarm();
@@ -63,11 +63,11 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
         
         //for (int id : appWidgetIds) {
             
-            // This intent will be called periodically.
-            if (action.equals(Constants.ACTION_APPWIDGET_UPDATE)) {
-                removePreviousAlarm();
-                setNewAlarm(context, appWidgetId, false);
-                
+            // This intent(ACTION_APPWIDGET_UPDATE) will be called periodically.
+            // This intent(ACTION_SHOW_LIST) will be called when current item pressed.
+            if ((action.equals(Constants.ACTION_APPWIDGET_UPDATE)) ||
+                  (action.equals(Constants.ACTION_SHOW_LIST))) {
+                refreshAlarmSetting(context, appWidgetId);
                 setRemoteViewToShowList(context, awm, appWidgetId);
     
             } else if (action.equals(Constants.ACTION_INIT_LIST)) {
@@ -76,8 +76,8 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
                 mSelectedRefreshTime = Utils.getRefreshTime(selectedRefreshTimeType);
                 mSelectedBullpenBoardUrl = Utils.getBullpenBoardUrl(selectedBullpenBoardType);
 
-                removePreviousAlarm();
-                setNewAlarm(context, appWidgetId, false);
+                // This function must be called after updating mSelectedRefreshTime.
+                refreshAlarmSetting(context, appWidgetId);
                 
                 // Send broadcast intent to update mSelectedBullpenBoardUrl variable on the BullpenListViewFactory.
                 // On the first time to show some item, this intent does not operate.
@@ -102,34 +102,8 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
                 context.sendBroadcast(broadcastIntent);
                 
                 setRemoteViewToShowItem(context, awm, appWidgetId);
-
-            // This intent will be called when current item pressed.
-            } else if (action.equals(Constants.ACTION_SHOW_LIST)) {
-                removePreviousAlarm();
-                setNewAlarm(context, appWidgetId, false);
-                
-                setRemoteViewToShowList(context, awm, appWidgetId);
             }
        // }
-    }
-
-    private String getRemoteViewTitle(Context context) {
-    	Resources res = context.getResources();
-    	if (mSelectedBullpenBoardUrl == null) {
-    		return res.getString(R.string.remoteViewTitle_Default);
-    	} else if (mSelectedBullpenBoardUrl.equals(Constants.mMLBParkUrl_mlbtown)) {
-    		return res.getString(R.string.remoteViewTitle_MlbTown);
-    	} else if (mSelectedBullpenBoardUrl.equals(Constants.mMLBParkUrl_kbotown)) {
-    		return res.getString(R.string.remoteViewTitle_KboTown);
-    	} else if (mSelectedBullpenBoardUrl.equals(Constants.mMLBParkUrl_bullpen)) {
-    		return res.getString(R.string.remoteViewTitle_Bullpen);
-    	} else if (mSelectedBullpenBoardUrl.equals(Constants.mMLBParkUrl_bullpen1000)) {
-    		return res.getString(R.string.remoteViewTitle_Bullpen1000);
-    	} else if (mSelectedBullpenBoardUrl.equals(Constants.mMLBParkUrl_bullpen2000)) {
-    		return res.getString(R.string.remoteViewTitle_Bullpen2000);
-    	} else {
-    		return null;
-    	}
     }
 
     private PendingIntent buildListRefreshIntent(Context context, int appWidgetId) {
@@ -176,7 +150,7 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
         rv.setRemoteAdapter(appWidgetId, R.id.listView, serviceIntent);
 
         // Set title of the remoteViews.
-        rv.setTextViewText(R.id.textListTitle, getRemoteViewTitle(context));
+        rv.setTextViewText(R.id.textListTitle, Utils.getRemoteViewTitle(context, mSelectedBullpenBoardUrl));
 
         // Set refresh button of the remoteViews.
         rv.setOnClickPendingIntent(R.id.btnListRefresh, buildListRefreshIntent(context, appWidgetId));
@@ -219,7 +193,7 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
         rv.setRemoteAdapter(appWidgetId, R.id.contentView, serviceIntent);    
 
         // Set title of the remoteViews.
-        rv.setTextViewText(R.id.textContentTitle, getRemoteViewTitle(context));
+        rv.setTextViewText(R.id.textContentTitle, Utils.getRemoteViewTitle(context, mSelectedBullpenBoardUrl));
 
         // Set refresh button of the remoteViews.
         rv.setOnClickPendingIntent(R.id.btnContentRefresh, buildContentRefreshIntent(context, appWidgetId));
@@ -249,6 +223,18 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
         }
     }
     
+    private void refreshAlarmSetting(Context context, int appWidgetId) {
+        // If user does not want to refresh, just remove alarm setting.
+        if (mSelectedRefreshTime == -1) {
+            removePreviousAlarm();
+            
+        // If user wants to refresh, set new alarm.
+        } else {
+            removePreviousAlarm();
+            setNewAlarm(context, appWidgetId, false);
+        }
+    }
+    
     private void setNewAlarm(Context context, int appWidgetId, boolean isUrgent) {
         Log.i(TAG, "setNewAlarm - appWidgetId[" + appWidgetId + "], isUrgent[" + isUrgent + "]");
 
@@ -270,17 +256,6 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
         if (mManager != null && mSender != null) {
             mSender.cancel();
             mManager.cancel(mSender);
-        }
-    }
-    
-    private boolean isInternetConnected(Context context) {
-        ConnectivityManager cm =  (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        
-        if(Utils.checkInternetConnectivity(cm)) {
-            return true;
-        } else {
-                Toast.makeText(context, R.string.internet_not_connected_msg, Toast.LENGTH_SHORT).show();
-                return false;
         }
     }
     

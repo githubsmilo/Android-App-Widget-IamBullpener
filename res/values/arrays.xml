@@ -6,6 +6,7 @@
         <item>5분</item>
         <item>10분</item>
         <item>30분</item>
+        <item>새로 고침 안함</item>
     </string-array>
     <string-array name="bullpenBoard">
         <item>MLB 타운</item>
