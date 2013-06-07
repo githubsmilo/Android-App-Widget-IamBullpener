@@ -91,12 +91,11 @@ public class BullpenConfigurationActivity extends Activity {
             Log.i(TAG, "mSelectedRefreshTimeType[" + mSelectedRefreshTimeType + "], mSelectedBullpenBoardType[" + mSelectedBullpenBoardType + "]");
             
             final Context context = BullpenConfigurationActivity.this;
-            Intent initIntent = new Intent();
+            Intent initIntent = new Intent(context, BullpenWidgetProvider.class);
             initIntent.setAction(Constants.ACTION_INIT_LIST);
             initIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, mAppWidgetId);
             initIntent.putExtra(Constants.EXTRA_REFRESH_TIME_TYPE, mSelectedRefreshTimeType);
             initIntent.putExtra(Constants.EXTRA_BULLPEN_BOARD_TYPE, mSelectedBullpenBoardType);
-            initIntent.setClass(context, BullpenWidgetProvider.class);
             context.sendBroadcast(initIntent);
             
             Intent resultValue = new Intent();

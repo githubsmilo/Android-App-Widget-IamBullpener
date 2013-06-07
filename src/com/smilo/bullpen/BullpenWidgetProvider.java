@@ -60,22 +60,13 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
         
         //for (int id : appWidgetIds) {
             
-            // This intent(ACTION_APPWIDGET_UPDATE) will be called periodically.
-            // This intent(ACTION_SHOW_LIST) will be called when current item pressed.
-            if ((action.equals(Constants.ACTION_APPWIDGET_UPDATE)) ||
-                  (action.equals(Constants.ACTION_SHOW_LIST))) {
-                refreshAlarmSetting(context, appWidgetId);
-                setRemoteViewToShowList(context, awm, appWidgetId);
-    
-            } else if (action.equals(Constants.ACTION_INIT_LIST)) {
+            // After setting configuration activity, this intent will be called.
+            if (action.equals(Constants.ACTION_INIT_LIST)) {
                 int selectedRefreshTimeType = intent.getIntExtra(Constants.EXTRA_REFRESH_TIME_TYPE, -1);
                 int selectedBullpenBoardType = intent.getIntExtra(Constants.EXTRA_BULLPEN_BOARD_TYPE, -1);
                 mSelectedRefreshTime = Utils.getRefreshTime(selectedRefreshTimeType);
                 mSelectedBullpenBoardUrl = Utils.getBullpenBoardUrl(selectedBullpenBoardType);
-
-                // This function must be called after updating mSelectedRefreshTime.
-                refreshAlarmSetting(context, appWidgetId);
-                
+    
                 // Send broadcast intent to update mSelectedBullpenBoardUrl variable on the BullpenListViewFactory.
                 // On the first time to show some item, this intent does not operate.
                 Intent broadcastIntent = new Intent(Constants.ACTION_UPDATE_LIST_URL);
@@ -83,8 +74,19 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
                 broadcastIntent.putExtra(Constants.EXTRA_LIST_URL, mSelectedBullpenBoardUrl);
                 context.sendBroadcast(broadcastIntent);
                 
+                // Broadcast ACTION_SHOW_LIST intent.
+                Intent showListIntent = new Intent(context, BullpenWidgetProvider.class);
+                showListIntent.setAction(Constants.ACTION_SHOW_LIST);
+                showListIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
+                context.sendBroadcast(showListIntent);
+
+            // This intent(ACTION_APPWIDGET_UPDATE) will be called periodically.
+            // This intent(ACTION_SHOW_LIST) will be called when current item pressed.
+            } else if ((action.equals(Constants.ACTION_APPWIDGET_UPDATE)) ||
+                                (action.equals(Constants.ACTION_SHOW_LIST))) {
+                refreshAlarmSetting(context, appWidgetId);
                 setRemoteViewToShowList(context, awm, appWidgetId);
-                
+    
             // This intent will be called when some item selected.
             // EXTRA_ITEM_URL was already filled in the BullpenListViewFactory - getViewAt().
             } else if (action.equals(Constants.ACTION_SHOW_ITEM)) {
@@ -187,7 +189,7 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
         serviceIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
         serviceIntent.putExtra(Constants.EXTRA_ITEM_URL, mSelectedItemUrl);
         // views.setRemoteAdapter(R.id.contentView, serviceIntent); // For API14+
-        rv.setRemoteAdapter(appWidgetId, R.id.contentView, serviceIntent);    
+        rv.setRemoteAdapter(appWidgetId, R.id.contentView, serviceIntent);
 
         // Set title of the remoteViews.
         rv.setTextViewText(R.id.textContentTitle, Utils.getRemoteViewTitle(context, mSelectedBullpenBoardUrl));
