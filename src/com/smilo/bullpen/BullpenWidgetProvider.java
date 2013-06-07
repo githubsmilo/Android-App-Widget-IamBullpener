@@ -131,6 +131,25 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
     		return null;
     	}
     }
+
+    private PendingIntent buildListRefreshIntent(Context context, int appWidgetId) {
+        Intent intent = new Intent(context, BullpenWidgetProvider.class);
+        intent.setAction(Constants.ACTION_SHOW_LIST);
+        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        
+        return pendingIntent;
+    }
+    
+    private PendingIntent buildContentRefreshIntent(Context context, int appWidgetId) {
+        Intent intent = new Intent(context, BullpenWidgetProvider.class);
+        intent.setAction(Constants.ACTION_SHOW_ITEM);
+        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
+        intent.putExtra(Constants.EXTRA_ITEM_URL, mSelectedItemUrl);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        
+        return pendingIntent;
+    }
     
     private PendingIntent buildConfigurationActivityIntent(Context context, int appWidgetId) {
         Intent intent = new Intent(context, BullpenConfigurationActivity.class);
@@ -144,15 +163,6 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
         return pendingIntent;
     }
 
-    private PendingIntent buildListRefreshIntent(Context context, int appWidgetId) {
-        Intent intent = new Intent(context, BullpenWidgetProvider.class);
-        intent.setAction(Constants.ACTION_SHOW_LIST);
-        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        
-        return pendingIntent;
-    }
-    
     private void setRemoteViewToShowList(Context context, AppWidgetManager awm, int appWidgetId) {
 
         // Create new remoteViews.
@@ -168,11 +178,11 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
         // Set title of the remoteViews.
         rv.setTextViewText(R.id.textListTitle, getRemoteViewTitle(context));
 
-        // Set setting button of the remoteViews.
-        rv.setOnClickPendingIntent(R.id.btnListSetting, buildConfigurationActivityIntent(context, appWidgetId));
-        
         // Set refresh button of the remoteViews.
         rv.setOnClickPendingIntent(R.id.btnListRefresh, buildListRefreshIntent(context, appWidgetId));
+        
+        // Set setting button of the remoteViews.
+        rv.setOnClickPendingIntent(R.id.btnListSetting, buildConfigurationActivityIntent(context, appWidgetId));
         
         // Set a pending intent for click event to the remoteViews.
         Intent clickIntent = new Intent(context, BullpenWidgetProvider.class);
@@ -210,10 +220,13 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
 
         // Set title of the remoteViews.
         rv.setTextViewText(R.id.textContentTitle, getRemoteViewTitle(context));
+
+        // Set refresh button of the remoteViews.
+        rv.setOnClickPendingIntent(R.id.btnContentRefresh, buildContentRefreshIntent(context, appWidgetId));
         
         // Set setting button of the remoteViews.
         rv.setOnClickPendingIntent(R.id.btnContentSetting, buildConfigurationActivityIntent(context, appWidgetId));
-
+        
         // Set a pending intent for click event to the remoteViews.
         Intent clickIntent = new Intent(context, BullpenWidgetProvider.class);
         clickIntent.setAction(Constants.ACTION_SHOW_LIST);
