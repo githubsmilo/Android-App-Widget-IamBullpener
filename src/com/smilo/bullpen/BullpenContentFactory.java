@@ -33,18 +33,14 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
 
     private static final String TAG = "BullpenContentFactory";
 
-    private contentItem mContentItem = null;
-    private Context mContext;
-    private int mAppWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID;
-    private String mSelectedItemUrl = null;
-    private BroadcastReceiver mIntentListener;
-    private Bitmap mBitmap = null;
+    private static contentItem mContentItem = null;
+    private static Context mContext;
+    private static int mAppWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID;
+    private static String mSelectedItemUrl = null;
+    private static BroadcastReceiver mIntentListener;
+    private static Bitmap mBitmap = null;
+    private static boolean mIsSuccessToParse = false;
 
-    private static boolean mIsSkipFirstCallOfGetViewAt = true;
-    private static boolean mIsUpdateRemoteView = false;
-
-    //private ConnectivityManager mConnectivityManager;
-    
     private class contentItem {
         public String itemTitle = null;
         public String itemBody = null;
@@ -87,22 +83,15 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
         mSelectedItemUrl = intent.getStringExtra(Constants.EXTRA_ITEM_URL);
         Log.i(TAG, "constructor - mSelectedItemUrl[" + mSelectedItemUrl + "], mAppWidgetId[" + mAppWidgetId + "]");
         
-        //mConnectivityManager =  (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        
         setupIntentListener();
     }
 
     @Override
     public RemoteViews getViewAt(int position) {
         //Log.i(TAG, "getViewAt - position[" + position + "]");
-        
-        if (mIsSkipFirstCallOfGetViewAt) {
-            mIsSkipFirstCallOfGetViewAt = false;
-            return null;
-        }
 
-        if (mIsUpdateRemoteView) {
-            RemoteViews rv = new RemoteViews(mContext.getPackageName(), R.layout.content_row);
+        RemoteViews rv = new RemoteViews(mContext.getPackageName(), R.layout.content_row);
+        if (mIsSuccessToParse) {
             if (mContentItem.isEmptyTitle() == false)
                 rv.setTextViewText(R.id.contentRowTitleText, mContentItem.itemTitle);
             
@@ -128,12 +117,11 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
 
             Intent fillInIntent = new Intent();
             rv.setOnClickFillInIntent(R.id.contentRowLayout, fillInIntent);
-
-            mIsUpdateRemoteView = false;
-            return rv;
+        } else {
+            rv.setTextViewText(R.id.contentRowTitleText, mContext.getResources().getString(R.string.text_failedToParse));
         }
-        
-        return null;
+
+        return rv;
     }
     
     @Override
@@ -147,11 +135,11 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
         
         // Parse MLBPark html data and add items to the widget item array list.
         try {
-            parseMLBParkHtmlDataMobileVer(mSelectedItemUrl);
-            mIsSkipFirstCallOfGetViewAt = true;
-            mIsUpdateRemoteView = true;
+            mIsSuccessToParse = (parseMLBParkHtmlDataMobileVer(mSelectedItemUrl) == true) ? true : false;
         } catch (IOException e) {
+        	Log.e(TAG, "onDataSetChanged - IOException![" + e.toString() + "]");
             e.printStackTrace();
+            mIsSuccessToParse = false;
         }
     }
     
@@ -167,7 +155,10 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
 
     @Override
     public RemoteViews getLoadingView() {
-        return null;
+        RemoteViews rv = new RemoteViews(mContext.getPackageName(), R.layout.content_row);
+        rv.setTextViewText(R.id.contentRowTitleText, mContext.getResources().getString(R.string.text_loadingView));
+
+        return rv;
     }
     
     @Override
@@ -322,14 +313,14 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
         return;
     }
 
-    private void parseMLBParkHtmlDataMobileVer(String urlAddress) throws IOException {
-        Source source = new Source(new URL(urlAddress));
-        source.fullSequentialParse();
-
+    private boolean parseMLBParkHtmlDataMobileVer(String urlAddress) throws IOException {
         if (mBitmap != null) {
             mBitmap.recycle();
             mBitmap = null;
         }
+        
+        Source source = new Source(new URL(urlAddress));
+        source.fullSequentialParse();
         
         String itemTitle = "";
         String itemWriter = "";
@@ -451,7 +442,7 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
         //Log.i(TAG, "mContentItem[" + mContentItem.toString() + "]");
 
         Log.i(TAG, "parseMLBParkHtmlData - done!");
-        return;
+        return true;
     }
     
     private Bitmap getImageBitmap(String url) { 

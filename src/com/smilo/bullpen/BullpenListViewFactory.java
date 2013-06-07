@@ -15,7 +15,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.net.ConnectivityManager;
 import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
@@ -30,17 +29,13 @@ public class BullpenListViewFactory implements RemoteViewsService.RemoteViewsFac
 
     private static final String TAG = "BullpenListViewFactory";
 
-    private List<listItem> mlistItems = new ArrayList<listItem>();
-    private Context mContext;
-    private int mAppWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID;
-    private String mSelectedBullpenBoardUrl = null;
-    private BroadcastReceiver mIntentListener;
-    
-    private static boolean mIsSkipFirstCallOfGetViewAt = true;
-    private static boolean mIsUpdateRemoteView = false;
+    private static List<listItem> mlistItems = new ArrayList<listItem>();
+    private static Context mContext;
+    private static int mAppWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID;
+    private static String mSelectedBullpenBoardUrl = null;
+    private static BroadcastReceiver mIntentListener;
+    private static boolean mIsSuccessToParse = false;
 
-    private ConnectivityManager mConnectivityManager;
-    
     private class listItem {
         public String itemTitle;
         public String itemUrl;
@@ -59,33 +54,25 @@ public class BullpenListViewFactory implements RemoteViewsService.RemoteViewsFac
         mSelectedBullpenBoardUrl = intent.getStringExtra(Constants.EXTRA_LIST_URL);
         Log.i(TAG, "constructor - mSelectedBullpenBoardUrl[" + mSelectedBullpenBoardUrl + "], mAppWidgetId[" + mAppWidgetId + "]");
         
-        mConnectivityManager =  (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        
         setupIntentListener();
     }
 
     @Override
     public RemoteViews getViewAt(int position) {
         //Log.i(TAG, "getViewAt - position[" + position + "]");
-        
-        if (mIsSkipFirstCallOfGetViewAt) {
-            mIsSkipFirstCallOfGetViewAt = false;
-            return null;
-        }
 
-        if (mIsUpdateRemoteView) {
-            // Create a RemoteView and set widget item array list to the RemoteView.
-            RemoteViews rv = new RemoteViews(mContext.getPackageName(), R.layout.list_row);
+        // Create a RemoteView and set widget item array list to the RemoteView.
+        RemoteViews rv = new RemoteViews(mContext.getPackageName(), R.layout.list_row);
+        if (mIsSuccessToParse) {
             rv.setTextViewText(R.id.listRowText, mlistItems.get(position).itemTitle);
-
             Intent fillInIntent = new Intent();
             fillInIntent.putExtra(Constants.EXTRA_ITEM_URL, mlistItems.get(position).itemUrl);
             rv.setOnClickFillInIntent(R.id.listRowText, fillInIntent);
-
-            return rv;            
+        } else {
+            rv.setTextViewText(R.id.listRowText, mContext.getResources().getString(R.string.text_failedToParse));
         }
 
-        return null;
+        return rv;
     }
 
     @Override
@@ -99,16 +86,23 @@ public class BullpenListViewFactory implements RemoteViewsService.RemoteViewsFac
         
         // Parse MLBPark html data and add items to the widget item array list.
         try {
-            parseMLBParkHtmlDataMobileVer(mSelectedBullpenBoardUrl);
-            mIsUpdateRemoteView = true;
+            mIsSuccessToParse = (parseMLBParkHtmlDataMobileVer(mSelectedBullpenBoardUrl) == true) ? true : false;
         } catch (IOException e) {
+            Log.e(TAG, "onDataSetChanged - IOException![" + e.toString() + "]");
             e.printStackTrace();
+            mIsSuccessToParse = false;
         }
     }
 
     @Override
     public int getCount() {
-        return Constants.LISTVIEW_MAX_ITEM_COUNT;
+    	//Log.i(TAG, "getCount");
+    	
+    	if (mIsSuccessToParse) {
+              return Constants.LISTVIEW_MAX_ITEM_COUNT;
+    	} else {
+              return 1;
+    	}
     }
 
     @Override
@@ -118,7 +112,10 @@ public class BullpenListViewFactory implements RemoteViewsService.RemoteViewsFac
 
     @Override
     public RemoteViews getLoadingView() {
-        return null;
+        RemoteViews rv = new RemoteViews(mContext.getPackageName(), R.layout.list_row);
+        rv.setTextViewText(R.id.listRowText, mContext.getResources().getString(R.string.text_loadingView));
+
+        return rv;
     }
 
     @Override
@@ -196,12 +193,12 @@ public class BullpenListViewFactory implements RemoteViewsService.RemoteViewsFac
         }
     }
 
-    private void parseMLBParkHtmlDataMobileVer(String urlAddress) throws IOException {
-        Source source = new Source(new URL(urlAddress));
-        source.fullSequentialParse();
-
+    private boolean parseMLBParkHtmlDataMobileVer(String urlAddress) throws IOException {
         // Initialize widget item array list here.
         mlistItems.clear();
+        
+        Source source = new Source(new URL(urlAddress));
+        source.fullSequentialParse();
         
         // Find the same pattern with <ul id="mNewsList">. This means the body of this article.
         List<Element> uls = source.getAllElements(HTMLElementName.UL);
@@ -215,7 +212,7 @@ public class BullpenListViewFactory implements RemoteViewsService.RemoteViewsFac
             }
         }
 
-        if (targetUl.isEmpty() == false) {
+        if ((targetUl != null) && (targetUl.isEmpty() == false)) {
             List<Element> lis = targetUl.getAllElements(HTMLElementName.LI);
             int addedItemCount = 0;
             
@@ -280,11 +277,14 @@ public class BullpenListViewFactory implements RemoteViewsService.RemoteViewsFac
 
                 if (addedItemCount == Constants.LISTVIEW_MAX_ITEM_COUNT) {
                     Log.i(TAG, "parseMLBParkHtmlDataMobileVer - done!");
-                    return;
+                    return true;
                 }
             }
+            
+            return true;
         } else {
             Log.e(TAG, "parseMLBParkHtmlDataMobileVer - Cannot find article list.");
+            return false;
         }
     }
     

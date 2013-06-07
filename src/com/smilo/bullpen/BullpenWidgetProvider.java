@@ -11,7 +11,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.net.ConnectivityManager;
-import android.net.Uri;
 import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.Toast;
@@ -55,14 +54,14 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
         if (isInternetConnected(context) == false) {
             Log.e(TAG, "onReceive - Internet is not connected!");
             
-            removePreviousAlarm();
-            setNewAlarm(context, appWidgetId, false);
+            //removePreviousAlarm();
+            //setNewAlarm(context, appWidgetId, false);
             
             // TODO : internet not connected remoteview
             return;
         }
         
-        for (int id : appWidgetIds) {
+        //for (int id : appWidgetIds) {
             
             // This intent will be called periodically.
             if (action.equals(Constants.ACTION_APPWIDGET_UPDATE)) {
@@ -111,7 +110,7 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
                 
                 setRemoteViewToShowList(context, awm, appWidgetId);
             }
-        }
+       // }
     }
 
     private String getRemoteViewTitle(Context context) {

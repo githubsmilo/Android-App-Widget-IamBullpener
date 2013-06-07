@@ -14,6 +14,8 @@
     <string name="remoteViewTitle_Bullpen1000">Bullpen 최다조회 1000 이상</string>
     <string name="remoteViewTitle_Bullpen2000">Bullpen 최다조회 2000 이상</string>
     <string name="btn_setting">Setting</string>
+    <string name="text_loadingView">Loading..</string>
+    <string name="text_failedToParse">Failed to parse html data!</string>
     
     <!-- Bullpen configuration activity -->
     <string name="prompt_refreshTime">새로고침 시간</string>
