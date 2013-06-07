@@ -22,6 +22,14 @@
 	        android:text="@string/remoteViewTitle_Default" />
         
         <Button
+            android:id="@+id/btnContentRefresh"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_toLeftOf="@+id/btnContentSetting"
+            android:text="@string/btn_refresh" />
+        
+        <Button
             android:id="@+id/btnContentSetting"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
