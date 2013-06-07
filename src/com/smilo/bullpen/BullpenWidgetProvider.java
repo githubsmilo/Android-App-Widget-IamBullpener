@@ -137,35 +137,52 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
         intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
         intent.putExtra(Constants.EXTRA_REFRESH_TIME_TYPE, Utils.getRefreshTimeType(mSelectedRefreshTime));
         intent.putExtra(Constants.EXTRA_BULLPEN_BOARD_TYPE, Utils.getBullpenBoardType(mSelectedBullpenBoardUrl));
-
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
         PendingIntent pendingIntent = PendingIntent.getActivity(context, appWidgetId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         return pendingIntent;
     }
 
+    private PendingIntent buildListRefreshIntent(Context context, int appWidgetId) {
+        Intent intent = new Intent(context, BullpenWidgetProvider.class);
+        intent.setAction(Constants.ACTION_SHOW_LIST);
+        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        
+        return pendingIntent;
+    }
+    
     private void setRemoteViewToShowList(Context context, AppWidgetManager awm, int appWidgetId) {
+
+        // Create new remoteViews.
+        RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.list);
         
-        Intent serviceIntent, clickIntent;
-        
-        serviceIntent = new Intent(context, BullpenListViewService.class);
+        // Set a remoteAdapter to the remoteViews.
+        Intent serviceIntent = new Intent(context, BullpenListViewService.class);
         serviceIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
         serviceIntent.putExtra(Constants.EXTRA_LIST_URL, mSelectedBullpenBoardUrl);
-    
-        clickIntent = new Intent(context, BullpenWidgetProvider.class);
-        clickIntent.setAction(Constants.ACTION_SHOW_ITEM);
-        clickIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
-    
-        RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.list);
-        rv.setTextViewText(R.id.textListTitle, getRemoteViewTitle(context));
-        rv.setOnClickPendingIntent(R.id.btnListSetting, buildConfigurationActivityIntent(context, appWidgetId));
         // views.setRemoteAdapter(R.id.list, serviceIntent); // For API14+
         rv.setRemoteAdapter(appWidgetId, R.id.listView, serviceIntent);
-    
+
+        // Set title of the remoteViews.
+        rv.setTextViewText(R.id.textListTitle, getRemoteViewTitle(context));
+
+        // Set setting button of the remoteViews.
+        rv.setOnClickPendingIntent(R.id.btnListSetting, buildConfigurationActivityIntent(context, appWidgetId));
+        
+        // Set refresh button of the remoteViews.
+        rv.setOnClickPendingIntent(R.id.btnListRefresh, buildListRefreshIntent(context, appWidgetId));
+        
+        // Set a pending intent for click event to the remoteViews.
+        Intent clickIntent = new Intent(context, BullpenWidgetProvider.class);
+        clickIntent.setAction(Constants.ACTION_SHOW_ITEM);
+        clickIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
         PendingIntent linkPendingIntent = PendingIntent.getBroadcast(
                 context, 0, clickIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         rv.setPendingIntentTemplate(R.id.listView, linkPendingIntent);
     
+        // Update widget.
         Log.i(TAG, "updateAppWidget[BaseballListViewService]");
         awm.updateAppWidget(appWidgetId, rv);
         
@@ -181,26 +198,31 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
     
     private void setRemoteViewToShowItem(Context context, AppWidgetManager awm, int appWidgetId) {
     
-        Intent serviceIntent, clickIntent;
+        // Create new remoteViews.
+        RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.content);
         
-        serviceIntent = new Intent(context, BullpenContentService.class);
+        // Set a remoteAdapter to the remoteViews.
+        Intent serviceIntent = new Intent(context, BullpenContentService.class);
         serviceIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
         serviceIntent.putExtra(Constants.EXTRA_ITEM_URL, mSelectedItemUrl);
-    
-        clickIntent = new Intent(context, BullpenWidgetProvider.class);
+        // views.setRemoteAdapter(R.id.list, serviceIntent); // For API14+
+        rv.setRemoteAdapter(appWidgetId, R.id.contentView, serviceIntent);    
+
+        // Set title of the remoteViews.
+        rv.setTextViewText(R.id.textContentTitle, getRemoteViewTitle(context));
+        
+        // Set setting button of the remoteViews.
+        rv.setOnClickPendingIntent(R.id.btnContentSetting, buildConfigurationActivityIntent(context, appWidgetId));
+
+        // Set a pending intent for click event to the remoteViews.
+        Intent clickIntent = new Intent(context, BullpenWidgetProvider.class);
         clickIntent.setAction(Constants.ACTION_SHOW_LIST);
         clickIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
-    
-        RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.content);
-        rv.setTextViewText(R.id.textContentTitle, getRemoteViewTitle(context));
-        rv.setOnClickPendingIntent(R.id.btnContentSetting, buildConfigurationActivityIntent(context, appWidgetId));
-        // views.setRemoteAdapter(R.id.list, serviceIntent); // For API14+
-        rv.setRemoteAdapter(appWidgetId, R.id.contentView, serviceIntent);
-    
         PendingIntent linkPendingIntent = PendingIntent.getBroadcast(
                 context, 0, clickIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         rv.setPendingIntentTemplate(R.id.contentView, linkPendingIntent);
     
+        // Update widget.
         Log.i(TAG, "updateAppWidget[BaseballContentService]");
         awm.updateAppWidget(appWidgetId, rv);
         
