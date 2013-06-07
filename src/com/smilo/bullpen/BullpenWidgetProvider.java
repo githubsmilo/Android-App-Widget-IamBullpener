@@ -9,11 +9,8 @@ import android.appwidget.AppWidgetProvider;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Resources;
-import android.net.ConnectivityManager;
 import android.util.Log;
 import android.widget.RemoteViews;
-import android.widget.Toast;
 
 public class BullpenWidgetProvider extends AppWidgetProvider {
 
@@ -146,7 +143,7 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
         Intent serviceIntent = new Intent(context, BullpenListViewService.class);
         serviceIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
         serviceIntent.putExtra(Constants.EXTRA_LIST_URL, mSelectedBullpenBoardUrl);
-        // views.setRemoteAdapter(R.id.list, serviceIntent); // For API14+
+        // views.setRemoteAdapter(R.id.listView, serviceIntent); // For API14+
         rv.setRemoteAdapter(appWidgetId, R.id.listView, serviceIntent);
 
         // Set title of the remoteViews.
@@ -189,7 +186,7 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
         Intent serviceIntent = new Intent(context, BullpenContentService.class);
         serviceIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
         serviceIntent.putExtra(Constants.EXTRA_ITEM_URL, mSelectedItemUrl);
-        // views.setRemoteAdapter(R.id.list, serviceIntent); // For API14+
+        // views.setRemoteAdapter(R.id.contentView, serviceIntent); // For API14+
         rv.setRemoteAdapter(appWidgetId, R.id.contentView, serviceIntent);    
 
         // Set title of the remoteViews.

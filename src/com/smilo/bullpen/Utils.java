@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.util.Log;
 import android.widget.Toast;
 
 public final class Utils {
