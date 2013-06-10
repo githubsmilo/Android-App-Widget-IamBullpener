@@ -29,6 +29,7 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
     private static boolean mIsSkipFirstCallListViewService = true;
     private static boolean mIsSkipFirstCallContentService = true;
     
+    private static boolean mSelectedPermitMobileConnection = false;
     private static int mSelectedRefreshTime = -1;
     private static String mSelectedBullpenBoardUrl = null;
     
@@ -60,33 +61,34 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
             Log.i(TAG, "onReceive - action[" + action + "], appWidgetId[" + appWidgetId + "], pageNum[" + pageNum +
                     "], appWidgetsNum[" + appWidgetIds.length + "]");
         }
+        
+        // After setting configuration activity, this intent will be called.
+        if (action.equals(Constants.ACTION_INIT_LIST)) {
+        	boolean selectedPermitMobileConnectionType = intent.getBooleanExtra(Constants.EXTRA_PERMIT_MOBILE_CONNECTION_TYPE, false);
+            int selectedRefreshTimeType = intent.getIntExtra(Constants.EXTRA_REFRESH_TIME_TYPE, -1);
+            int selectedBullpenBoardType = intent.getIntExtra(Constants.EXTRA_BULLPEN_BOARD_TYPE, -1);
+            mSelectedPermitMobileConnection = selectedPermitMobileConnectionType;
+            mSelectedRefreshTime = Utils.getRefreshTime(selectedRefreshTimeType);
+            mSelectedBullpenBoardUrl = Utils.getBullpenBoardUrl(selectedBullpenBoardType);
 
-        if (Utils.isInternetConnected(context) == false) {
-            Log.e(TAG, "onReceive - Internet is not connected!");
+            // Send broadcast intent to update mSelectedBullpenBoardUrl, pageNum variable on the BullpenListViewFactory.
+            context.sendBroadcast(buildUpdateListUrlIntent(appWidgetId, Constants.DEFAULT_PAGE_NUM));
             
-            //removePreviousAlarm();
-            //setNewAlarm(context, appWidgetId, false);
+            // Broadcast ACTION_SHOW_LIST intent.
+            context.sendBroadcast(buildShowListIntent(context, appWidgetId, Constants.DEFAULT_PAGE_NUM));
             
-            // TODO : internet not connected remoteview
             return;
+        }
+
+        if (Utils.isInternetConnected(context, mSelectedPermitMobileConnection) == false) {
+        	Log.e(TAG, "onReceive - Internet is not connected!");
+        	// TODO : implement some remoteview!
+        	return;
         }
         
         //for (int id : appWidgetIds) {
-            
-            // After setting configuration activity, this intent will be called.
-            if (action.equals(Constants.ACTION_INIT_LIST)) {
-                int selectedRefreshTimeType = intent.getIntExtra(Constants.EXTRA_REFRESH_TIME_TYPE, -1);
-                int selectedBullpenBoardType = intent.getIntExtra(Constants.EXTRA_BULLPEN_BOARD_TYPE, -1);
-                mSelectedRefreshTime = Utils.getRefreshTime(selectedRefreshTimeType);
-                mSelectedBullpenBoardUrl = Utils.getBullpenBoardUrl(selectedBullpenBoardType);
-    
-                // Send broadcast intent to update mSelectedBullpenBoardUrl, pageNum variable on the BullpenListViewFactory.
-                context.sendBroadcast(buildUpdateListUrlIntent(appWidgetId, Constants.DEFAULT_PAGE_NUM));
-                
-                // Broadcast ACTION_SHOW_LIST intent.
-                context.sendBroadcast(buildShowListIntent(context, appWidgetId, Constants.DEFAULT_PAGE_NUM));
 
-            } else if (action.equals(Constants.ACTION_REFRESH_LIST)){
+            if (action.equals(Constants.ACTION_REFRESH_LIST)){
                 // Send broadcast intent to update mSelectedBullpenBoardUrl, pageNum variable on the BullpenListViewFactory.
                 context.sendBroadcast(buildUpdateListUrlIntent(appWidgetId, pageNum));
                 
@@ -179,6 +181,7 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
     private Intent buildConfigurationActivityIntent(Context context, int appWidgetId) {
         Intent intent = new Intent(context, BullpenConfigurationActivity.class);
         intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
+        intent.putExtra(Constants.EXTRA_PERMIT_MOBILE_CONNECTION_TYPE, mSelectedPermitMobileConnection);
         intent.putExtra(Constants.EXTRA_REFRESH_TIME_TYPE, Utils.getRefreshTimeType(mSelectedRefreshTime));
         intent.putExtra(Constants.EXTRA_BULLPEN_BOARD_TYPE, Utils.getBullpenBoardType(mSelectedBullpenBoardUrl));
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

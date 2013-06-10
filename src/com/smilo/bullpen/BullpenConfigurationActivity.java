@@ -11,6 +11,7 @@ import android.view.Menu;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
 import android.widget.Spinner;
 
 public class BullpenConfigurationActivity extends Activity {
@@ -49,18 +50,20 @@ public class BullpenConfigurationActivity extends Activity {
             mIsExecutedBySettingButton = true;
         }
         
+        boolean isPermitMobileConnection = extras.getBoolean(Constants.EXTRA_PERMIT_MOBILE_CONNECTION_TYPE, false);
         int refreshTimeType = extras.getInt(Constants.EXTRA_REFRESH_TIME_TYPE, 0);
         int bullpenBoardType = extras.getInt(Constants.EXTRA_BULLPEN_BOARD_TYPE, 0);
         
-        initializeButtons();
+        initializeRadioButton(isPermitMobileConnection);
         initializeSpinners(refreshTimeType, bullpenBoardType);
+        initializeButtons();
     }
 
-    private void initializeButtons() {
-        findViewById(R.id.btnOk).setOnClickListener(mBtnOkOnClickListener);
-        findViewById(R.id.btnCancel).setOnClickListener(mBtnCancelOnClickListener);
+    private void initializeRadioButton(boolean isPermitMobileConnection) {
+    	CheckBox cb = (CheckBox)findViewById(R.id.cbMobileConnection);
+    	cb.setChecked(isPermitMobileConnection);
     }
-
+    
     private void initializeSpinners(int refreshTypeType, int bullpenBoardType) {
         Spinner spinRefreshTime = (Spinner)findViewById(R.id.spinRefreshTime);
         ArrayAdapter<CharSequence> adapterRefreshTime = ArrayAdapter.createFromResource(this, R.array.refreshTime, android.R.layout.simple_spinner_item);
@@ -77,6 +80,11 @@ public class BullpenConfigurationActivity extends Activity {
         spinBullpenBoard.setSelection(bullpenBoardType);
     }
 
+    private void initializeButtons() {
+        findViewById(R.id.btnOk).setOnClickListener(mBtnOkOnClickListener);
+        findViewById(R.id.btnCancel).setOnClickListener(mBtnCancelOnClickListener);
+    }
+    
     View.OnClickListener mBtnOkOnClickListener = new View.OnClickListener() {
         public void onClick(View v) {
             Log.i(TAG, "Button OK clicked");
@@ -88,12 +96,18 @@ public class BullpenConfigurationActivity extends Activity {
                 mSelectedBullpenBoardType = 0;
             }
             
-            Log.i(TAG, "mSelectedRefreshTimeType[" + mSelectedRefreshTimeType + "], mSelectedBullpenBoardType[" + mSelectedBullpenBoardType + "]");
+            CheckBox cb = (CheckBox)findViewById(R.id.cbMobileConnection);
+            boolean selectedPermitMobileConnectionType = cb.isChecked();
+            
+            Log.i(TAG, "selectedPermitMobileConnectionType[" + selectedPermitMobileConnectionType +
+            		"], mSelectedRefreshTimeType[" + mSelectedRefreshTimeType + 
+            		"], mSelectedBullpenBoardType[" + mSelectedBullpenBoardType + "]");
             
             final Context context = BullpenConfigurationActivity.this;
             Intent initIntent = new Intent(context, BullpenWidgetProvider.class);
             initIntent.setAction(Constants.ACTION_INIT_LIST);
             initIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, mAppWidgetId);
+            initIntent.putExtra(Constants.EXTRA_PERMIT_MOBILE_CONNECTION_TYPE, selectedPermitMobileConnectionType);
             initIntent.putExtra(Constants.EXTRA_REFRESH_TIME_TYPE, mSelectedRefreshTimeType);
             initIntent.putExtra(Constants.EXTRA_BULLPEN_BOARD_TYPE, mSelectedBullpenBoardType);
             context.sendBroadcast(initIntent);

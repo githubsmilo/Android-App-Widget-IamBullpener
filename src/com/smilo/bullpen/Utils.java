@@ -5,25 +5,30 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.util.Log;
 import android.widget.Toast;
 
 public final class Utils {
 
-    //private static final String TAG = "BullpenUtils";
+    private static final String TAG = "BullpenUtils";
     
-    public static boolean isInternetConnected(Context context) {
+    public static boolean isInternetConnected(Context context, boolean selectedPermitMobileConnection) {
+    	Log.i(TAG, "isInternetConnected - selectedPermitMobileConnection[" + selectedPermitMobileConnection + "]");
+    	
         ConnectivityManager cm =  (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         
         NetworkInfo niWifi = cm.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
         if ((niWifi != null) && (niWifi.isConnected() == true)) {
                 return true;
         }
-/*
-        NetworkInfo mobileWifi = cm.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
-        if ((mobileWifi != null) && (mobileWifi.isConnected() == true)) {
-            return true;
+
+        if (selectedPermitMobileConnection) {
+            NetworkInfo mobileWifi = cm.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+            if ((mobileWifi != null) && (mobileWifi.isConnected() == true)) {
+                return true;
+            }
         }
-        
+/*
         NetworkInfo niEth = cm.getNetworkInfo(ConnectivityManager.TYPE_ETHERNET);
         if ((niEth != null) && (niEth.isConnected() == true)) {
                 return true;
