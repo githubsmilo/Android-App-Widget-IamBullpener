@@ -97,7 +97,7 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
                     }
                 }
                 
-                // Add a devider between title and body.
+                // Add a divider between title and body.
                 rv.addView(R.id.contentRowBodyLayout, rvDivider);
                 
                 // Set text and image of content body.
@@ -120,15 +120,30 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
                         if (bodyImage != null && bodyImage.length() > 0) {
                             //Log.i(TAG, "getViewAt - image[" + image + "]");
                             // TODO : manage bitmap
-                            Bitmap bitmap = getImageBitmap(bodyImage);
                             RemoteViews rvBodyImage = new RemoteViews(mContext.getPackageName(), R.layout.content_row_image);
-                            rvBodyImage.setImageViewBitmap(R.id.contentRowImage, bitmap);
+                        	Bitmap bitmap = null;
+                        	try {
+                        		bitmap = getImageBitmap(bodyImage);
+                        		rvBodyImage.setImageViewBitmap(R.id.contentRowImage, bitmap);
+	                        } catch (IOException e) {
+	                            Log.e(TAG, "getViewAt - getImageBitmap - IOException![" + e.toString() + "]");
+	                            e.printStackTrace();
+	                            rvBodyImage.setImageViewBitmap(R.id.contentRowImage, null);
+	                        } catch (RuntimeException e) {
+	                        	Log.e(TAG, "getViewAt - getImageBitmap - RuntimeException![" + e.toString() + "]");
+	                            e.printStackTrace();
+	                            rvBodyImage.setImageViewBitmap(R.id.contentRowImage, null);
+	                        } catch (OutOfMemoryError e) {
+	                        	Log.e(TAG, "getViewAt - getImageBitmap - OutOfMemoryError![" + e.toString() + "]");
+	                            e.printStackTrace();
+	                            rvBodyImage.setImageViewBitmap(R.id.contentRowImage, null);
+	                        }
                             rv.addView(R.id.contentRowBodyLayout, rvBodyImage);
                         }
                     }
                 }
                 
-                // Add a devider between body and title.
+                // Add a divider between body and title.
                 rv.addView(R.id.contentRowCommentLayout, rvDivider);
                 
                 // Set text of content comment.
@@ -198,15 +213,15 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
         try {
             mParsingResult = parseMLBParkHtmlDataMobileVer(mSelectedItemUrl);
         } catch (IOException e) {
-            Log.e(TAG, "onDataSetChanged - IOException![" + e.toString() + "]");
+            Log.e(TAG, "onDataSetChanged - parseMLBParkHtmlDataMobileVer - IOException![" + e.toString() + "]");
             e.printStackTrace();
             mParsingResult = PARSING_RESULT.FAILED_IO_EXCEPTION;
         } catch (JSONException e) {
-            Log.e(TAG, "onDataSetChanged - JSONException![" + e.toString() + "]");
+            Log.e(TAG, "onDataSetChanged - parseMLBParkHtmlDataMobileVer - JSONException![" + e.toString() + "]");
             e.printStackTrace();
             mParsingResult = PARSING_RESULT.FAILED_JSON_EXCEPTION;
         } catch (StackOverflowError e) {
-            Log.e(TAG, "onDataSetChanged - StackOverflowError![" + e.toString() + "]");
+            Log.e(TAG, "onDataSetChanged - parseMLBParkHtmlDataMobileVer - StackOverflowError![" + e.toString() + "]");
             e.printStackTrace();
             mParsingResult = PARSING_RESULT.FAILED_STACK_OVERFLOW;
         }
@@ -418,21 +433,17 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
         return PARSING_RESULT.SUCCESS;
     }
     
-    private Bitmap getImageBitmap(String url) { 
+    private Bitmap getImageBitmap(String url) throws IOException, RuntimeException, OutOfMemoryError { 
         Bitmap bm = null; 
-        try { 
-            URL aURL = new URL(url); 
-            URLConnection conn = aURL.openConnection(); 
-            conn.connect(); 
-            InputStream is = conn.getInputStream(); 
-            BufferedInputStream bis = new BufferedInputStream(is); 
-            bm = BitmapFactory.decodeStream(bis); 
-            bis.close(); 
-            is.close(); 
-       } catch (IOException e) { 
-           Log.e(TAG, "Error getting bitmap", e); 
-       } 
-       return bm; 
+        URL aURL = new URL(url); 
+        URLConnection conn = aURL.openConnection(); 
+        conn.connect(); 
+        InputStream is = conn.getInputStream(); 
+        BufferedInputStream bis = new BufferedInputStream(is); 
+        bm = BitmapFactory.decodeStream(bis);
+        bis.close(); 
+        is.close();
+        return bm; 
     } 
     
     private void setupIntentListener() {
