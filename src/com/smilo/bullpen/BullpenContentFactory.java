@@ -1,6 +1,14 @@
 
 package com.smilo.bullpen;
 
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.net.URLConnection;
+import java.util.Iterator;
+import java.util.List;
+
 import net.htmlparser.jericho.CharacterReference;
 import net.htmlparser.jericho.Element;
 import net.htmlparser.jericho.EndTag;
@@ -9,6 +17,10 @@ import net.htmlparser.jericho.Segment;
 import net.htmlparser.jericho.Source;
 import net.htmlparser.jericho.StartTag;
 import net.htmlparser.jericho.Tag;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import android.appwidget.AppWidgetManager;
 import android.content.BroadcastReceiver;
@@ -21,59 +33,25 @@ import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.net.URLConnection;
-import java.util.Iterator;
-import java.util.List;
-
 public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFactory {
 
     private static final String TAG = "BullpenContentFactory";
 
-    private static contentItem mContentItem = null;
+    private static JSONObject mParsedJSONObject = null;
     private static Context mContext;
     private static int mAppWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID;
     private static String mSelectedItemUrl = null;
     private static BroadcastReceiver mIntentListener;
-    private static Bitmap mBitmap = null;
     private static boolean mIsSuccessToParse = false;
-
-    private class contentItem {
-        public String itemTitle = null;
-        public String itemBody = null;
-        public String itemImgUrl = null;
-        public String itemComment = null;
-
-        contentItem(String title, String body, String imgUrl, String comment) {
-            itemTitle = title;
-            itemBody = body;
-            itemImgUrl = imgUrl;
-            itemComment = comment;
-        }
-
-        public boolean isEmptyTitle() {
-            return ((itemTitle == null) || (itemTitle.equals("")));
-        }
-        
-        public boolean isEmptyBody() {
-            return ((itemBody == null) || (itemBody.equals("")));
-        }
-        
-        public boolean isEmptyImgUrl() {
-            return ((itemImgUrl == null) || (itemImgUrl.equals("")));
-        }
-        
-        public boolean isEmptyComment() {
-            return ((itemComment == null) || (itemComment.equals("")));
-        }
-        
-        public String toString() {
-            return ("itemTitle[" + itemTitle + "], itemBody[" + itemBody + "], itemImgUrl[" + itemImgUrl + "], itemComment[" + itemComment + "]");
-        }
-    }
+    
+    private static final String JSON_TITLE = "title";
+    private static final String JSON_WRITER = "writer";
+    private static final String JSON_BODY = "body";
+    private static final String JSON_BODY_TEXT = "bodyText";
+    private static final String JSON_BODY_IMAGE = "bodyImage";
+    private static final String JSON_COMMENT = "comment";
+    private static final String JSON_COMMENT_WRITER = "commentWriter";
+    private static final String JSON_COMMENT_TEXT = "commentText";
 
     public BullpenContentFactory(Context context, Intent intent) {
         mContext = context;
@@ -90,33 +68,86 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
     public RemoteViews getViewAt(int position) {
         //Log.i(TAG, "getViewAt - position[" + position + "]");
 
+        // Create remoteViews
         RemoteViews rv = new RemoteViews(mContext.getPackageName(), R.layout.content_row);
+        
         if (mIsSuccessToParse) {
-            if (mContentItem.isEmptyTitle() == false)
-                rv.setTextViewText(R.id.contentRowTitleText, mContentItem.itemTitle);
-            
-            if (mContentItem.isEmptyBody() == false)
-                rv.setTextViewText(R.id.contentRowBodyText, mContentItem.itemBody);
-
-            if (mContentItem.isEmptyImgUrl() == false) {
-                mBitmap = getImageBitmap(mContentItem.itemImgUrl);
-                if (mBitmap != null) {
-                    //Log.i(TAG, "setImageViewBitmap - given bitmap");
-                    rv.setImageViewBitmap(R.id.contentRowImage, mBitmap);
+            // Set writer and title
+            String contentTitle = mParsedJSONObject.optString(JSON_TITLE);
+            String contentWriter = mParsedJSONObject.optString(JSON_WRITER);
+            if (contentTitle != null && contentTitle.length() > 0) {
+                if (contentWriter != null && contentWriter.length() > 0) {
+                    rv.setTextViewText(R.id.contentRowTitleText, "[" + contentWriter + "] " + contentTitle);
                 } else {
-                    //Log.i(TAG, "setImageViewBitmap - null1");
-                    rv.setImageViewBitmap(R.id.contentRowImage, null);
+                    rv.setTextViewText(R.id.contentRowTitleText, "[writer not existed]" + contentTitle);
                 }
             } else {
-                //Log.i(TAG, "setImageViewBitmap - null2");
-                rv.setImageViewBitmap(R.id.contentRowImage, null);
+                if (contentWriter != null && contentWriter.length() > 0) {
+                    rv.setTextViewText(R.id.contentRowTitleText, "[" + contentWriter + "]");
+                } else {
+                    rv.setTextViewText(R.id.contentRowTitleText, "[writer not existed] title not existed");
+                }
             }
-
-            if (mContentItem.isEmptyComment() == false)
-                rv.setTextViewText(R.id.contentRowCommentText, mContentItem.itemComment);
+            
+            // Set text and image of content body.
+            JSONArray bodyArray = mParsedJSONObject.optJSONArray(JSON_BODY);
+            if (bodyArray != null && bodyArray.length() > 0) {
+                for (int i = 0 ; i < bodyArray.length() ; i++) {
+                    JSONObject obj = bodyArray.optJSONObject(i);
+                    if (obj == null || obj.length() == 0) {
+                        break;
+                    }
+                    String bodyText = obj.optString(JSON_BODY_TEXT);
+                    if (bodyText != null && bodyText.length() > 0) {
+                        //Log.i(TAG, "getViewAt - text[" + text + "]");
+                        RemoteViews rvBodyText = new RemoteViews(mContext.getPackageName(), R.layout.content_row_text);
+                        rvBodyText.setTextViewText(R.id.contentRowText, bodyText);
+                        rv.addView(R.id.contentRowBodyLayout, rvBodyText);
+                        continue;
+                    }
+                    String bodyImage = obj.optString(JSON_BODY_IMAGE);
+                    if (bodyImage != null && bodyImage.length() > 0) {
+                        //Log.i(TAG, "getViewAt - image[" + image + "]");
+                        // TODO : manage bitmap
+                        Bitmap bitmap = getImageBitmap(bodyImage);
+                        RemoteViews rvBodyImage = new RemoteViews(mContext.getPackageName(), R.layout.content_row_image);
+                        rvBodyImage.setImageViewBitmap(R.id.contentRowImage, bitmap);
+                        rv.addView(R.id.contentRowBodyLayout, rvBodyImage);
+                    }
+                }
+            }
+            
+            // Set text of content comment.
+            JSONArray commentArray = mParsedJSONObject.optJSONArray(JSON_COMMENT);
+            if (commentArray != null && commentArray.length() > 0) {
+                for (int i = 0 ; i < commentArray.length() ; i++) {
+                    JSONObject obj = commentArray.optJSONObject(i);
+                    if (obj == null || obj.length() == 0) {
+                        break;
+                    }
+                    String commentWriter = obj.optString(JSON_COMMENT_WRITER);
+                    String commentText = obj.optString(JSON_COMMENT_TEXT);
+                    RemoteViews rvComment = new RemoteViews(mContext.getPackageName(), R.layout.content_row_text);
+                    if (commentWriter != null && commentWriter.length() > 0) {
+                        if (commentText != null && commentText.length() >0) {
+                            rvComment.setTextViewText(R.id.contentRowText, "[" + commentWriter + "] " + commentText);
+                        } else {
+                            rvComment.setTextViewText(R.id.contentRowText, "[" + commentWriter + "] comment not exsited");
+                        }
+                    } else {
+                        if (commentText != null && commentText.length() >0) {
+                            rvComment.setTextViewText(R.id.contentRowText, "[writer not existed] " + commentText);
+                        } else {
+                            rvComment.setTextViewText(R.id.contentRowText, "[writer not existed] comment not existed");
+                        }
+                    }
+                    rv.addView(R.id.contentRowBodyLayout, rvComment);
+                }
+            }
 
             Intent fillInIntent = new Intent();
             rv.setOnClickFillInIntent(R.id.contentRowLayout, fillInIntent);
+            
         } else {
             rv.setTextViewText(R.id.contentRowTitleText, mContext.getResources().getString(R.string.text_failedToParse));
         }
@@ -137,7 +168,11 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
         try {
             mIsSuccessToParse = (parseMLBParkHtmlDataMobileVer(mSelectedItemUrl) == true) ? true : false;
         } catch (IOException e) {
-        	Log.e(TAG, "onDataSetChanged - IOException![" + e.toString() + "]");
+            Log.e(TAG, "onDataSetChanged - IOException![" + e.toString() + "]");
+            e.printStackTrace();
+            mIsSuccessToParse = false;
+        } catch (JSONException e) {
+            Log.e(TAG, "onDataSetChanged - JSONException![" + e.toString() + "]");
             e.printStackTrace();
             mIsSuccessToParse = false;
         }
@@ -155,8 +190,8 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
 
     @Override
     public RemoteViews getLoadingView() {
-        RemoteViews rv = new RemoteViews(mContext.getPackageName(), R.layout.content_row);
-        rv.setTextViewText(R.id.contentRowTitleText, mContext.getResources().getString(R.string.text_loadingView));
+        RemoteViews rv = new RemoteViews(mContext.getPackageName(), R.layout.content_row_text);
+        rv.setTextViewText(R.id.contentRowText, mContext.getResources().getString(R.string.text_loadingView));
 
         return rv;
     }
@@ -181,153 +216,19 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
         teardownIntentListener();
     }
 
-    private void parseMLBParkHtmlDataFullVer(String urlAddress) throws IOException {
-        Source source = new Source(new URL(urlAddress));
-        source.fullSequentialParse();
+    private boolean parseMLBParkHtmlDataMobileVer(String urlAddress) throws IOException, JSONException {
 
-        if (mBitmap != null) {
-            mBitmap.recycle();
-            mBitmap = null;
-        }
-        
-        // TODO : parse itemTitle!
-        String itemTitle = "";
-        String itemBody = "";
-        String itemImgUrl = "";
-        String itemComment = "";
-
-        List<Element> divs = source.getAllElements(HTMLElementName.DIV);
-        for (int i = 0; i < divs.size(); i++) {
-            Element div = divs.get(i);
-            String value;
-            
-            // Find the same pattern with <div align="justify". This means the body of this article.
-            value = div.getAttributeValue("align");
-            if (value != null && value.equals("justify")) {
-                Segment seg = div.getContent();
-                boolean isSkipSegment = false;
-                //Log.i(TAG, "content segment[" + seg.toString() + "]");
-                
-                // Parse article body.
-                for (Iterator<Segment> nodeIterator = seg.getNodeIterator() ; nodeIterator.hasNext();) {
-                    Segment nodeSeg = nodeIterator.next();
-                    
-                    // If article body has <head>...</head>, just skip!
-                    // If <br> tag, add new line to itemBody.
-                    // if <img> tag, add img address to itemImgUrl.
-                    if (nodeSeg instanceof StartTag) {
-                        String tagName = ((Tag)nodeSeg).getName();
-                        if (tagName.equals("head")) {
-                            isSkipSegment = true;
-                        } else if (!isSkipSegment && tagName.equals("br")) {
-                            itemBody += "\n";
-                        } else if (!isSkipSegment && tagName.equals("img")) {
-                            itemImgUrl = ((StartTag) nodeSeg).getAttributeValue("src");
-                        }
-                        continue;
-                        
-                    // If </p> or </div> tag, add new line to itemBody.
-                    } else if (nodeSeg instanceof EndTag) {
-                        String tagName = ((Tag)nodeSeg).getName();
-                        if (tagName.equals("head")) {
-                            isSkipSegment = false;
-                        } else if (!isSkipSegment && (tagName.equals("p") || tagName.equals("div"))) {
-                            itemBody += "\n";
-                        }
-                        continue;
-                        
-                    // Ignore &bnsp;
-                    } else if (nodeSeg instanceof CharacterReference) {
-                        continue;
-                        
-                    // If plain text, add it to itemBody.
-                    } else {
-                        if (!isSkipSegment && (nodeSeg.isWhiteSpace() == false)) {
-                            itemBody += nodeSeg.getTextExtractor().toString();
-                        }
-                    }
-                }
-            }
-            
-            // Find the same pattern with <div id="myArea". This means the comment of this article.
-            value = div.getAttributeValue("id");
-            if (value != null && value.equals("myArea")) {
-                Segment seg = div.getContent();
-                boolean isSkipSegment = false, isAddNick = false, isAddComment = false;;
-                //Log.i(TAG, "comment segment[" + seg.toString() + "]");
-                
-                // Parse article comment.
-                for (Iterator<Segment> nodeIterator = seg.getNodeIterator() ; nodeIterator.hasNext();) {
-                    Segment nodeSeg = nodeIterator.next();
-                    
-                    // If article body has <script>...</script>, just skip!
-                    // If <a> tag, prepare to add nick.
-                    // if <tv class="G12"> tag, prepare to add comment.
-                    if (nodeSeg instanceof StartTag) {
-                        String tagName = ((Tag)nodeSeg).getName();
-                        if (tagName.equals("script")) {
-                            isSkipSegment = true;
-                        } else if (tagName.equals("a")) {
-                            isAddNick = true;
-                        } else if (tagName.equals("td")) {
-                            String classAttr = ((StartTag)nodeSeg).getAttributeValue("class");
-                            if (classAttr != null && classAttr.equals("G12"))
-                                isAddComment = true;
-                        }
-                        continue;
-                    
-                    } else if (nodeSeg instanceof EndTag) {
-                        String tagName = ((Tag)nodeSeg).getName();
-                        if (tagName.equals("script")) {
-                            isSkipSegment = false;
-                        }
-                        continue;
-                        
-                    // Ignore &bnsp;
-                    } else if (nodeSeg instanceof CharacterReference) {
-                        continue;
-                        
-                    // If plain text, add it to itemComment.
-                    } else {
-                        if (!isSkipSegment) {
-                            if (isAddNick) {
-                                itemComment += ("[" + nodeSeg.getTextExtractor().toString() + "] : ");
-                                isAddNick = false;
-                            } else if (isAddComment) {
-                                itemComment += (nodeSeg.getTextExtractor().toString() + "\n\n");
-                                isAddComment = false;
-                            }
-                        }
-                    }
-                }
-
-                // Finish!
-                break;
-            }
-        }
-        
-        mContentItem = new contentItem(itemTitle, itemBody, itemImgUrl, itemComment);
-        //Log.i(TAG, "mContentItem[" + mContentItem.toString() + "]");
-
-        Log.i(TAG, "parseMLBParkHtmlData - done!");
-        return;
-    }
-
-    private boolean parseMLBParkHtmlDataMobileVer(String urlAddress) throws IOException {
-        if (mBitmap != null) {
-            mBitmap.recycle();
-            mBitmap = null;
-        }
-        
+        // Load HTML data from given urlAddress.
         Source source = new Source(new URL(urlAddress));
         source.fullSequentialParse();
         
-        String itemTitle = "";
-        String itemWriter = "";
-        String itemBody = "";
-        String itemImgUrl = "";
-        String itemComment = "";
-
+        // Create an empty JSONObjects.
+        JSONObject obj = new JSONObject();
+        JSONArray body = new JSONArray();
+        JSONArray comment = new JSONArray();
+        obj.put(JSON_BODY, body);
+        obj.put(JSON_COMMENT, comment);
+        
         List<Element> divs = source.getAllElements(HTMLElementName.DIV);
         for (int i = 0; i < divs.size(); i++) {
             Element div = divs.get(i);
@@ -336,7 +237,11 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
             // Find the same pattern with <div class='article'>. This means the title of this article.
             if (value != null && value.equals("article")) {
                 Element h3 = div.getContent().getFirstElement("h3");
-                itemTitle = h3.getTextExtractor().toString();
+                String itemTitle = h3.getTextExtractor().toString();
+                //Log.i(TAG, "parseMLBParkHtmlDataMobileVer - parsed title[" + itemTitle + "]");
+                
+                // Put itemTitle to the 'obj' JSONObject.
+                obj.put(JSON_TITLE, itemTitle);
                 continue;
             
             // Find the same pattern with <div class='w'>. This means the writer of this article.
@@ -355,8 +260,12 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
                         ;
                     } else {
                         if (isAddWriter) {
-                            itemWriter = nodeSeg.getTextExtractor().toString();
+                            String itemWriter = nodeSeg.getTextExtractor().toString();
+                            //Log.i(TAG, "parseMLBParkHtmlDataMobileVer - parsed writer[" + itemWriter + "]");
                             isAddWriter = false;
+                            
+                            // Put itemWriter to the 'obj' JSONObject.
+                            obj.put(JSON_WRITER, itemWriter);
                             break;
                         }
                     }
@@ -366,7 +275,8 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
             // Find the same pattern with <div class='ar_txt'>. This means the body of this article.
             } else if (value != null && value.equals("ar_txt")) {
                 Segment seg = div.getContent();
-                boolean isSkipSegment = false, isSkipImgUrl = false;
+                boolean isSkipSegment = false, isAddTextToBody = false;
+                String itemBodyText = "";
                 for (Iterator<Segment> nodeIterator = seg.getNodeIterator() ; nodeIterator.hasNext();) {
                     Segment nodeSeg = nodeIterator.next();
                     if (nodeSeg instanceof StartTag) {
@@ -374,25 +284,48 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
                         if (tagName.equals("style")) {
                             isSkipSegment = true;
                         } else if (!isSkipSegment && (tagName.equals("br") || tagName.equals("div"))) {
-                            itemBody += "\n";
-                        } else if (!isSkipSegment && !isSkipImgUrl && tagName.equals("img")) {
-                            itemImgUrl = ((StartTag) nodeSeg).getAttributeValue("src");
-                            isSkipImgUrl = true;
+                            itemBodyText += "\n";
+                            isAddTextToBody = true;
+                        } else if (!isSkipSegment && tagName.equals("img")) {
+                            // If stored itemBodyText exists before parsing image tag,
+                            // put it to the 'body' JSONArray and initialize isAddTextToBody, itemBodyText.
+                            if (isAddTextToBody) {
+                                JSONObject newBodyText = new JSONObject();
+                                newBodyText.put(JSON_BODY_TEXT, itemBodyText);
+                                body.put(newBodyText);
+                                isAddTextToBody = false;
+                                itemBodyText = "";
+                            }
+                            String itemImgUrl = ((StartTag) nodeSeg).getAttributeValue("src");
+                            
+                            // Put itemImgUrl to the 'body' JSONArray.
+                            JSONObject newImgUrl = new JSONObject();
+                            newImgUrl.put(JSON_BODY_IMAGE, itemImgUrl);
+                            body.put(newImgUrl);
                         }
                     } else if (nodeSeg instanceof EndTag) {
                         String tagName = ((Tag)nodeSeg).getName();
                         if (tagName.equals("style")) {
                             isSkipSegment = false;
                         } else if (!isSkipSegment && tagName.equals("p")) {
-                            itemBody += "\n";
+                            itemBodyText += "\n";
+                            isAddTextToBody = true;
                         }
                     } else if (nodeSeg instanceof CharacterReference) {
                         ;
                     } else {
                         if (!isSkipSegment && (nodeSeg.isWhiteSpace() == false)) {
-                            itemBody += nodeSeg.getTextExtractor().toString();
+                            itemBodyText += nodeSeg.getTextExtractor().toString();
+                            isAddTextToBody = true;
                         }
                     }
+                }
+                // If stored itemBodyText exists after parsing this article,
+                // put it to the 'body' JSONArray.
+                if (isAddTextToBody) {
+                    JSONObject newBodyText = new JSONObject();
+                    newBodyText.put(JSON_BODY_TEXT, itemBodyText);
+                    body.put(newBodyText);
                 }
                 continue;
                 
@@ -426,7 +359,12 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
                         if (!isSkipSegment && isAddComment) {
                             tmpComment += nodeSeg.getTextExtractor().toString();
                         } else if (!isSkipSegment && isAddNick) {
-                            itemComment += ("[" + nodeSeg.getTextExtractor().toString() + "] : " + tmpComment + "\n\n");
+                            // Put comment info to the 'comment' JSONArray.
+                            String writer = nodeSeg.getTextExtractor().toString();
+                            JSONObject newComment = new JSONObject();
+                            newComment.put(JSON_COMMENT_WRITER, writer);
+                            newComment.put(JSON_COMMENT_TEXT, tmpComment);
+                            comment.put(newComment);
                             tmpComment = "";
                             isAddNick = false;
                         }
@@ -438,10 +376,10 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
             }
         }
         
-        mContentItem = new contentItem((itemTitle + " by " + itemWriter), itemBody, itemImgUrl, itemComment);
-        //Log.i(TAG, "mContentItem[" + mContentItem.toString() + "]");
-
-        Log.i(TAG, "parseMLBParkHtmlData - done!");
+        // Save parsed result.
+        mParsedJSONObject = obj;
+        Log.i(TAG, "parseMLBParkHtmlDataMobileVer - mParsedJSONString[" + obj.toString(4) + "]");
+        Log.i(TAG, "parseMLBParkHtmlDataMobileVer - done!");
         return true;
     }
     

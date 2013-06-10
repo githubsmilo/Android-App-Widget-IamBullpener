@@ -9,7 +9,7 @@ import android.widget.Toast;
 
 public final class Utils {
 
-    private static final String TAG = "BullpenUtils";
+    //private static final String TAG = "BullpenUtils";
     
     public static boolean isInternetConnected(Context context) {
         ConnectivityManager cm =  (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);

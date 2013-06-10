@@ -6,6 +6,7 @@
         android:layout_height="match_parent"
         android:padding="@dimen/widget_margin" >
         
+    <!--  [writer] title -->
     <TextView
             android:id="@+id/contentRowTitleText"
             android:layout_width="match_parent"
@@ -15,33 +16,23 @@
             android:paddingLeft="10dip"
             android:paddingRight="10dip"
             android:minHeight="?android:attr/listPreferredItemHeight" />
-        
-    <ImageView
-            android:id="@+id/contentRowImage"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingLeft="10dip"
-            android:paddingRight="10dip"
-            android:contentDescription="@string/imgContentDescription" />
-        
-    <TextView
-            android:id="@+id/contentRowBodyText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:gravity="center_vertical"
-            android:paddingLeft="10dip"
-            android:paddingRight="10dip"
-            android:minHeight="?android:attr/listPreferredItemHeight" />
-
-    <TextView
-            android:id="@+id/contentRowCommentText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:gravity="center_vertical"
-            android:paddingLeft="10dip"
-            android:paddingRight="10dip"
-            android:minHeight="?android:attr/listPreferredItemHeight" />
+    
+    <!-- body (text + image) -->
+    <LinearLayout
+        android:id="@+id/contentRowBodyLayout"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+        <!-- Add dynamic view here -->
+    </LinearLayout>
+    
+    <!-- comment -->
+    <LinearLayout
+        android:id="@+id/contentRowCommentLayout"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+        <!-- Add dynamic view here -->
+    </LinearLayout>
 
 </LinearLayout>

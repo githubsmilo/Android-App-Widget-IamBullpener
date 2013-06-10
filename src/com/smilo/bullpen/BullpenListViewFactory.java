@@ -137,62 +137,7 @@ public class BullpenListViewFactory implements RemoteViewsService.RemoteViewsFac
     public void onDestroy() {
     	teardownIntentListener();
     }
-
-    private void parseMLBParkHtmlDataFullVer(String urlAddress) throws IOException {
-        Source source = new Source(new URL(urlAddress));
-        source.fullSequentialParse();
-
-        // Initialize widget item array list here.
-        mlistItems.clear();
-
-        List<Element> tables = source.getAllElements(HTMLElementName.TABLE);
-        int addedItemCount = 0;
-        for (int i = 0; i < tables.size(); i++) {
-            Element table = tables.get(i);
-
-            // Find the same pattern with <table width='100%' border='0' cellspacing='6' cellpadding='0'
-            String widthAttr = table.getAttributeValue("width");
-            String borderAttr = table.getAttributeValue("border");
-            String cellspacingAttr = table.getAttributeValue("cellspacing");
-            String cellpaddingAttr = table.getAttributeValue("cellpadding");
-            if ((widthAttr != null && widthAttr.equals("100%"))
-                    && (borderAttr != null && borderAttr.equals("0"))
-                    && (cellspacingAttr != null && cellspacingAttr.equals("6"))
-                    && (cellpaddingAttr != null && cellpaddingAttr.equals("0"))) {
-
-                Segment content;
-                
-                // Skip Notice
-                content= table.getFirstElementByClass("A11gray").getContent();
-                if (content.getTextExtractor().toString().equals("공지"))
-                    continue;
-                
-                content = table.getFirstElementByClass("G12read").getContent();
-
-                // Get title and url
-                String title = content.getTextExtractor().toString();
-                String url = content.getURIAttributes().get(0).getValue();
-                if (url.startsWith("/")) {
-                    StringBuffer strBuf = new StringBuffer();
-                    strBuf.append(Constants.mMLBParkUrl_base);
-                    strBuf.append(url);
-                    url = strBuf.toString();
-                }
-                //Log.i(TAG, "parseMLBParkHtmlDataFullVer - title[" + title + "],url[" + url + "]");
-
-                // Add widget item array list
-                listItem item = new listItem(title, url);
-                mlistItems.add(item);
-                addedItemCount++;
-
-                if (addedItemCount == Constants.LISTVIEW_MAX_ITEM_COUNT) {
-                    Log.i(TAG, "parseMLBParkHtmlDataFullVer - done!");
-                    return;
-                }
-            }
-        }
-    }
-
+    
     private boolean parseMLBParkHtmlDataMobileVer(String urlAddress) throws IOException {
         // Initialize widget item array list here.
         mlistItems.clear();
