@@ -1,6 +1,10 @@
 
 package com.smilo.bullpen;
 
+import com.smilo.bullpen.Constants.PARSING_RESULT;
+
+import org.json.JSONException;
+
 import net.htmlparser.jericho.CharacterReference;
 import net.htmlparser.jericho.Element;
 import net.htmlparser.jericho.EndTag;
@@ -34,7 +38,7 @@ public class BullpenListViewFactory implements RemoteViewsService.RemoteViewsFac
     private static int mAppWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID;
     private static String mSelectedBullpenBoardUrl = null;
     private static BroadcastReceiver mIntentListener;
-    private static boolean mIsSuccessToParse = false;
+    private static PARSING_RESULT mParsingResult = PARSING_RESULT.FAILED_UNKNOWN;
 
     private class listItem {
         public String itemTitle;
@@ -63,13 +67,31 @@ public class BullpenListViewFactory implements RemoteViewsService.RemoteViewsFac
 
         // Create a RemoteView and set widget item array list to the RemoteView.
         RemoteViews rv = new RemoteViews(mContext.getPackageName(), R.layout.list_row);
-        if (mIsSuccessToParse) {
-            rv.setTextViewText(R.id.listRowText, mlistItems.get(position).itemTitle);
-            Intent fillInIntent = new Intent();
-            fillInIntent.putExtra(Constants.EXTRA_ITEM_URL, mlistItems.get(position).itemUrl);
-            rv.setOnClickFillInIntent(R.id.listRowText, fillInIntent);
-        } else {
-            rv.setTextViewText(R.id.listRowText, mContext.getResources().getString(R.string.text_failedToParse));
+        
+        switch (mParsingResult) {
+            case SUCCESS :
+                rv.setTextViewText(R.id.listRowText, mlistItems.get(position).itemTitle);
+                Intent fillInIntent = new Intent();
+                fillInIntent.putExtra(Constants.EXTRA_ITEM_URL, mlistItems.get(position).itemUrl);
+                rv.setOnClickFillInIntent(R.id.listRowText, fillInIntent);
+                break;
+                
+            case FAILED_IO_EXCEPTION :
+                rv.setTextViewText(R.id.listRowText, mContext.getResources().getString(R.string.text_failed_io_exception));
+                break;
+                
+            case FAILED_JSON_EXCEPTION :
+                rv.setTextViewText(R.id.listRowText, mContext.getResources().getString(R.string.text_failed_json_exception));
+                break;
+                
+            case FAILED_STACK_OVERFLOW :
+                rv.setTextViewText(R.id.listRowText, mContext.getResources().getString(R.string.text_failed_stack_overflow));
+                break;
+                
+            case FAILED_UNKNOWN :
+            default:
+                rv.setTextViewText(R.id.listRowText, mContext.getResources().getString(R.string.text_failed_unknown));
+                break;
         }
 
         return rv;
@@ -86,11 +108,19 @@ public class BullpenListViewFactory implements RemoteViewsService.RemoteViewsFac
         
         // Parse MLBPark html data and add items to the widget item array list.
         try {
-            mIsSuccessToParse = (parseMLBParkHtmlDataMobileVer(mSelectedBullpenBoardUrl) == true) ? true : false;
+            mParsingResult = parseMLBParkHtmlDataMobileVer(mSelectedBullpenBoardUrl);
         } catch (IOException e) {
             Log.e(TAG, "onDataSetChanged - IOException![" + e.toString() + "]");
             e.printStackTrace();
-            mIsSuccessToParse = false;
+            mParsingResult = PARSING_RESULT.FAILED_IO_EXCEPTION;
+        } catch (JSONException e) {
+            Log.e(TAG, "onDataSetChanged - JSONException![" + e.toString() + "]");
+            e.printStackTrace();
+            mParsingResult = PARSING_RESULT.FAILED_JSON_EXCEPTION;
+        } catch (StackOverflowError e) {
+            Log.e(TAG, "onDataSetChanged - StackOverflowError![" + e.toString() + "]");
+            e.printStackTrace();
+            mParsingResult = PARSING_RESULT.FAILED_STACK_OVERFLOW;
         }
     }
 
@@ -98,8 +128,8 @@ public class BullpenListViewFactory implements RemoteViewsService.RemoteViewsFac
     public int getCount() {
     	//Log.i(TAG, "getCount");
     	
-    	if (mIsSuccessToParse) {
-              return Constants.LISTVIEW_MAX_ITEM_COUNT;
+    	if (mParsingResult == PARSING_RESULT.SUCCESS) {
+    	    return Constants.LISTVIEW_MAX_ITEM_COUNT;
     	} else {
               return 1;
     	}
@@ -138,7 +168,7 @@ public class BullpenListViewFactory implements RemoteViewsService.RemoteViewsFac
     	teardownIntentListener();
     }
     
-    private boolean parseMLBParkHtmlDataMobileVer(String urlAddress) throws IOException {
+    private PARSING_RESULT parseMLBParkHtmlDataMobileVer(String urlAddress) throws IOException, JSONException, StackOverflowError {
         // Initialize widget item array list here.
         mlistItems.clear();
         
@@ -222,14 +252,14 @@ public class BullpenListViewFactory implements RemoteViewsService.RemoteViewsFac
 
                 if (addedItemCount == Constants.LISTVIEW_MAX_ITEM_COUNT) {
                     Log.i(TAG, "parseMLBParkHtmlDataMobileVer - done!");
-                    return true;
+                    return PARSING_RESULT.SUCCESS;
                 }
             }
             
-            return true;
+            return PARSING_RESULT.SUCCESS;
         } else {
             Log.e(TAG, "parseMLBParkHtmlDataMobileVer - Cannot find article list.");
-            return false;
+            return PARSING_RESULT.FAILED_UNKNOWN;
         }
     }
     

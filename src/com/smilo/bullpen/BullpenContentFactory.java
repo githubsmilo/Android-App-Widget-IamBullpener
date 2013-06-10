@@ -1,13 +1,7 @@
 
 package com.smilo.bullpen;
 
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.net.URLConnection;
-import java.util.Iterator;
-import java.util.List;
+import com.smilo.bullpen.Constants.PARSING_RESULT;
 
 import net.htmlparser.jericho.CharacterReference;
 import net.htmlparser.jericho.Element;
@@ -33,6 +27,14 @@ import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.net.URLConnection;
+import java.util.Iterator;
+import java.util.List;
+
 public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFactory {
 
     private static final String TAG = "BullpenContentFactory";
@@ -42,7 +44,7 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
     private static int mAppWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID;
     private static String mSelectedItemUrl = null;
     private static BroadcastReceiver mIntentListener;
-    private static boolean mIsSuccessToParse = false;
+    private static PARSING_RESULT mParsingResult = PARSING_RESULT.FAILED_UNKNOWN;
     
     private static final String JSON_TITLE = "title";
     private static final String JSON_WRITER = "writer";
@@ -70,96 +72,112 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
 
         // Create remoteViews
         RemoteViews rv = new RemoteViews(mContext.getPackageName(), R.layout.content_row);
-        RemoteViews rvDivider = new RemoteViews(mContext.getPackageName(), R.layout.content_row_divider);
         
-        if (mIsSuccessToParse) {
-            // Set writer and title
-            String contentTitle = mParsedJSONObject.optString(JSON_TITLE);
-            String contentWriter = mParsedJSONObject.optString(JSON_WRITER);
-            if (contentTitle != null && contentTitle.length() > 0) {
-                if (contentWriter != null && contentWriter.length() > 0) {
-                    rv.setTextViewText(R.id.contentRowTitleText, "[" + contentWriter + "] " + contentTitle);
-                } else {
-                    rv.setTextViewText(R.id.contentRowTitleText, "[writer not existed]" + contentTitle);
-                }
-            } else {
-                if (contentWriter != null && contentWriter.length() > 0) {
-                    rv.setTextViewText(R.id.contentRowTitleText, "[" + contentWriter + "]");
-                } else {
-                    rv.setTextViewText(R.id.contentRowTitleText, "[writer not existed] title not existed");
-                }
-            }
-            
-            // Add a devider between title and body.
-            rv.addView(R.id.contentRowBodyLayout, rvDivider);
-            
-            // Set text and image of content body.
-            JSONArray bodyArray = mParsedJSONObject.optJSONArray(JSON_BODY);
-            if (bodyArray != null && bodyArray.length() > 0) {
-                for (int i = 0 ; i < bodyArray.length() ; i++) {
-                    JSONObject obj = bodyArray.optJSONObject(i);
-                    if (obj == null || obj.length() == 0) {
-                        break;
-                    }
-                    String bodyText = obj.optString(JSON_BODY_TEXT);
-                    if (bodyText != null && bodyText.length() > 0) {
-                        //Log.i(TAG, "getViewAt - text[" + text + "]");
-                        RemoteViews rvBodyText = new RemoteViews(mContext.getPackageName(), R.layout.content_row_text);
-                        rvBodyText.setTextViewText(R.id.contentRowText, bodyText);
-                        rv.addView(R.id.contentRowBodyLayout, rvBodyText);
-                        continue;
-                    }
-                    String bodyImage = obj.optString(JSON_BODY_IMAGE);
-                    if (bodyImage != null && bodyImage.length() > 0) {
-                        //Log.i(TAG, "getViewAt - image[" + image + "]");
-                        // TODO : manage bitmap
-                        Bitmap bitmap = getImageBitmap(bodyImage);
-                        RemoteViews rvBodyImage = new RemoteViews(mContext.getPackageName(), R.layout.content_row_image);
-                        rvBodyImage.setImageViewBitmap(R.id.contentRowImage, bitmap);
-                        rv.addView(R.id.contentRowBodyLayout, rvBodyImage);
-                    }
-                }
-            }
-            
-            // Add a devider between body and title.
-            rv.addView(R.id.contentRowCommentLayout, rvDivider);
-            
-            // Set text of content comment.
-            JSONArray commentArray = mParsedJSONObject.optJSONArray(JSON_COMMENT);
-            if (commentArray != null && commentArray.length() > 0) {
-                for (int i = 0 ; i < commentArray.length() ; i++) {
-                    JSONObject obj = commentArray.optJSONObject(i);
-                    if (obj == null || obj.length() == 0) {
-                        break;
-                    }
-                    String commentWriter = obj.optString(JSON_COMMENT_WRITER);
-                    String commentText = obj.optString(JSON_COMMENT_TEXT);
-                    RemoteViews rvComment = new RemoteViews(mContext.getPackageName(), R.layout.content_row_text);
-                    if (commentWriter != null && commentWriter.length() > 0) {
-                        if (commentText != null && commentText.length() >0) {
-                            rvComment.setTextViewText(R.id.contentRowText, "[" + commentWriter + "] " + commentText);
-                        } else {
-                            rvComment.setTextViewText(R.id.contentRowText, "[" + commentWriter + "] comment not exsited");
-                        }
+        switch (mParsingResult) {
+            case  SUCCESS :
+                RemoteViews rvDivider = new RemoteViews(mContext.getPackageName(), R.layout.content_row_divider);
+                
+                // Set writer and title
+                String contentTitle = mParsedJSONObject.optString(JSON_TITLE);
+                String contentWriter = mParsedJSONObject.optString(JSON_WRITER);
+                if (contentTitle != null && contentTitle.length() > 0) {
+                    if (contentWriter != null && contentWriter.length() > 0) {
+                        rv.setTextViewText(R.id.contentRowTitleText, "[" + contentWriter + "] " + contentTitle);
                     } else {
-                        if (commentText != null && commentText.length() >0) {
-                            rvComment.setTextViewText(R.id.contentRowText, "[writer not existed] " + commentText);
-                        } else {
-                            rvComment.setTextViewText(R.id.contentRowText, "[writer not existed] comment not existed");
+                        rv.setTextViewText(R.id.contentRowTitleText, "[writer not existed]" + contentTitle);
+                    }
+                } else {
+                    if (contentWriter != null && contentWriter.length() > 0) {
+                        rv.setTextViewText(R.id.contentRowTitleText, "[" + contentWriter + "]");
+                    } else {
+                        rv.setTextViewText(R.id.contentRowTitleText, "[writer not existed] title not existed");
+                    }
+                }
+                
+                // Add a devider between title and body.
+                rv.addView(R.id.contentRowBodyLayout, rvDivider);
+                
+                // Set text and image of content body.
+                JSONArray bodyArray = mParsedJSONObject.optJSONArray(JSON_BODY);
+                if (bodyArray != null && bodyArray.length() > 0) {
+                    for (int i = 0 ; i < bodyArray.length() ; i++) {
+                        JSONObject obj = bodyArray.optJSONObject(i);
+                        if (obj == null || obj.length() == 0) {
+                            break;
+                        }
+                        String bodyText = obj.optString(JSON_BODY_TEXT);
+                        if (bodyText != null && bodyText.length() > 0) {
+                            //Log.i(TAG, "getViewAt - text[" + text + "]");
+                            RemoteViews rvBodyText = new RemoteViews(mContext.getPackageName(), R.layout.content_row_text);
+                            rvBodyText.setTextViewText(R.id.contentRowText, bodyText);
+                            rv.addView(R.id.contentRowBodyLayout, rvBodyText);
+                            continue;
+                        }
+                        String bodyImage = obj.optString(JSON_BODY_IMAGE);
+                        if (bodyImage != null && bodyImage.length() > 0) {
+                            //Log.i(TAG, "getViewAt - image[" + image + "]");
+                            // TODO : manage bitmap
+                            Bitmap bitmap = getImageBitmap(bodyImage);
+                            RemoteViews rvBodyImage = new RemoteViews(mContext.getPackageName(), R.layout.content_row_image);
+                            rvBodyImage.setImageViewBitmap(R.id.contentRowImage, bitmap);
+                            rv.addView(R.id.contentRowBodyLayout, rvBodyImage);
                         }
                     }
-                    rv.addView(R.id.contentRowCommentLayout, rvComment);
-                    rv.addView(R.id.contentRowCommentLayout, rvDivider);
                 }
-            }
-
-            Intent fillInIntent = new Intent();
-            rv.setOnClickFillInIntent(R.id.contentRowLayout, fillInIntent);
+                
+                // Add a devider between body and title.
+                rv.addView(R.id.contentRowCommentLayout, rvDivider);
+                
+                // Set text of content comment.
+                JSONArray commentArray = mParsedJSONObject.optJSONArray(JSON_COMMENT);
+                if (commentArray != null && commentArray.length() > 0) {
+                    for (int i = 0 ; i < commentArray.length() ; i++) {
+                        JSONObject obj = commentArray.optJSONObject(i);
+                        if (obj == null || obj.length() == 0) {
+                            break;
+                        }
+                        String commentWriter = obj.optString(JSON_COMMENT_WRITER);
+                        String commentText = obj.optString(JSON_COMMENT_TEXT);
+                        RemoteViews rvComment = new RemoteViews(mContext.getPackageName(), R.layout.content_row_text);
+                        if (commentWriter != null && commentWriter.length() > 0) {
+                            if (commentText != null && commentText.length() >0) {
+                                rvComment.setTextViewText(R.id.contentRowText, "[" + commentWriter + "] " + commentText);
+                            } else {
+                                rvComment.setTextViewText(R.id.contentRowText, "[" + commentWriter + "] comment not exsited");
+                            }
+                        } else {
+                            if (commentText != null && commentText.length() >0) {
+                                rvComment.setTextViewText(R.id.contentRowText, "[writer not existed] " + commentText);
+                            } else {
+                                rvComment.setTextViewText(R.id.contentRowText, "[writer not existed] comment not existed");
+                            }
+                        }
+                        rv.addView(R.id.contentRowCommentLayout, rvComment);
+                        rv.addView(R.id.contentRowCommentLayout, rvDivider);
+                    }
+                }
+                break;
             
-        } else {
-            rv.setTextViewText(R.id.contentRowTitleText, mContext.getResources().getString(R.string.text_failedToParse));
+            case FAILED_IO_EXCEPTION :
+                rv.setTextViewText(R.id.contentRowTitleText, mContext.getResources().getString(R.string.text_failed_io_exception));
+                break;
+                
+            case FAILED_JSON_EXCEPTION :
+                rv.setTextViewText(R.id.contentRowTitleText, mContext.getResources().getString(R.string.text_failed_json_exception));
+                break;
+                
+            case FAILED_STACK_OVERFLOW :
+                rv.setTextViewText(R.id.contentRowTitleText, mContext.getResources().getString(R.string.text_failed_stack_overflow));
+                break;
+                
+            case FAILED_UNKNOWN :
+            default:
+                rv.setTextViewText(R.id.contentRowTitleText, mContext.getResources().getString(R.string.text_failed_unknown));
+                break;
         }
 
+        Intent fillInIntent = new Intent();
+        rv.setOnClickFillInIntent(R.id.contentRowLayout, fillInIntent);
         return rv;
     }
     
@@ -174,15 +192,19 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
         
         // Parse MLBPark html data and add items to the widget item array list.
         try {
-            mIsSuccessToParse = (parseMLBParkHtmlDataMobileVer(mSelectedItemUrl) == true) ? true : false;
+            mParsingResult = parseMLBParkHtmlDataMobileVer(mSelectedItemUrl);
         } catch (IOException e) {
             Log.e(TAG, "onDataSetChanged - IOException![" + e.toString() + "]");
             e.printStackTrace();
-            mIsSuccessToParse = false;
+            mParsingResult = PARSING_RESULT.FAILED_IO_EXCEPTION;
         } catch (JSONException e) {
             Log.e(TAG, "onDataSetChanged - JSONException![" + e.toString() + "]");
             e.printStackTrace();
-            mIsSuccessToParse = false;
+            mParsingResult = PARSING_RESULT.FAILED_JSON_EXCEPTION;
+        } catch (StackOverflowError e) {
+            Log.e(TAG, "onDataSetChanged - StackOverflowError![" + e.toString() + "]");
+            e.printStackTrace();
+            mParsingResult = PARSING_RESULT.FAILED_STACK_OVERFLOW;
         }
     }
     
@@ -224,7 +246,7 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
         teardownIntentListener();
     }
 
-    private boolean parseMLBParkHtmlDataMobileVer(String urlAddress) throws IOException, JSONException {
+    private PARSING_RESULT parseMLBParkHtmlDataMobileVer(String urlAddress) throws IOException, JSONException, StackOverflowError {
 
         // Load HTML data from given urlAddress.
         Source source = new Source(new URL(urlAddress));
@@ -388,7 +410,8 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
         mParsedJSONObject = obj;
         Log.i(TAG, "parseMLBParkHtmlDataMobileVer - mParsedJSONString[" + obj.toString(4) + "]");
         Log.i(TAG, "parseMLBParkHtmlDataMobileVer - done!");
-        return true;
+        
+        return PARSING_RESULT.SUCCESS;
     }
     
     private Bitmap getImageBitmap(String url) { 

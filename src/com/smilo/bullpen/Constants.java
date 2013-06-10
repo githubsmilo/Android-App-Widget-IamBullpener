@@ -29,4 +29,12 @@ public final class Constants {
     public static final String mMLBParkUrl_bullpen = "http://mlbpark.donga.com/mbs/articleL.php?mbsC=bullpen";
     public static final String mMLBParkUrl_bullpen1000 = "http://mlbpark.donga.com/mbs/articleL.php?mbsC=bullpen&mbsW=search&select=hit&opt=1&keyword=1000";
     public static final String mMLBParkUrl_bullpen2000 = "http://mlbpark.donga.com/mbs/articleL.php?mbsC=bullpen&mbsW=search&select=hit&opt=1&keyword=2000";
+    
+    public enum PARSING_RESULT {
+        SUCCESS,
+        FAILED_IO_EXCEPTION,
+        FAILED_JSON_EXCEPTION,
+        FAILED_STACK_OVERFLOW,
+        FAILED_UNKNOWN,
+    };
 }
