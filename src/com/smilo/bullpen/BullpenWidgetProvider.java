@@ -53,10 +53,12 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
         int[] appWidgetIds = awm.getAppWidgetIds(new ComponentName(context, getClass()));
 
         if (appWidgetId <= AppWidgetManager.INVALID_APPWIDGET_ID) {
-            Log.e(TAG, "onReceive - action[" + action + "], Invalid appWidgetId[" + appWidgetId + "], pageNum[" + pageNum + "], appWidgetsNum[" + appWidgetIds.length + "]");
+            Log.e(TAG, "onReceive - action[" + action + "], Invalid appWidgetId[" + appWidgetId + "], pageNum[" + pageNum +
+                    "], appWidgetsNum[" + appWidgetIds.length + "]");
             return;
         } else {
-            Log.i(TAG, "onReceive - action[" + action + "], appWidgetId[" + appWidgetId + "], pageNum[" + pageNum + "], appWidgetsNum[" + appWidgetIds.length + "]");
+            Log.i(TAG, "onReceive - action[" + action + "], appWidgetId[" + appWidgetId + "], pageNum[" + pageNum +
+                    "], appWidgetsNum[" + appWidgetIds.length + "]");
         }
 
         if (Utils.isInternetConnected(context) == false) {
@@ -78,36 +80,18 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
                 mSelectedRefreshTime = Utils.getRefreshTime(selectedRefreshTimeType);
                 mSelectedBullpenBoardUrl = Utils.getBullpenBoardUrl(selectedBullpenBoardType);
     
-                // Send broadcast intent to update mSelectedBullpenBoardUrl variable on the BullpenListViewFactory.
-                // On the first time to show some item, this intent does not operate.
-                Intent broadcastIntent = new Intent(Constants.ACTION_UPDATE_LIST_URL);
-                broadcastIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
-                broadcastIntent.putExtra(Constants.EXTRA_LIST_URL, mSelectedBullpenBoardUrl);
-                broadcastIntent.putExtra(Constants.EXTRA_PAGE_NUM, Constants.DEFAULT_PAGE_NUM);
-                context.sendBroadcast(broadcastIntent);
+                // Send broadcast intent to update mSelectedBullpenBoardUrl, pageNum variable on the BullpenListViewFactory.
+                context.sendBroadcast(buildUpdateListUrlIntent(appWidgetId, Constants.DEFAULT_PAGE_NUM));
                 
                 // Broadcast ACTION_SHOW_LIST intent.
-                Intent showListIntent = new Intent(context, BullpenWidgetProvider.class);
-                showListIntent.setAction(Constants.ACTION_SHOW_LIST);
-                showListIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
-                showListIntent.putExtra(Constants.EXTRA_PAGE_NUM, Constants.DEFAULT_PAGE_NUM);
-                context.sendBroadcast(showListIntent);
+                context.sendBroadcast(buildShowListIntent(context, appWidgetId, Constants.DEFAULT_PAGE_NUM));
 
             } else if (action.equals(Constants.ACTION_REFRESH_LIST)){
-                // Send broadcast intent to update mSelectedBullpenBoardUrl variable on the BullpenListViewFactory.
-                // On the first time to show some item, this intent does not operate.
-                Intent broadcastIntent = new Intent(Constants.ACTION_UPDATE_LIST_URL);
-                broadcastIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
-                broadcastIntent.putExtra(Constants.EXTRA_LIST_URL, mSelectedBullpenBoardUrl);
-                broadcastIntent.putExtra(Constants.EXTRA_PAGE_NUM, pageNum);
-                context.sendBroadcast(broadcastIntent);
+                // Send broadcast intent to update mSelectedBullpenBoardUrl, pageNum variable on the BullpenListViewFactory.
+                context.sendBroadcast(buildUpdateListUrlIntent(appWidgetId, pageNum));
                 
                 // Broadcast ACTION_SHOW_LIST intent.
-                Intent showListIntent = new Intent(context, BullpenWidgetProvider.class);
-                showListIntent.setAction(Constants.ACTION_SHOW_LIST);
-                showListIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
-                showListIntent.putExtra(Constants.EXTRA_PAGE_NUM, pageNum);
-                context.sendBroadcast(showListIntent);
+                context.sendBroadcast(buildShowListIntent(context, appWidgetId, pageNum));
                 
             // This intent(ACTION_APPWIDGET_UPDATE) will be called periodically.
             // This intent(ACTION_SHOW_LIST) will be called when current item pressed.
@@ -123,53 +107,90 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
                 mSelectedItemUrl = intent.getStringExtra(Constants.EXTRA_ITEM_URL);
 
                 // Send broadcast intent to update mSelectedItemUrl variable on the BullpenContentFactory.
-                // On the first time to show some item, this intent does not operate.
-                Intent broadcastIntent = new Intent(Constants.ACTION_UPDATE_ITEM_URL);
-                broadcastIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
-                broadcastIntent.putExtra(Constants.EXTRA_ITEM_URL, mSelectedItemUrl);
-                broadcastIntent.putExtra(Constants.EXTRA_PAGE_NUM, pageNum);
-                context.sendBroadcast(broadcastIntent);
+                context.sendBroadcast(buildUpdateItemUrlIntent(appWidgetId, pageNum));
                 
                 setRemoteViewToShowItem(context, awm, appWidgetId, pageNum);
             }
        // }
     }
 
-    private PendingIntent buildListRefreshIntent(PENDING_INTENT_REQUEST_CODE requestCode, Context context, int appWidgetId, int pageNum) {
+    private Intent buildShowListIntent(Context context, int appWidgetId, int pageNum) {
+        Intent intent = new Intent(context, BullpenWidgetProvider.class);
+        intent.setAction(Constants.ACTION_SHOW_LIST);
+        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
+        intent.putExtra(Constants.EXTRA_PAGE_NUM, pageNum);
+        
+        return intent;
+    }
+    
+    private Intent buildUpdateListUrlIntent(int appWidgetId, int pageNum) {
+        if (mSelectedBullpenBoardUrl == null) {
+            Log.e(TAG, "buildUpdateListUrlIntent - mSelectedBullpenBoardUrl is null!");
+            return null;            
+        }
+        
+        Intent intent = new Intent(Constants.ACTION_UPDATE_LIST_URL);
+        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
+        intent.putExtra(Constants.EXTRA_LIST_URL, mSelectedBullpenBoardUrl);
+        intent.putExtra(Constants.EXTRA_PAGE_NUM, pageNum);
+        
+        return intent;
+    }
+    
+    private Intent buildUpdateItemUrlIntent(int appWidgetId, int pageNum) {
+        if (mSelectedItemUrl == null) {
+            Log.e(TAG, "buildUpdateItemUrlIntent - mSelectedItemUrl is null!");
+            return null;            
+        }
+        
+        Intent intent = new Intent(Constants.ACTION_UPDATE_ITEM_URL);
+        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
+        intent.putExtra(Constants.EXTRA_ITEM_URL, mSelectedItemUrl);
+        intent.putExtra(Constants.EXTRA_PAGE_NUM, pageNum);
+        
+        return intent;
+    }
+        
+    private Intent buildRefreshListIntent(Context context, int appWidgetId, int pageNum) {
         Intent intent = new Intent(context, BullpenWidgetProvider.class);
         intent.setAction(Constants.ACTION_REFRESH_LIST);
         intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
         intent.putExtra(Constants.EXTRA_PAGE_NUM, pageNum);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, requestCode.ordinal(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
         
-        return pendingIntent;
+        return intent;
     }
     
-    private PendingIntent buildContentRefreshIntent(Context context, int appWidgetId, int pageNum) {
+    private Intent buildShowItemIntent(Context context, int appWidgetId, int pageNum, boolean isAddSelectedItemUri) {
+        if (isAddSelectedItemUri == true && mSelectedItemUrl == null) {
+            Log.e(TAG, "buildShowItemIntent - mSelectedItemUrl is null!");
+            return null;            
+        }
+        
         Intent intent = new Intent(context, BullpenWidgetProvider.class);
         intent.setAction(Constants.ACTION_SHOW_ITEM);
         intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
-        intent.putExtra(Constants.EXTRA_ITEM_URL, mSelectedItemUrl);
+        if (isAddSelectedItemUri)
+            intent.putExtra(Constants.EXTRA_ITEM_URL, mSelectedItemUrl);
         intent.putExtra(Constants.EXTRA_PAGE_NUM, pageNum);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         
-        return pendingIntent;
+        return intent;
     }
     
-    private PendingIntent buildConfigurationActivityIntent(Context context, int appWidgetId) {
+    private Intent buildConfigurationActivityIntent(Context context, int appWidgetId) {
         Intent intent = new Intent(context, BullpenConfigurationActivity.class);
         intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
         intent.putExtra(Constants.EXTRA_REFRESH_TIME_TYPE, Utils.getRefreshTimeType(mSelectedRefreshTime));
         intent.putExtra(Constants.EXTRA_BULLPEN_BOARD_TYPE, Utils.getBullpenBoardType(mSelectedBullpenBoardUrl));
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-
-        return pendingIntent;
+        return intent;
     }
 
     private void setRemoteViewToShowList(Context context, AppWidgetManager awm, int appWidgetId, int pageNum) {
 
+        Intent intent = null;
+        PendingIntent pendingIntent = null;
+        
         // Create new remoteViews.
         RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.list);
         
@@ -185,31 +206,37 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
         rv.setTextViewText(R.id.textListTitle, Utils.getRemoteViewTitleWithPageNum(context, mSelectedBullpenBoardUrl, pageNum));
 
         // Set top button of the remoteViews.
-        rv.setOnClickPendingIntent(R.id.btnListNavTop, buildListRefreshIntent(
-                PENDING_INTENT_REQUEST_CODE.REQUEST_TOP, context, appWidgetId, Constants.DEFAULT_PAGE_NUM));
+        intent = buildRefreshListIntent(context, appWidgetId, Constants.DEFAULT_PAGE_NUM);
+        pendingIntent = PendingIntent.getBroadcast(
+                context, PENDING_INTENT_REQUEST_CODE.REQUEST_TOP.ordinal(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        rv.setOnClickPendingIntent(R.id.btnListNavTop, pendingIntent);
         
         // Set prev button of the removeViews.
-        rv.setOnClickPendingIntent(R.id.btnListNavPrev, buildListRefreshIntent(
-                PENDING_INTENT_REQUEST_CODE.REQUEST_PREV, context, appWidgetId, (pageNum > Constants.DEFAULT_PAGE_NUM ? pageNum - 1 : pageNum)));
+        intent = buildRefreshListIntent(context, appWidgetId, (pageNum > Constants.DEFAULT_PAGE_NUM ? pageNum - 1 : pageNum));
+        pendingIntent = PendingIntent.getBroadcast(
+                context, PENDING_INTENT_REQUEST_CODE.REQUEST_PREV.ordinal(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        rv.setOnClickPendingIntent(R.id.btnListNavPrev, pendingIntent);
         
         // Set next button of the remoteViews.
-        rv.setOnClickPendingIntent(R.id.btnListNavNext, buildListRefreshIntent(
-                PENDING_INTENT_REQUEST_CODE.REQUEST_NEXT, context, appWidgetId, pageNum + 1));
+        intent = buildRefreshListIntent(context, appWidgetId, pageNum + 1);
+        pendingIntent = PendingIntent.getBroadcast(
+                context, PENDING_INTENT_REQUEST_CODE.REQUEST_NEXT.ordinal(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        rv.setOnClickPendingIntent(R.id.btnListNavNext, pendingIntent);
         
         // Set refresh button of the remoteViews.
-        rv.setOnClickPendingIntent(R.id.btnListRefresh, buildListRefreshIntent(
-                PENDING_INTENT_REQUEST_CODE.REQUEST_REFRESH, context, appWidgetId, pageNum));
+        intent = buildRefreshListIntent(context, appWidgetId, pageNum);
+        pendingIntent = PendingIntent.getBroadcast(
+                context, PENDING_INTENT_REQUEST_CODE.REQUEST_REFRESH.ordinal(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        rv.setOnClickPendingIntent(R.id.btnListRefresh, pendingIntent);
         
         // Set setting button of the remoteViews.
-        rv.setOnClickPendingIntent(R.id.btnListSetting, buildConfigurationActivityIntent(context, appWidgetId));
+        intent = buildConfigurationActivityIntent(context, appWidgetId);
+        pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        rv.setOnClickPendingIntent(R.id.btnListSetting, pendingIntent);
         
         // Set a pending intent for click event to the remoteViews.
-        Intent clickIntent = new Intent(context, BullpenWidgetProvider.class);
-        clickIntent.setAction(Constants.ACTION_SHOW_ITEM);
-        clickIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
-        clickIntent.putExtra(Constants.EXTRA_PAGE_NUM, pageNum);
-        PendingIntent linkPendingIntent = PendingIntent.getBroadcast(
-                context, 0, clickIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        Intent clickIntent = buildShowItemIntent(context, appWidgetId, pageNum, false);
+        PendingIntent linkPendingIntent = PendingIntent.getBroadcast(context, 0, clickIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         rv.setPendingIntentTemplate(R.id.listView, linkPendingIntent);
     
         // Update widget.
@@ -228,6 +255,9 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
     
     private void setRemoteViewToShowItem(Context context, AppWidgetManager awm, int appWidgetId, int pageNum) {
     
+        Intent intent = null;
+        PendingIntent pendingIntent = null;
+        
         // Create new remoteViews.
         RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.content);
         
@@ -243,16 +273,17 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
         rv.setTextViewText(R.id.textContentTitle, Utils.getRemoteViewTitle(context, mSelectedBullpenBoardUrl));
 
         // Set refresh button of the remoteViews.
-        rv.setOnClickPendingIntent(R.id.btnContentRefresh, buildContentRefreshIntent(context, appWidgetId, pageNum));
+        intent = buildShowItemIntent(context, appWidgetId, pageNum, true);
+        pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        rv.setOnClickPendingIntent(R.id.btnContentRefresh, pendingIntent);
         
         // Set setting button of the remoteViews.
-        rv.setOnClickPendingIntent(R.id.btnContentSetting, buildConfigurationActivityIntent(context, appWidgetId));
+        intent = buildConfigurationActivityIntent(context, appWidgetId);
+        pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        rv.setOnClickPendingIntent(R.id.btnContentSetting, pendingIntent);
         
         // Set a pending intent for click event to the remoteViews.
-        Intent clickIntent = new Intent(context, BullpenWidgetProvider.class);
-        clickIntent.setAction(Constants.ACTION_SHOW_LIST);
-        clickIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
-        clickIntent.putExtra(Constants.EXTRA_PAGE_NUM, pageNum);
+        Intent clickIntent = buildShowListIntent(context, appWidgetId, pageNum);
         PendingIntent linkPendingIntent = PendingIntent.getBroadcast(
                 context, 0, clickIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         rv.setPendingIntentTemplate(R.id.contentView, linkPendingIntent);
