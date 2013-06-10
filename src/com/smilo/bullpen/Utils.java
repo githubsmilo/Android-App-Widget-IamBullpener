@@ -36,17 +36,36 @@ public final class Utils {
     public static String getRemoteViewTitle(Context context, String selectedUrl) {
         Resources res = context.getResources();
         if (selectedUrl == null) {
-                  return res.getString(R.string.remoteViewTitle_Default);
+                  return (res.getString(R.string.remoteViewTitle_Default));
         } else if (selectedUrl.equals(Constants.mMLBParkUrl_mlbtown)) {
-                  return res.getString(R.string.remoteViewTitle_MlbTown);
+                  return (res.getString(R.string.remoteViewTitle_MlbTown));
         } else if (selectedUrl.equals(Constants.mMLBParkUrl_kbotown)) {
-                  return res.getString(R.string.remoteViewTitle_KboTown);
+                  return (res.getString(R.string.remoteViewTitle_KboTown));
         } else if (selectedUrl.equals(Constants.mMLBParkUrl_bullpen)) {
-                  return res.getString(R.string.remoteViewTitle_Bullpen);
+                  return (res.getString(R.string.remoteViewTitle_Bullpen));
         } else if (selectedUrl.equals(Constants.mMLBParkUrl_bullpen1000)) {
-                  return res.getString(R.string.remoteViewTitle_Bullpen1000);
+                  return (res.getString(R.string.remoteViewTitle_Bullpen1000));
         } else if (selectedUrl.equals(Constants.mMLBParkUrl_bullpen2000)) {
-                  return res.getString(R.string.remoteViewTitle_Bullpen2000);
+                  return (res.getString(R.string.remoteViewTitle_Bullpen2000));
+        } else {
+                  return null;
+        }
+  }
+    
+    public static String getRemoteViewTitleWithPageNum(Context context, String selectedUrl, int pageNum) {
+        Resources res = context.getResources();
+        if (selectedUrl == null) {
+                  return (res.getString(R.string.remoteViewTitle_Default) + " - " + pageNum);
+        } else if (selectedUrl.equals(Constants.mMLBParkUrl_mlbtown)) {
+                  return (res.getString(R.string.remoteViewTitle_MlbTown) + " - " + pageNum);
+        } else if (selectedUrl.equals(Constants.mMLBParkUrl_kbotown)) {
+                  return (res.getString(R.string.remoteViewTitle_KboTown) + " - " + pageNum);
+        } else if (selectedUrl.equals(Constants.mMLBParkUrl_bullpen)) {
+                  return (res.getString(R.string.remoteViewTitle_Bullpen) + " - " + pageNum);
+        } else if (selectedUrl.equals(Constants.mMLBParkUrl_bullpen1000)) {
+                  return (res.getString(R.string.remoteViewTitle_Bullpen1000) + " - " + pageNum);
+        } else if (selectedUrl.equals(Constants.mMLBParkUrl_bullpen2000)) {
+                  return (res.getString(R.string.remoteViewTitle_Bullpen2000) + " - " + pageNum);
         } else {
                   return null;
         }

@@ -45,6 +45,7 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
     private static String mSelectedItemUrl = null;
     private static BroadcastReceiver mIntentListener;
     private static PARSING_RESULT mParsingResult = PARSING_RESULT.FAILED_UNKNOWN;
+    private static int mPageNum = Constants.DEFAULT_PAGE_NUM;
     
     private static final String JSON_TITLE = "title";
     private static final String JSON_WRITER = "writer";
@@ -61,7 +62,9 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
                 AppWidgetManager.EXTRA_APPWIDGET_ID,
                 AppWidgetManager.INVALID_APPWIDGET_ID);
         mSelectedItemUrl = intent.getStringExtra(Constants.EXTRA_ITEM_URL);
-        Log.i(TAG, "constructor - mSelectedItemUrl[" + mSelectedItemUrl + "], mAppWidgetId[" + mAppWidgetId + "]");
+        mPageNum = intent.getIntExtra(Constants.EXTRA_PAGE_NUM, Constants.DEFAULT_PAGE_NUM);
+        Log.i(TAG, "constructor - mSelectedItemUrl[" + mSelectedItemUrl +
+                "], mPageNum[" + mPageNum + "], mAppWidgetId[" + mAppWidgetId + "]");
         
         setupIntentListener();
     }
@@ -177,6 +180,7 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
         }
 
         Intent fillInIntent = new Intent();
+        fillInIntent.putExtra(Constants.EXTRA_PAGE_NUM, mPageNum);
         rv.setOnClickFillInIntent(R.id.contentRowLayout, fillInIntent);
         return rv;
     }
@@ -439,7 +443,9 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
                     // Update mSelectedItemUrl through Broadcast Intent.
                     mAppWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
                     mSelectedItemUrl = intent.getStringExtra(Constants.EXTRA_ITEM_URL);
-                    Log.i(TAG, "onReceive - update mSelectedItemUrl[" + mSelectedItemUrl + "], mAppWidgetId[" + mAppWidgetId + "]");
+                    mPageNum = intent.getIntExtra(Constants.EXTRA_PAGE_NUM, Constants.DEFAULT_PAGE_NUM);
+                    Log.i(TAG, "onReceive - update mSelectedItemUrl[" + mSelectedItemUrl + 
+                            "], mPageNum[" + mPageNum + "], mAppWidgetId[" + mAppWidgetId + "]");
                 }
             };
             IntentFilter filter = new IntentFilter();

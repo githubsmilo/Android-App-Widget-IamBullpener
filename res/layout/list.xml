@@ -21,6 +21,30 @@
 	        android:paddingTop="10dp"
 	        android:text="@string/remoteViewTitle_Default" />
 
+        <Button
+            android:id="@+id/btnListNavTop"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_toLeftOf="@+id/btnListNavPrev"
+            android:text="@string/btn_top" />
+
+        <Button
+            android:id="@+id/btnListNavPrev"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_toLeftOf="@+id/btnListNavNext"
+            android:text="@string/btn_prev" />
+
+        <Button
+            android:id="@+id/btnListNavNext"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_toLeftOf="@+id/btnListRefresh"
+            android:text="@string/btn_next" />
+
 	    <Button
             android:id="@+id/btnListRefresh"
             android:layout_width="wrap_content"

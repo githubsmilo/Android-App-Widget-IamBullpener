@@ -39,6 +39,7 @@ public class BullpenListViewFactory implements RemoteViewsService.RemoteViewsFac
     private static String mSelectedBullpenBoardUrl = null;
     private static BroadcastReceiver mIntentListener;
     private static PARSING_RESULT mParsingResult = PARSING_RESULT.FAILED_UNKNOWN;
+    private static int mPageNum = Constants.DEFAULT_PAGE_NUM;
 
     private class listItem {
         public String itemTitle;
@@ -56,7 +57,9 @@ public class BullpenListViewFactory implements RemoteViewsService.RemoteViewsFac
                 AppWidgetManager.EXTRA_APPWIDGET_ID,
                 AppWidgetManager.INVALID_APPWIDGET_ID);
         mSelectedBullpenBoardUrl = intent.getStringExtra(Constants.EXTRA_LIST_URL);
-        Log.i(TAG, "constructor - mSelectedBullpenBoardUrl[" + mSelectedBullpenBoardUrl + "], mAppWidgetId[" + mAppWidgetId + "]");
+        mPageNum = intent.getIntExtra(Constants.EXTRA_PAGE_NUM, Constants.DEFAULT_PAGE_NUM);
+        Log.i(TAG, "constructor - mSelectedBullpenBoardUrl[" + mSelectedBullpenBoardUrl +
+                "], mPageNum[" + mPageNum + "], mAppWidgetId[" + mAppWidgetId + "]");
         
         setupIntentListener();
     }
@@ -99,16 +102,19 @@ public class BullpenListViewFactory implements RemoteViewsService.RemoteViewsFac
 
     @Override
     public void onDataSetChanged() {
-        Log.i(TAG, "onDataSetChanged - mSelectedBullpenBoardUrl[" + mSelectedBullpenBoardUrl + "]");
+        Log.i(TAG, "onDataSetChanged - mSelectedBullpenBoardUrl[" + mSelectedBullpenBoardUrl + "], mPageNum[" + mPageNum + "]");
 
         if (mSelectedBullpenBoardUrl == null) {
             Log.e(TAG, "onDataSetChanged - mSelectedBullpenBoardUrl is null!");
+            return;
+        } else if (mPageNum < Constants.DEFAULT_PAGE_NUM) {
+            Log.e(TAG, "onDatasetChanged - mPageNum is invalid![" + mPageNum + "]");
             return;
         }
         
         // Parse MLBPark html data and add items to the widget item array list.
         try {
-            mParsingResult = parseMLBParkHtmlDataMobileVer(mSelectedBullpenBoardUrl);
+            mParsingResult = parseMLBParkHtmlDataMobileVer(mSelectedBullpenBoardUrl + mPageNum);
         } catch (IOException e) {
             Log.e(TAG, "onDataSetChanged - IOException![" + e.toString() + "]");
             e.printStackTrace();
@@ -139,7 +145,6 @@ public class BullpenListViewFactory implements RemoteViewsService.RemoteViewsFac
     public long getItemId(int position) {
         return position;
     }
-
     @Override
     public RemoteViews getLoadingView() {
         RemoteViews rv = new RemoteViews(mContext.getPackageName(), R.layout.list_row);
@@ -271,7 +276,9 @@ public class BullpenListViewFactory implements RemoteViewsService.RemoteViewsFac
 	                // Update mSelectedBullpenBoardUrl through Broadcast Intent.
 	                mAppWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
 	                mSelectedBullpenBoardUrl = intent.getStringExtra(Constants.EXTRA_LIST_URL);
-	                Log.i(TAG, "onReceive - update mSelectedBullpenBoardUrl[" + mSelectedBullpenBoardUrl + "], mAppWidgetId[" + mAppWidgetId + "]");
+	                mPageNum = intent.getIntExtra(Constants.EXTRA_PAGE_NUM, Constants.DEFAULT_PAGE_NUM);
+	                Log.i(TAG, "onReceive - update mSelectedBullpenBoardUrl[" + mSelectedBullpenBoardUrl + 
+	                        "], mPageNum[" + mPageNum + "], mAppWidgetId[" + mAppWidgetId + "]");
 	            }
 	        };
 	        IntentFilter filter = new IntentFilter();
