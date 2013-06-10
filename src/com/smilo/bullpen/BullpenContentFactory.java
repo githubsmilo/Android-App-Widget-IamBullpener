@@ -70,6 +70,7 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
 
         // Create remoteViews
         RemoteViews rv = new RemoteViews(mContext.getPackageName(), R.layout.content_row);
+        RemoteViews rvDivider = new RemoteViews(mContext.getPackageName(), R.layout.content_row_divider);
         
         if (mIsSuccessToParse) {
             // Set writer and title
@@ -88,6 +89,9 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
                     rv.setTextViewText(R.id.contentRowTitleText, "[writer not existed] title not existed");
                 }
             }
+            
+            // Add a devider between title and body.
+            rv.addView(R.id.contentRowBodyLayout, rvDivider);
             
             // Set text and image of content body.
             JSONArray bodyArray = mParsedJSONObject.optJSONArray(JSON_BODY);
@@ -117,6 +121,9 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
                 }
             }
             
+            // Add a devider between body and title.
+            rv.addView(R.id.contentRowCommentLayout, rvDivider);
+            
             // Set text of content comment.
             JSONArray commentArray = mParsedJSONObject.optJSONArray(JSON_COMMENT);
             if (commentArray != null && commentArray.length() > 0) {
@@ -141,7 +148,8 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
                             rvComment.setTextViewText(R.id.contentRowText, "[writer not existed] comment not existed");
                         }
                     }
-                    rv.addView(R.id.contentRowBodyLayout, rvComment);
+                    rv.addView(R.id.contentRowCommentLayout, rvComment);
+                    rv.addView(R.id.contentRowCommentLayout, rvDivider);
                 }
             }
 

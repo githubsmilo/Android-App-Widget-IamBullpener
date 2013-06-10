@@ -5,8 +5,8 @@
     android:layout_height="wrap_content"
     android:textAppearance="?android:attr/textAppearanceMedium"
     android:gravity="center_vertical"
-    android:paddingLeft="10dip"
-    android:paddingRight="10dip"
+    android:paddingLeft="10dp"
+    android:paddingRight="10dp"
     android:minHeight="?android:attr/listPreferredItemHeight"
     android:singleLine = "true"
 />
