@@ -110,7 +110,7 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
                         }
                         String bodyText = obj.optString(JSON_BODY_TEXT);
                         if (bodyText != null && bodyText.length() > 0) {
-                            //Log.i(TAG, "getViewAt - text[" + text + "]");
+                            //Log.i(TAG, "getViewAt - text[" + bodyText + "]");
                             RemoteViews rvBodyText = new RemoteViews(mContext.getPackageName(), R.layout.content_row_text);
                             rvBodyText.setTextViewText(R.id.contentRowText, bodyText);
                             rv.addView(R.id.contentRowBodyLayout, rvBodyText);
@@ -118,26 +118,27 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
                         }
                         String bodyImage = obj.optString(JSON_BODY_IMAGE);
                         if (bodyImage != null && bodyImage.length() > 0) {
-                            //Log.i(TAG, "getViewAt - image[" + image + "]");
+                            Log.i(TAG, "getViewAt - image[" + bodyImage + "]");
                             // TODO : manage bitmap
                             RemoteViews rvBodyImage = new RemoteViews(mContext.getPackageName(), R.layout.content_row_image);
-                        	Bitmap bitmap = null;
-                        	try {
-                        		bitmap = getImageBitmap(bodyImage);
-                        		rvBodyImage.setImageViewBitmap(R.id.contentRowImage, bitmap);
-	                        } catch (IOException e) {
-	                            Log.e(TAG, "getViewAt - getImageBitmap - IOException![" + e.toString() + "]");
-	                            e.printStackTrace();
-	                            rvBodyImage.setImageViewBitmap(R.id.contentRowImage, null);
-	                        } catch (RuntimeException e) {
-	                        	Log.e(TAG, "getViewAt - getImageBitmap - RuntimeException![" + e.toString() + "]");
-	                            e.printStackTrace();
-	                            rvBodyImage.setImageViewBitmap(R.id.contentRowImage, null);
-	                        } catch (OutOfMemoryError e) {
-	                        	Log.e(TAG, "getViewAt - getImageBitmap - OutOfMemoryError![" + e.toString() + "]");
-	                            e.printStackTrace();
-	                            rvBodyImage.setImageViewBitmap(R.id.contentRowImage, null);
-	                        }
+                            Bitmap bitmap = null;
+                            try {
+                                bitmap = getImageBitmap(bodyImage);
+                                Log.i(TAG, "getViewAt - getImageBitmap - bitmap is ok!");
+                                rvBodyImage.setImageViewBitmap(R.id.contentRowImage, bitmap);
+                            } catch (IOException e) {
+                                Log.e(TAG, "getViewAt - getImageBitmap - IOException![" + e.toString() + "]");
+                                e.printStackTrace();
+                                rvBodyImage.setImageViewBitmap(R.id.contentRowImage, null);
+                            } catch (RuntimeException e) {
+                                Log.e(TAG, "getViewAt - getImageBitmap - RuntimeException![" + e.toString() + "]");
+                                e.printStackTrace();
+                                rvBodyImage.setImageViewBitmap(R.id.contentRowImage, null);
+                            } catch (OutOfMemoryError e) {
+                                Log.e(TAG, "getViewAt - getImageBitmap - OutOfMemoryError![" + e.toString() + "]");
+                                e.printStackTrace();
+                                rvBodyImage.setImageViewBitmap(R.id.contentRowImage, null);
+                            }
                             rv.addView(R.id.contentRowBodyLayout, rvBodyImage);
                         }
                     }
@@ -427,7 +428,7 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
         
         // Save parsed result.
         mParsedJSONObject = obj;
-        Log.i(TAG, "parseMLBParkHtmlDataMobileVer - mParsedJSONString[" + obj.toString(4) + "]");
+        //Log.i(TAG, "parseMLBParkHtmlDataMobileVer - mParsedJSONString[" + obj.toString(4) + "]");
         Log.i(TAG, "parseMLBParkHtmlDataMobileVer - done!");
         
         return PARSING_RESULT.SUCCESS;

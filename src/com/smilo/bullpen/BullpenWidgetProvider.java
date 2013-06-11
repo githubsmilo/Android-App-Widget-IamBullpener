@@ -78,7 +78,6 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
                 context.sendBroadcast(buildUpdateListUrlIntent(appWidgetId, Constants.DEFAULT_PAGE_NUM));
                 
                 if (Utils.isInternetConnected(context, mSelectedPermitMobileConnection) == false) {
-                    // TODO : implement some remoteview!
                     setRemoteViewToShowLostInternetConnection(context, awm, appWidgetId, pageNum);
                     return;
                 } else {
