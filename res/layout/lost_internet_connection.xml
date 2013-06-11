@@ -29,7 +29,7 @@
             android:layout_centerVertical="true"
             android:layout_marginRight="20dp"
             android:layout_toLeftOf="@+id/btnLostInternetSetting"
-            android:background="@drawable/reload_icon_32"
+            android:background="@drawable/reload_button_selector"
             android:contentDescription="@string/btn_refresh" />
                
         <ImageButton
@@ -38,7 +38,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
-            android:background="@drawable/cog_icon_32"
+            android:background="@drawable/setting_button_selector"
             android:contentDescription="@string/btn_setting" />
 
     </RelativeLayout>

@@ -29,7 +29,7 @@
             android:layout_centerVertical="true"
             android:layout_marginRight="20dp"
             android:layout_toLeftOf="@+id/btnListNavTop"
-            android:background="@drawable/br_prev_icon_32"
+            android:background="@drawable/prev_button_selector"
             android:contentDescription="@string/btn_prev" />
 
         <ImageButton
@@ -39,7 +39,7 @@
             android:layout_centerVertical="true"
             android:layout_marginRight="20dp"
             android:layout_toLeftOf="@+id/btnListNavNext"
-            android:background="@drawable/br_up_icon_32"
+            android:background="@drawable/up_button_selector"
             android:contentDescription="@string/btn_top" />
         
         <ImageButton
@@ -49,7 +49,7 @@
             android:layout_centerVertical="true"
             android:layout_marginRight="20dp"
             android:layout_toLeftOf="@+id/btnListRefresh"
-            android:background="@drawable/br_next_icon_32"
+            android:background="@drawable/next_button_selector"
             android:contentDescription="@string/btn_next" />
 
 	    <ImageButton
@@ -59,7 +59,7 @@
             android:layout_centerVertical="true"
             android:layout_marginRight="20dp"
             android:layout_toLeftOf="@+id/btnListSetting"
-            android:background="@drawable/reload_icon_32"
+            android:background="@drawable/reload_button_selector"
             android:contentDescription="@string/btn_refresh" />
 	           
 	    <ImageButton
@@ -68,7 +68,7 @@
 	        android:layout_height="wrap_content"
 	        android:layout_alignParentRight="true"
 	        android:layout_centerVertical="true"
-	        android:background="@drawable/cog_icon_32"
+	        android:background="@drawable/setting_button_selector"
 	        android:contentDescription="@string/btn_setting" />
 
     </RelativeLayout>
