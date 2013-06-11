@@ -239,17 +239,17 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
         // Set title of the remoteViews.
         rv.setTextViewText(R.id.textListTitle, Utils.getRemoteViewTitleWithPageNum(context, mSelectedBullpenBoardUrl, pageNum));
 
-        // Set top button of the remoteViews.
-        intent = buildRefreshListIntent(context, appWidgetId, Constants.DEFAULT_PAGE_NUM);
-        pendingIntent = PendingIntent.getBroadcast(
-                context, PENDING_INTENT_REQUEST_CODE.REQUEST_TOP.ordinal(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        rv.setOnClickPendingIntent(R.id.btnListNavTop, pendingIntent);
-        
         // Set prev button of the removeViews.
         intent = buildRefreshListIntent(context, appWidgetId, (pageNum > Constants.DEFAULT_PAGE_NUM ? pageNum - 1 : pageNum));
         pendingIntent = PendingIntent.getBroadcast(
                 context, PENDING_INTENT_REQUEST_CODE.REQUEST_PREV.ordinal(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
         rv.setOnClickPendingIntent(R.id.btnListNavPrev, pendingIntent);
+        
+        // Set top button of the remoteViews.
+        intent = buildRefreshListIntent(context, appWidgetId, Constants.DEFAULT_PAGE_NUM);
+        pendingIntent = PendingIntent.getBroadcast(
+                context, PENDING_INTENT_REQUEST_CODE.REQUEST_TOP.ordinal(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        rv.setOnClickPendingIntent(R.id.btnListNavTop, pendingIntent);
         
         // Set next button of the remoteViews.
         intent = buildRefreshListIntent(context, appWidgetId, pageNum + 1);

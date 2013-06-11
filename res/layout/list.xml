@@ -9,6 +9,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/dark_green"
+        android:paddingBottom="10dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:paddingTop="10dp"
         android:orientation="horizontal" >
         
 	    <TextView
@@ -16,49 +20,56 @@
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
 	        android:textAppearance="?android:attr/textAppearanceLarge"
-	        android:paddingBottom="10dp"
-	        android:paddingLeft="10dp"
-	        android:paddingTop="10dp"
 	        android:text="@string/remoteViewTitle_Default" />
 
-        <Button
-            android:id="@+id/btnListNavTop"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_toLeftOf="@+id/btnListNavPrev"
-            android:text="@string/btn_top" />
-
-        <Button
+        <ImageButton
             android:id="@+id/btnListNavPrev"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_toLeftOf="@+id/btnListNavNext"
-            android:text="@string/btn_prev" />
+            android:layout_centerVertical="true"
+            android:layout_marginRight="20dp"
+            android:layout_toLeftOf="@+id/btnListNavTop"
+            android:background="@drawable/br_prev_icon_32"
+            android:contentDescription="@string/btn_prev" />
 
-        <Button
+        <ImageButton
+            android:id="@+id/btnListNavTop"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="20dp"
+            android:layout_toLeftOf="@+id/btnListNavNext"
+            android:background="@drawable/br_up_icon_32"
+            android:contentDescription="@string/btn_top" />
+        
+        <ImageButton
             android:id="@+id/btnListNavNext"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="20dp"
             android:layout_toLeftOf="@+id/btnListRefresh"
-            android:text="@string/btn_next" />
+            android:background="@drawable/br_next_icon_32"
+            android:contentDescription="@string/btn_next" />
 
-	    <Button
+	    <ImageButton
             android:id="@+id/btnListRefresh"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="20dp"
             android:layout_toLeftOf="@+id/btnListSetting"
-            android:text="@string/btn_refresh" />
+            android:background="@drawable/reload_icon_32"
+            android:contentDescription="@string/btn_refresh" />
 	           
-	    <Button
+	    <ImageButton
 	        android:id="@+id/btnListSetting"
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
 	        android:layout_alignParentRight="true"
-	        android:text="@string/btn_setting" />
+	        android:layout_centerVertical="true"
+	        android:background="@drawable/cog_icon_32"
+	        android:contentDescription="@string/btn_setting" />
 
     </RelativeLayout>
         
@@ -71,3 +82,4 @@
 </LinearLayout>
 
 <!-- background image url : http://www.hdwallpapersdesktop.com/iPad/Miscellaneous/imagepages/image2.htm -->
+<!-- icon image url : http://www.wwvalue.com/design/minimalist-pixel-perfect-icons-for-designers-and-developers.html -->
