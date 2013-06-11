@@ -89,12 +89,11 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
             // This intent(ACTION_SHOW_LIST) will be called when current item pressed.
             } else if ((action.equals(Constants.ACTION_APPWIDGET_UPDATE)) ||
                                 (action.equals(Constants.ACTION_SHOW_LIST))) {
-                refreshAlarmSetting(context, appWidgetId, pageNum);
-                
                 if (Utils.isInternetConnected(context, mSelectedPermitMobileConnection) == false) {
                     Log.e(TAG, "onReceive - Internet is not connected!");
                     return;
                 } else {
+                    refreshAlarmSetting(context, appWidgetId, pageNum);
                     setRemoteViewToShowList(context, awm, appWidgetId, pageNum);
                 }
 
