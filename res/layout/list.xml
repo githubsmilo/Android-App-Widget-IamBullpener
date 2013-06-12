@@ -28,10 +28,10 @@
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_marginRight="20dp"
-            android:layout_toLeftOf="@+id/btnListNavTop"
+            android:layout_toLeftOf="@+id/btnListNavNext"
             android:background="@drawable/prev_button_selector"
             android:contentDescription="@string/btn_prev" />
-
+<!--  
         <ImageButton
             android:id="@+id/btnListNavTop"
             android:layout_width="wrap_content"
@@ -41,7 +41,7 @@
             android:layout_toLeftOf="@+id/btnListNavNext"
             android:background="@drawable/up_button_selector"
             android:contentDescription="@string/btn_top" />
-        
+-->
         <ImageButton
             android:id="@+id/btnListNavNext"
             android:layout_width="wrap_content"

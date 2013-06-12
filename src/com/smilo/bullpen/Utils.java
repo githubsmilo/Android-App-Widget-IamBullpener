@@ -44,12 +44,21 @@ public final class Utils {
         return false;
     }
     
-    public static String getDateByPageNum(int pageNum) {
+    public static String getDateByPageNum1(int pageNum) {
         Calendar cal = new GregorianCalendar();
         cal.add(Calendar.DATE, -pageNum);
         Date date = cal.getTime();
         
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.KOREA);
+        return dateFormat.format(date);
+    }
+    
+    public static String getDateByPageNum2(int pageNum) {
+        Calendar cal = new GregorianCalendar();
+        cal.add(Calendar.DATE, -pageNum);
+        Date date = cal.getTime();
+        
+        SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd", Locale.KOREA);
         return dateFormat.format(date);
     }
     
@@ -89,11 +98,11 @@ public final class Utils {
         } else if (selectedUrl.equals(Constants.mMLBParkUrl_bullpen)) {
                   return (res.getString(R.string.remoteViewTitle_Bullpen) + " - " + pageNum);
         } else if (selectedUrl.equals(Constants.mMLBParkUrl_bullpen_best_recommended)) {
-            return (res.getString(R.string.remoteViewTitle_BullpenBestRecommended) + " - " + getDateByPageNum(pageNum));
+            return (res.getString(R.string.remoteViewTitle_BullpenBestRecommended) + " " + getDateByPageNum2(pageNum));
         } else if (selectedUrl.equals(Constants.mMLBParkUrl_bullpen_best_hits)) {
-            return (res.getString(R.string.remoteViewTitle_BullpenBestHits) + " - " + getDateByPageNum(pageNum));
+            return (res.getString(R.string.remoteViewTitle_BullpenBestHits) + " " + getDateByPageNum2(pageNum));
         } else if (selectedUrl.equals(Constants.mMLBParkUrl_bullpen_best_reply)) {
-            return (res.getString(R.string.remoteViewTitle_BullpenBestReply) + " - " + getDateByPageNum(pageNum));
+            return (res.getString(R.string.remoteViewTitle_BullpenBestReply) + " " + getDateByPageNum2(pageNum));
         } else if (selectedUrl.equals(Constants.mMLBParkUrl_bullpen1000)) {
                   return (res.getString(R.string.remoteViewTitle_Bullpen1000) + " - " + pageNum);
         } else if (selectedUrl.equals(Constants.mMLBParkUrl_bullpen2000)) {

@@ -117,7 +117,7 @@ public class BullpenListViewFactory implements RemoteViewsService.RemoteViewsFac
             if (Utils.isMobileSiteUrl(mSelectedBullpenBoardUrl)) {
                 mParsingResult = parseMLBParkHtmlDataMobileVer(mSelectedBullpenBoardUrl + mPageNum);
             } else {
-                mParsingResult = parseMLBParkHtmlDataFullVer(mSelectedBullpenBoardUrl + Utils.getDateByPageNum(mPageNum));
+                mParsingResult = parseMLBParkHtmlDataFullVer(mSelectedBullpenBoardUrl + Utils.getDateByPageNum1(mPageNum));
             }
         } catch (IOException e) {
             Log.e(TAG, "onDataSetChanged - IOException![" + e.toString() + "]");
