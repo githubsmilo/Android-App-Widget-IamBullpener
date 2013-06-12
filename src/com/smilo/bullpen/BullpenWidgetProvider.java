@@ -235,6 +235,7 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
         serviceIntent.putExtra(Constants.EXTRA_PAGE_NUM, pageNum);
         // views.setRemoteAdapter(R.id.listView, serviceIntent); // For API14+
         rv.setRemoteAdapter(appWidgetId, R.id.listView, serviceIntent);
+        rv.setScrollPosition(R.id.listView, 0); // Scroll to top
 
         // Set title of the remoteViews.
         rv.setTextViewText(R.id.textListTitle, Utils.getRemoteViewTitleWithPageNum(context, mSelectedBullpenBoardUrl, pageNum));
@@ -304,6 +305,7 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
         serviceIntent.putExtra(Constants.EXTRA_PAGE_NUM, pageNum);
         // views.setRemoteAdapter(R.id.contentView, serviceIntent); // For API14+
         rv.setRemoteAdapter(appWidgetId, R.id.contentView, serviceIntent);
+        rv.setScrollPosition(R.id.contentView, 0); // Scroll to top
 
         // Set title of the remoteViews.
         rv.setTextViewText(R.id.textContentTitle, Utils.getRemoteViewTitle(context, mSelectedBullpenBoardUrl));
