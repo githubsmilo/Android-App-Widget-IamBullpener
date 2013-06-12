@@ -80,17 +80,17 @@ public final class Utils {
         int result = -1;
         
         switch (type) {
-            case 0: // 30 sec
-                result = 60000 / 2;
-                break;
-            case 1: // 1 min
+            case 0: // 1 min
                 result = 60000;
                 break;
-            case 2: // 5 min
+            case 1: // 5 min
                 result = 60000 * 5;
                 break;
-            case 3: // 10 min
+            case 2: // 10 min
                 result = 60000 * 10;
+                break;
+            case 3: // 20 min
+                result = 60000 * 20;
                 break;
             case 4: // 30 min
                 result = 60000 * 30;
@@ -109,16 +109,16 @@ public final class Utils {
         int result = -1;
         
         switch (time) {
-            case 60000 / 2: // 30 sec
+            case 60000: // 1 min
                 result = 0;
                 break;
-            case 60000: // 1 min
+            case 60000 * 5: // 5 min
                 result = 1;
                 break;
-            case 60000 * 5: // 5 min
+            case 60000 * 10: // 10 min
                 result = 2;
                 break;
-            case 60000 * 10: // 10 min
+            case 60000 * 20: // 20 min
                 result = 3;
                 break;
             case 60000 * 30: // 30 min

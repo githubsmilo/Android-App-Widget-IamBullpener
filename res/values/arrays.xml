@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="refreshTime">
-        <item>30초</item>
         <item>1분</item>
         <item>5분</item>
         <item>10분</item>
+        <item>20분</item>
         <item>30분</item>
         <item>새로 고침 안함</item>
     </string-array>
