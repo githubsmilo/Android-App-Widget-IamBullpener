@@ -162,7 +162,7 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
                             if (commentText != null && commentText.length() >0) {
                                 rvComment.setTextViewText(R.id.contentRowText, "[" + commentWriter + "] " + commentText);
                             } else {
-                                rvComment.setTextViewText(R.id.contentRowText, "[" + commentWriter + "] comment not exsited");
+                                rvComment.setTextViewText(R.id.contentRowText, "[" + commentWriter + "] comment not existed");
                             }
                         } else {
                             if (commentText != null && commentText.length() >0) {
