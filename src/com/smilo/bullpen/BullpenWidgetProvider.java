@@ -265,7 +265,8 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
         
         // Set setting button of the remoteViews.
         intent = buildConfigurationActivityIntent(context, appWidgetId);
-        pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        pendingIntent = PendingIntent.getActivity(
+        		context, PENDING_INTENT_REQUEST_CODE.REQUEST_SETTING.ordinal(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
         rv.setOnClickPendingIntent(R.id.btnListSetting, pendingIntent);
         
         // Set a pending intent for click event to the remoteViews.
@@ -306,14 +307,22 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
         // Set title of the remoteViews.
         rv.setTextViewText(R.id.textContentTitle, Utils.getRemoteViewTitle(context, mSelectedBullpenBoardUrl));
 
+        // Set top button of the remoteViews.
+        intent = buildRefreshListIntent(context, appWidgetId, pageNum);
+        pendingIntent = PendingIntent.getBroadcast(
+                context, PENDING_INTENT_REQUEST_CODE.REQUEST_TOP.ordinal(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        rv.setOnClickPendingIntent(R.id.btnContentNavTop, pendingIntent);
+        
         // Set refresh button of the remoteViews.
         intent = buildShowItemIntent(context, appWidgetId, pageNum, true);
-        pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        pendingIntent = PendingIntent.getBroadcast(
+        		context, PENDING_INTENT_REQUEST_CODE.REQUEST_REFRESH.ordinal(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
         rv.setOnClickPendingIntent(R.id.btnContentRefresh, pendingIntent);
         
         // Set setting button of the remoteViews.
         intent = buildConfigurationActivityIntent(context, appWidgetId);
-        pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        pendingIntent = PendingIntent.getActivity(
+        		context, PENDING_INTENT_REQUEST_CODE.REQUEST_SETTING.ordinal(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
         rv.setOnClickPendingIntent(R.id.btnContentSetting, pendingIntent);
         
         // Set a pending intent for click event to the remoteViews.

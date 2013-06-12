@@ -23,6 +23,16 @@
 	        android:text="@string/remoteViewTitle_Default" />
         
         <ImageButton
+            android:id="@+id/btnContentNavTop"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="20dp"
+            android:layout_toLeftOf="@+id/btnContentRefresh"
+            android:background="@drawable/up_button_selector"
+            android:contentDescription="@string/btn_top" />
+        
+        <ImageButton
             android:id="@+id/btnContentRefresh"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
