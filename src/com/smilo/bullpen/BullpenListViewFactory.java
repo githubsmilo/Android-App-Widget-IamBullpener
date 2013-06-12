@@ -3,8 +3,6 @@ package com.smilo.bullpen;
 
 import com.smilo.bullpen.Constants.PARSING_RESULT;
 
-import org.json.JSONException;
-
 import net.htmlparser.jericho.CharacterReference;
 import net.htmlparser.jericho.Element;
 import net.htmlparser.jericho.EndTag;
@@ -13,6 +11,8 @@ import net.htmlparser.jericho.Segment;
 import net.htmlparser.jericho.Source;
 import net.htmlparser.jericho.StartTag;
 import net.htmlparser.jericho.Tag;
+
+import org.json.JSONException;
 
 import android.appwidget.AppWidgetManager;
 import android.content.BroadcastReceiver;
@@ -33,7 +33,7 @@ public class BullpenListViewFactory implements RemoteViewsService.RemoteViewsFac
 
     private static final String TAG = "BullpenListViewFactory";
 
-    private static List<listItem> mlistItems = new ArrayList<listItem>();
+    private static List<listItem> mListItems = new ArrayList<listItem>();
     private static Context mContext;
     private static int mAppWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID;
     private static String mSelectedBullpenBoardUrl = null;
@@ -73,9 +73,9 @@ public class BullpenListViewFactory implements RemoteViewsService.RemoteViewsFac
         
         switch (mParsingResult) {
             case SUCCESS :
-                rv.setTextViewText(R.id.listRowText, mlistItems.get(position).itemTitle);
+                rv.setTextViewText(R.id.listRowText, mListItems.get(position).itemTitle);
                 Intent fillInIntent = new Intent();
-                fillInIntent.putExtra(Constants.EXTRA_ITEM_URL, mlistItems.get(position).itemUrl);
+                fillInIntent.putExtra(Constants.EXTRA_ITEM_URL, mListItems.get(position).itemUrl);
                 rv.setOnClickFillInIntent(R.id.listRowText, fillInIntent);
                 break;
                 
@@ -111,10 +111,14 @@ public class BullpenListViewFactory implements RemoteViewsService.RemoteViewsFac
             Log.e(TAG, "onDatasetChanged - mPageNum is invalid![" + mPageNum + "]");
             return;
         }
-        
+
         // Parse MLBPark html data and add items to the widget item array list.
         try {
-            mParsingResult = parseMLBParkHtmlDataMobileVer(mSelectedBullpenBoardUrl + mPageNum);
+            if (Utils.isMobileSiteUrl(mSelectedBullpenBoardUrl)) {
+                mParsingResult = parseMLBParkHtmlDataMobileVer(mSelectedBullpenBoardUrl + mPageNum);
+            } else {
+                mParsingResult = parseMLBParkHtmlDataFullVer(mSelectedBullpenBoardUrl + Utils.getDateByPageNum(mPageNum));
+            }
         } catch (IOException e) {
             Log.e(TAG, "onDataSetChanged - IOException![" + e.toString() + "]");
             e.printStackTrace();
@@ -175,7 +179,7 @@ public class BullpenListViewFactory implements RemoteViewsService.RemoteViewsFac
     
     private PARSING_RESULT parseMLBParkHtmlDataMobileVer(String urlAddress) throws IOException, JSONException, StackOverflowError {
         // Initialize widget item array list here.
-        mlistItems.clear();
+        mListItems.clear();
         
         Source source = new Source(new URL(urlAddress));
         source.fullSequentialParse();
@@ -252,7 +256,7 @@ public class BullpenListViewFactory implements RemoteViewsService.RemoteViewsFac
                 
                 // Add widget item array list
                 listItem item = new listItem(title, url);
-                mlistItems.add(item);
+                mListItems.add(item);
                 addedItemCount++;
 
                 if (addedItemCount == Constants.LISTVIEW_MAX_ITEM_COUNT) {
@@ -268,6 +272,66 @@ public class BullpenListViewFactory implements RemoteViewsService.RemoteViewsFac
         }
     }
     
+    private PARSING_RESULT parseMLBParkHtmlDataFullVer(String urlAddress) throws IOException, JSONException, StackOverflowError {
+        // Initialize widget item array list here
+        mListItems.clear();
+        
+        Source source = new Source(new URL(urlAddress));
+        source.fullSequentialParse();
+        
+        List<Element> tables = source.getAllElements(HTMLElementName.TABLE);
+        int addedItemCount = 0;
+        for (int i = 0 ; i < tables.size() ; i++) {
+            Element table = tables.get(i);
+
+            // Find the same pattern with <table width='100%' border='0' cellspacing='6' cellpadding='0'>
+            String widthAttr = table.getAttributeValue("width");
+            String borderAttr = table.getAttributeValue("border");
+            String cellspacingAttr = table.getAttributeValue("cellspacing");
+            String cellpaddingAttr = table.getAttributeValue("cellpadding");
+            if ((widthAttr != null && widthAttr.equals("100%")) &&
+                  (borderAttr != null && borderAttr.equals("0")) &&
+                  (cellspacingAttr != null && cellspacingAttr.equals("6")) &&
+                  (cellpaddingAttr != null && cellpaddingAttr.equals("0"))) {
+                
+                Segment content;
+                
+                // Skip Notice
+                Element notice = table.getFirstElementByClass("Allgray");
+                if (notice != null) {
+                    content = notice.getContent();
+                    if (content.getTextExtractor().toString().equals("공지"))
+                        continue;
+                }
+                
+                content = table.getFirstElementByClass("G12read").getContent();
+                
+                // Get title and url
+                String title = content.getTextExtractor().toString();
+                String url = content.getURIAttributes().get(0).getValue();
+                if (url.startsWith("/")) {
+                    StringBuffer strBuf = new StringBuffer();
+                    strBuf.append(Constants.mMLBParkUrl_base);
+                    strBuf.append(url);
+                    url = strBuf.toString();
+                }
+                //Log.i(TAG, "parseMLBParkHtmlDataFullVer - title[" + title + "], url[" + url + "]");
+                
+                // Add widget item to array list
+                listItem item = new listItem(title, url);
+                mListItems.add(item);
+                addedItemCount++;
+                
+                if (addedItemCount == Constants.LISTVIEW_MAX_ITEM_COUNT) {
+                    Log.i(TAG, "parseMLBParkHtmlDataFullVer - done!");
+                    return PARSING_RESULT.SUCCESS;
+                }
+            }
+        }
+
+        return PARSING_RESULT.FAILED_UNKNOWN;
+    }
+
     private void setupIntentListener() {
 	    if (mIntentListener == null) {
 	        mIntentListener = new BroadcastReceiver() {

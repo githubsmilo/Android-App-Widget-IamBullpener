@@ -12,6 +12,9 @@
         <item>MLB 타운</item>
         <item>한국야구 타운</item>
         <item>BULLPEN</item>
+        <item>BULLPEN 최다 추천</item>
+        <item>BULLPEN 최고 조회</item>
+        <item>BULLPEN 최다 리플</item>
         <item>BULLPEN 조회수 1000 이상</item>
         <item>BULLPEN 조회수 2000 이상</item>
     </string-array>

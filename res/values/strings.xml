@@ -12,6 +12,9 @@
     <string name="remoteViewTitle_MlbTown">MLB Town</string>
     <string name="remoteViewTitle_KboTown">KBO Town</string>
     <string name="remoteViewTitle_Bullpen">Bullpen</string>
+    <string name="remoteViewTitle_BullpenBestRecommended">Bullpen 최다 추천</string>
+    <string name="remoteViewTitle_BullpenBestHits">Bullpen 최고 조회</string>
+    <string name="remoteViewTitle_BullpenBestReply">Bullpen 최다 리플</string>
     <string name="remoteViewTitle_Bullpen1000">Bullpen 1000</string>
     <string name="remoteViewTitle_Bullpen2000">Bullpen 2000</string>
     <string name="btn_top">Top</string>
