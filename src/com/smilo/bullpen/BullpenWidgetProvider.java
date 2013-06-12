@@ -271,7 +271,8 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
         
         // Set a pending intent for click event to the remoteViews.
         Intent clickIntent = buildShowItemIntent(context, appWidgetId, pageNum, false);
-        PendingIntent linkPendingIntent = PendingIntent.getBroadcast(context, 0, clickIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent linkPendingIntent = PendingIntent.getBroadcast(
+        		context, 0, clickIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         rv.setPendingIntentTemplate(R.id.listView, linkPendingIntent);
     
         // Update widget.
