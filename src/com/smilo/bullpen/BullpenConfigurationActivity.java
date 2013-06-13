@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.Spinner;
 
 public class BullpenConfigurationActivity extends Activity {
@@ -56,10 +57,18 @@ public class BullpenConfigurationActivity extends Activity {
         
         initializeRadioButton(isPermitMobileConnection);
         initializeSpinners(refreshTimeType, bullpenBoardType);
+        initializeEditText();
         initializeButtons();
     }
 
-    private void initializeRadioButton(boolean isPermitMobileConnection) {
+    private void initializeEditText() {
+		EditText et = (EditText)findViewById(R.id.editBlackList);
+		
+		// TODO
+		et.setFocusable(false);
+	}
+
+	private void initializeRadioButton(boolean isPermitMobileConnection) {
     	CheckBox cb = (CheckBox)findViewById(R.id.cbMobileConnection);
     	cb.setChecked(isPermitMobileConnection);
     }

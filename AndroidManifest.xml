@@ -38,6 +38,7 @@
         <activity
             android:name="com.smilo.bullpen.BullpenConfigurationActivity"
             android:theme="@android:style/Theme.Dialog"
+            android:windowSoftInputMode="stateAlwaysHidden"
             android:allowTaskReparenting="false"
             android:taskAffinity=""
             android:label="@string/app_name" >

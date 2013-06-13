@@ -275,6 +275,7 @@ public class BullpenListViewFactory implements RemoteViewsService.RemoteViewsFac
         		}
         	}
 
+        	Log.i(TAG, "parseMLBParkTodayBest - done!");
         	return PARSING_RESULT.SUCCESS_MOBILE_TODAY_BEST;
         	
         } else {
