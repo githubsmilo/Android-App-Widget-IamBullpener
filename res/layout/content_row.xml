@@ -13,9 +13,9 @@
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:gravity="center_vertical"
+            android:paddingBottom="10dp"
             android:paddingLeft="10dp"
-            android:paddingRight="10dp"
-            android:minHeight="?android:attr/listPreferredItemHeight" />
+            android:paddingRight="10dp" />
     
     <!-- body (text + image) -->
     <LinearLayout
@@ -23,7 +23,7 @@
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:paddingBottom="10dp" >
+        android:paddingBottom="5dp" >
         <!-- Add dynamic view here -->
     </LinearLayout>
     

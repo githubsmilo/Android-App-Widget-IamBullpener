@@ -160,15 +160,15 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
                         RemoteViews rvComment = new RemoteViews(mContext.getPackageName(), R.layout.content_row_text);
                         if (commentWriter != null && commentWriter.length() > 0) {
                             if (commentText != null && commentText.length() >0) {
-                                rvComment.setTextViewText(R.id.contentRowText, "[" + commentWriter + "] " + commentText);
+                                rvComment.setTextViewText(R.id.contentRowText, "[" + commentWriter + "]\n" + commentText);
                             } else {
-                                rvComment.setTextViewText(R.id.contentRowText, "[" + commentWriter + "] comment not existed");
+                                rvComment.setTextViewText(R.id.contentRowText, "[" + commentWriter + "]\n" + mContext.getResources().getString(R.string.text_comment_not_existed));
                             }
                         } else {
                             if (commentText != null && commentText.length() >0) {
-                                rvComment.setTextViewText(R.id.contentRowText, "[writer not existed] " + commentText);
+                                rvComment.setTextViewText(R.id.contentRowText, "[" + mContext.getResources().getString(R.string.text_writer_not_existed) + "]\n" + commentText);
                             } else {
-                                rvComment.setTextViewText(R.id.contentRowText, "[writer not existed] comment not existed");
+                                rvComment.setTextViewText(R.id.contentRowText, "[" + mContext.getResources().getString(R.string.text_writer_not_existed) + "]\n" + mContext.getResources().getString(R.string.text_comment_not_existed));
                             }
                         }
                         rv.addView(R.id.contentRowCommentLayout, rvComment);
