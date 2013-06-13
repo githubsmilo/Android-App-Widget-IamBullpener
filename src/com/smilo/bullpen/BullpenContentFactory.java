@@ -77,7 +77,7 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
         RemoteViews rv = new RemoteViews(mContext.getPackageName(), R.layout.content_row);
         
         switch (mParsingResult) {
-            case  SUCCESS :
+            case SUCCESS_MOBILE_BOARD :
                 RemoteViews rvDivider = new RemoteViews(mContext.getPackageName(), R.layout.content_row_divider);
                 
                 // Set writer and title
@@ -431,7 +431,7 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
         //Log.i(TAG, "parseMLBParkHtmlDataMobileVer - mParsedJSONString[" + obj.toString(4) + "]");
         Log.i(TAG, "parseMLBParkHtmlDataMobileVer - done!");
         
-        return PARSING_RESULT.SUCCESS;
+        return PARSING_RESULT.SUCCESS_MOBILE_BOARD;
     }
     
     private Bitmap getImageBitmap(String url) throws IOException, RuntimeException, OutOfMemoryError { 

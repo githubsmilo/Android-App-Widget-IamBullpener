@@ -7,14 +7,14 @@
     <string name="action_settings">Settings</string>
 
     <!-- Bullpen ListView & Content -->
-    <string name="remoteViewTitle_Default">Wait..</string>
+    <string name="remoteViewTitle_Default">잠시 기다려 주세요.</string>
     <string name="remoteViewTitle_LostInternet">인터넷 연결 안됨</string>
     <string name="remoteViewTitle_MlbTown">MLB 타운</string>
-    <string name="remoteViewTitle_KboTown">한국야구 타운</string>
+    <string name="remoteViewTitle_KboTown">KBO 타운</string>
     <string name="remoteViewTitle_Bullpen">불펜</string>
-    <string name="remoteViewTitle_BullpenBestRecommended">불펜 추천</string>
-    <string name="remoteViewTitle_BullpenBestHits">불펜 조회</string>
-    <string name="remoteViewTitle_BullpenBestReply">불펜 리플</string>
+    <string name="remoteViewTitle_MlbTown_TodayBest">MLB 타운 TODAY BEST</string>
+    <string name="remoteViewTitle_KboTown_TodayBest">KBO 타운 TODAY BEST</string>
+    <string name="remoteViewTitle_Bullpen_TodayBest">불펜 TODAY BEST</string>
     <string name="remoteViewTitle_Bullpen1000">불펜 1000</string>
     <string name="remoteViewTitle_Bullpen2000">불펜 2000</string>
     <string name="btn_top">Top</string>
@@ -41,6 +41,6 @@
     <string name="btn_cancel">Cancel</string>
     
     <string name="appInfo">sMiLoListener@gmail.com\nTwitter:@sMiLoListener</string>
-    <string name="appVersion">0.1_130612</string>
+    <string name="appVersion">0.1_130613</string>
 
 </resources>

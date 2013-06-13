@@ -40,6 +40,8 @@ public class BullpenListViewFactory implements RemoteViewsService.RemoteViewsFac
     private static BroadcastReceiver mIntentListener;
     private static PARSING_RESULT mParsingResult = PARSING_RESULT.FAILED_UNKNOWN;
     private static int mPageNum = Constants.DEFAULT_PAGE_NUM;
+    
+    private static int mAddedTodayBestItemCount = 0;
 
     private class listItem {
         public String itemTitle;
@@ -72,7 +74,9 @@ public class BullpenListViewFactory implements RemoteViewsService.RemoteViewsFac
         RemoteViews rv = new RemoteViews(mContext.getPackageName(), R.layout.list_row);
         
         switch (mParsingResult) {
-            case SUCCESS :
+            case SUCCESS_FULL_BOARD :
+            case SUCCESS_MOBILE_BOARD :
+            case SUCCESS_MOBILE_TODAY_BEST :
                 rv.setTextViewText(R.id.listRowText, mListItems.get(position).itemTitle);
                 Intent fillInIntent = new Intent();
                 fillInIntent.putExtra(Constants.EXTRA_ITEM_URL, mListItems.get(position).itemUrl);
@@ -114,10 +118,10 @@ public class BullpenListViewFactory implements RemoteViewsService.RemoteViewsFac
 
         // Parse MLBPark html data and add items to the widget item array list.
         try {
-            if (Utils.isMobileSiteUrl(mSelectedBullpenBoardUrl)) {
-                mParsingResult = parseMLBParkHtmlDataMobileVer(mSelectedBullpenBoardUrl + mPageNum);
+            if (Utils.isTodayBestUrl(mSelectedBullpenBoardUrl)) {
+                mParsingResult = parseMLBParkTodayBest(mSelectedBullpenBoardUrl);
             } else {
-                mParsingResult = parseMLBParkHtmlDataFullVer(mSelectedBullpenBoardUrl + Utils.getDateByPageNum1(mPageNum));
+            	mParsingResult = parseMLBParkMobileBoard(mSelectedBullpenBoardUrl + mPageNum);
             }
         } catch (IOException e) {
             Log.e(TAG, "onDataSetChanged - IOException![" + e.toString() + "]");
@@ -134,12 +138,15 @@ public class BullpenListViewFactory implements RemoteViewsService.RemoteViewsFac
         }
     }
 
-    @Override
+	@Override
     public int getCount() {
     	//Log.i(TAG, "getCount");
     	
-    	if (mParsingResult == PARSING_RESULT.SUCCESS) {
-    	    return Constants.LISTVIEW_MAX_ITEM_COUNT;
+    	if (mParsingResult == PARSING_RESULT.SUCCESS_FULL_BOARD ||
+    		mParsingResult == PARSING_RESULT.SUCCESS_MOBILE_BOARD) {
+    		return Constants.LISTVIEW_MAX_ITEM_COUNT;
+    	} else if (mParsingResult == PARSING_RESULT.SUCCESS_MOBILE_TODAY_BEST) {
+    		return mAddedTodayBestItemCount;
     	} else {
               return 1;
     	}
@@ -177,7 +184,106 @@ public class BullpenListViewFactory implements RemoteViewsService.RemoteViewsFac
     	teardownIntentListener();
     }
     
-    private PARSING_RESULT parseMLBParkHtmlDataMobileVer(String urlAddress) throws IOException, JSONException, StackOverflowError {
+    private PARSING_RESULT parseMLBParkTodayBest(String urlAddress) throws IOException, JSONException, StackOverflowError {
+    	// Initialize widget item array list here.
+        mListItems.clear();
+
+        Source source = new Source(new URL(Constants.mMLBParkUrl_base));
+        source.fullSequentialParse();
+        
+        // Find the same pattern with <div class='today_best'>. This means the 'today best' and we can find three items.
+        // First 'today best' item is belong to the MLB town.
+        // Second 'today best' item is belong to the KBO town.
+        // Third 'today best' item is belong to the Bullpen.
+        List<Element> divs = source.getAllElements(HTMLElementName.DIV);
+        Element targetDiv = null;
+        int foundTodayBest = 0;
+        for (int i = 0 ; i < divs.size() ; i++) {
+            Element div = divs.get(i);
+            String classAttr = div.getAttributeValue("class");
+            if (classAttr != null && classAttr.equals("today_best")) {
+            	foundTodayBest++;
+            	if ((urlAddress.equals(Constants.mMLBParkUrl_mlbtown_todaybest) && foundTodayBest == 1) ||
+            		(urlAddress.equals(Constants.mMLBParkUrl_kbotown_todaybest) && foundTodayBest == 2) ||
+            		(urlAddress.equals(Constants.mMLBParkUrl_bullpen_todaybest) && foundTodayBest == 3)) {
+	            	targetDiv = div;
+	            	break;
+            	}
+            }
+        }
+        
+        if ((targetDiv != null) && (targetDiv.isEmpty() == false)) {
+        	List<Element> ols = targetDiv.getAllElements(HTMLElementName.OL);
+        	mAddedTodayBestItemCount = 0;
+        	
+        	for (int i = 0 ; i < ols.size() ; i++) {
+        		Segment seg = ols.get(i).getContent();
+        		String title = null, url = null;
+        		boolean isStartLiTag = false, isAddTitle = false;
+        		int itemNum = 1;
+        		//Log.i(TAG, "seg[" + seg.toString() + "]");
+        	
+        		// Parse title and url
+        		for (Iterator<Segment> nodeIterator = seg.getNodeIterator() ; nodeIterator.hasNext();) {
+        			Segment nodeSeg = nodeIterator.next();
+        			
+        			if (nodeSeg instanceof StartTag) {
+        				String tagName = ((Tag)nodeSeg).getName();
+        				if (tagName.equals("li")) {
+        					isStartLiTag = true;
+        				} else if (tagName.equals("a") && isStartLiTag == true) {
+        					url = ((StartTag)nodeSeg).getAttributeValue("href");
+        					if (url.startsWith("/")) {
+                                StringBuffer strBuf = new StringBuffer();
+                                strBuf.append(Constants.mMLBParkUrl_base);
+                                strBuf.append(url);
+                                url = strBuf.toString();
+                            }
+        				}
+        				
+        			} else if (nodeSeg instanceof EndTag) {
+        				String tagName = ((Tag)nodeSeg).getName();
+        				if (tagName.equals("li")) {
+        					// Add widget item array list
+        					//Log.i(TAG, "parseMLBParkTodayBest - title[" + title + "],url[" + url + "]");
+        					
+        					listItem item = new listItem(title, url);
+        					mListItems.add(item);
+        					title = null;
+        					url = null;
+        					mAddedTodayBestItemCount++;
+        					isStartLiTag = false;
+        				} else if (tagName.equals("strong") && isStartLiTag == true) {
+        					isAddTitle = true;
+        				}
+                      
+        		    // Ignore &bnsp;
+        			} else if (nodeSeg instanceof CharacterReference) {
+                        continue;
+                        
+                    // If plain text, add it to title.
+        			} else {
+        				if (isAddTitle) {
+        					if (i == 0) title = "[추천] " + itemNum++ + ". ";
+        					else if (i == 1) title = "[조회] " + itemNum++ + ". ";
+        					else if (i == 2) title = "[리플] " + itemNum++ + ". ";
+        					title += nodeSeg.getTextExtractor().toString();
+        					isAddTitle = false;
+        				}
+        				
+        			}
+        		}
+        	}
+
+        	return PARSING_RESULT.SUCCESS_MOBILE_TODAY_BEST;
+        	
+        } else {
+            Log.e(TAG, "parseMLBParkTodayBest - Cannot find today best element.");
+            return PARSING_RESULT.FAILED_UNKNOWN;
+        }
+	}
+
+    private PARSING_RESULT parseMLBParkMobileBoard(String urlAddress) throws IOException, JSONException, StackOverflowError {
         // Initialize widget item array list here.
         mListItems.clear();
         
@@ -187,7 +293,7 @@ public class BullpenListViewFactory implements RemoteViewsService.RemoteViewsFac
         // Find the same pattern with <ul id="mNewsList">. This means the body of this article.
         List<Element> uls = source.getAllElements(HTMLElementName.UL);
         Element targetUl = null;
-        for (int i = 0 ; i < uls.size() ; i++ ) {
+        for (int i = 0 ; i < uls.size() ; i++) {
             Element ul = uls.get(i);
             String idAttr = ul.getAttributeValue("id");
             if (idAttr != null && idAttr.equals("mNewsList")) {
@@ -200,13 +306,13 @@ public class BullpenListViewFactory implements RemoteViewsService.RemoteViewsFac
             List<Element> lis = targetUl.getAllElements(HTMLElementName.LI);
             int addedItemCount = 0;
             
-            for (int i = 0 ; i < lis.size() ; i++ ) {
+            for (int i = 0 ; i < lis.size() ; i++) {
                 Segment seg = lis.get(i).getContent();
                 String title = null, url = null;
                 boolean isAddTitle = false, isAddCommentNum = false;
                 //Log.i(TAG, "seg[" + seg.toString() + "]");
 
-                // Parse title
+                // Parse title and url
                 for (Iterator<Segment> nodeIterator = seg.getNodeIterator() ; nodeIterator.hasNext();) {
                     Segment nodeSeg = nodeIterator.next();
                     
@@ -216,7 +322,7 @@ public class BullpenListViewFactory implements RemoteViewsService.RemoteViewsFac
                     if (nodeSeg instanceof StartTag) {
                         String tagName = ((Tag)nodeSeg).getName();
                         if (tagName.equals("a")) {
-                           url = ((StartTag) nodeSeg).getAttributeValue("href");
+                           url = ((StartTag)nodeSeg).getAttributeValue("href");
                            if (url.startsWith("/")) {
                                StringBuffer strBuf = new StringBuffer();
                                strBuf.append(Constants.mMLBParkUrl_base);
@@ -237,7 +343,7 @@ public class BullpenListViewFactory implements RemoteViewsService.RemoteViewsFac
                         // Do nothing
                         continue;
                         
-                     // Ignore &bnsp;
+                    // Ignore &bnsp;
                     } else if (nodeSeg instanceof CharacterReference) {
                         continue;
                         
@@ -252,27 +358,26 @@ public class BullpenListViewFactory implements RemoteViewsService.RemoteViewsFac
                         }
                     }
                 }
-                //Log.i(TAG, "parseMLBParkHtmlDataMobileVer - title[" + title + "],url[" + url + "]");
+                //Log.i(TAG, "parseMLBParkMobileBoard - title[" + title + "],url[" + url + "]");
                 
                 // Add widget item array list
                 listItem item = new listItem(title, url);
                 mListItems.add(item);
                 addedItemCount++;
 
-                if (addedItemCount == Constants.LISTVIEW_MAX_ITEM_COUNT) {
-                    Log.i(TAG, "parseMLBParkHtmlDataMobileVer - done!");
-                    return PARSING_RESULT.SUCCESS;
-                }
+                if (addedItemCount == Constants.LISTVIEW_MAX_ITEM_COUNT)
+                    break;
             }
             
-            return PARSING_RESULT.SUCCESS;
+            Log.i(TAG, "parseMLBParkMobileBoard - done!");
+            return PARSING_RESULT.SUCCESS_MOBILE_BOARD;
         } else {
-            Log.e(TAG, "parseMLBParkHtmlDataMobileVer - Cannot find article list.");
+            Log.e(TAG, "parseMLBParkMobileBoard - Cannot find article list.");
             return PARSING_RESULT.FAILED_UNKNOWN;
         }
     }
     
-    private PARSING_RESULT parseMLBParkHtmlDataFullVer(String urlAddress) throws IOException, JSONException, StackOverflowError {
+    private PARSING_RESULT parseMLBParkFullBoard(String urlAddress) throws IOException, JSONException, StackOverflowError {
         // Initialize widget item array list here
         mListItems.clear();
         
@@ -315,7 +420,7 @@ public class BullpenListViewFactory implements RemoteViewsService.RemoteViewsFac
                     strBuf.append(url);
                     url = strBuf.toString();
                 }
-                //Log.i(TAG, "parseMLBParkHtmlDataFullVer - title[" + title + "], url[" + url + "]");
+                //Log.i(TAG, "parseMLBParkFullBoard - title[" + title + "], url[" + url + "]");
                 
                 // Add widget item to array list
                 listItem item = new listItem(title, url);
@@ -323,8 +428,8 @@ public class BullpenListViewFactory implements RemoteViewsService.RemoteViewsFac
                 addedItemCount++;
                 
                 if (addedItemCount == Constants.LISTVIEW_MAX_ITEM_COUNT) {
-                    Log.i(TAG, "parseMLBParkHtmlDataFullVer - done!");
-                    return PARSING_RESULT.SUCCESS;
+                    Log.i(TAG, "parseMLBParkFullBoard - done!");
+                    return PARSING_RESULT.SUCCESS_FULL_BOARD;
                 }
             }
         }

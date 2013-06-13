@@ -44,6 +44,8 @@ public final class Utils {
         return false;
     }
     
+    // NOT USED
+    /*
     public static String getDateByPageNum1(int pageNum) {
         Calendar cal = new GregorianCalendar();
         cal.add(Calendar.DATE, -pageNum);
@@ -52,7 +54,10 @@ public final class Utils {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.KOREA);
         return dateFormat.format(date);
     }
+    */
     
+    // NOT USED
+    /*
     public static String getDateByPageNum2(int pageNum) {
         Calendar cal = new GregorianCalendar();
         cal.add(Calendar.DATE, -pageNum);
@@ -60,6 +65,16 @@ public final class Utils {
         
         SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd", Locale.KOREA);
         return dateFormat.format(date);
+    }
+    */
+    
+    public static boolean isTodayBestUrl(String selectedUrl) {
+    	if ((selectedUrl.equals(Constants.mMLBParkUrl_mlbtown_todaybest)) ||
+    	    (selectedUrl.equals(Constants.mMLBParkUrl_kbotown_todaybest)) ||
+    	    (selectedUrl.equals(Constants.mMLBParkUrl_bullpen_todaybest)))
+    		return true;
+    	else
+    		return false;
     }
     
     public static String getRemoteViewTitle(Context context, String selectedUrl) {
@@ -72,12 +87,12 @@ public final class Utils {
                   return (res.getString(R.string.remoteViewTitle_KboTown));
         } else if (selectedUrl.equals(Constants.mMLBParkUrl_bullpen)) {
                   return (res.getString(R.string.remoteViewTitle_Bullpen));
-        } else if (selectedUrl.equals(Constants.mMLBParkUrl_bullpen_best_recommended)) {
-            return (res.getString(R.string.remoteViewTitle_BullpenBestRecommended));
-        } else if (selectedUrl.equals(Constants.mMLBParkUrl_bullpen_best_hits)) {
-            return (res.getString(R.string.remoteViewTitle_BullpenBestHits));
-        } else if (selectedUrl.equals(Constants.mMLBParkUrl_bullpen_best_reply)) {
-            return (res.getString(R.string.remoteViewTitle_BullpenBestReply));
+        } else if (selectedUrl.equals(Constants.mMLBParkUrl_mlbtown_todaybest)) {
+            return (res.getString(R.string.remoteViewTitle_MlbTown_TodayBest));
+        } else if (selectedUrl.equals(Constants.mMLBParkUrl_kbotown_todaybest)) {
+            return (res.getString(R.string.remoteViewTitle_KboTown_TodayBest));
+        } else if (selectedUrl.equals(Constants.mMLBParkUrl_bullpen_todaybest)) {
+            return (res.getString(R.string.remoteViewTitle_Bullpen_TodayBest));
         } else if (selectedUrl.equals(Constants.mMLBParkUrl_bullpen1000)) {
                   return (res.getString(R.string.remoteViewTitle_Bullpen1000));
         } else if (selectedUrl.equals(Constants.mMLBParkUrl_bullpen2000)) {
@@ -97,12 +112,12 @@ public final class Utils {
                   return (res.getString(R.string.remoteViewTitle_KboTown) + " - " + pageNum);
         } else if (selectedUrl.equals(Constants.mMLBParkUrl_bullpen)) {
                   return (res.getString(R.string.remoteViewTitle_Bullpen) + " - " + pageNum);
-        } else if (selectedUrl.equals(Constants.mMLBParkUrl_bullpen_best_recommended)) {
-            return (res.getString(R.string.remoteViewTitle_BullpenBestRecommended) + " " + getDateByPageNum2(pageNum));
-        } else if (selectedUrl.equals(Constants.mMLBParkUrl_bullpen_best_hits)) {
-            return (res.getString(R.string.remoteViewTitle_BullpenBestHits) + " " + getDateByPageNum2(pageNum));
-        } else if (selectedUrl.equals(Constants.mMLBParkUrl_bullpen_best_reply)) {
-            return (res.getString(R.string.remoteViewTitle_BullpenBestReply) + " " + getDateByPageNum2(pageNum));
+        } else if (selectedUrl.equals(Constants.mMLBParkUrl_mlbtown_todaybest)) {
+            return (res.getString(R.string.remoteViewTitle_MlbTown_TodayBest) + " - " + pageNum);
+        } else if (selectedUrl.equals(Constants.mMLBParkUrl_kbotown_todaybest)) {
+            return (res.getString(R.string.remoteViewTitle_KboTown_TodayBest) + " - " + pageNum);
+        } else if (selectedUrl.equals(Constants.mMLBParkUrl_bullpen_todaybest)) {
+            return (res.getString(R.string.remoteViewTitle_Bullpen_TodayBest) + " - " + pageNum);
         } else if (selectedUrl.equals(Constants.mMLBParkUrl_bullpen1000)) {
                   return (res.getString(R.string.remoteViewTitle_Bullpen1000) + " - " + pageNum);
         } else if (selectedUrl.equals(Constants.mMLBParkUrl_bullpen2000)) {
@@ -170,15 +185,6 @@ public final class Utils {
         return result;
     }
     
-    public static boolean isMobileSiteUrl(String url) {
-        if ((url.equals(Constants.mMLBParkUrl_bullpen_best_hits)) ||
-              (url.equals(Constants.mMLBParkUrl_bullpen_best_recommended)) ||
-              (url.equals(Constants.mMLBParkUrl_bullpen_best_reply)))
-            return false;
-        else
-            return true;
-    }
-    
     public static String getBullpenBoardUrl(int type) {
         String result = null;
         
@@ -186,20 +192,20 @@ public final class Utils {
             case 0 : // MLB 타운
                 result = Constants.mMLBParkUrl_mlbtown;
                 break;
-            case 1 : // 한국야구 타운
+            case 1 : // KBO 타운
                 result = Constants.mMLBParkUrl_kbotown;
                 break;
             case 2 : // BULLPEN
                 result = Constants.mMLBParkUrl_bullpen;
                 break;
-            case 3 : // BULLPEN 최다 추천
-                result = Constants.mMLBParkUrl_bullpen_best_recommended;
+            case 3 : // MLB 타운 TODAY BEST
+                result = Constants.mMLBParkUrl_mlbtown_todaybest;
                 break;
-            case 4 : // BULLPEN 최고 조회
-                result = Constants.mMLBParkUrl_bullpen_best_hits;
+            case 4 : // KBO 타운 TODAY BEST
+                result = Constants.mMLBParkUrl_kbotown_todaybest;
                 break;
-            case 5 : // BULLPEN 최다 리플
-                result = Constants.mMLBParkUrl_bullpen_best_reply;
+            case 5 : // BULLPEN TODAY BEST
+                result = Constants.mMLBParkUrl_bullpen_todaybest;
                 break;
             case 6 : // BULLPEN 조회수 1000 이상
                 result = Constants.mMLBParkUrl_bullpen1000;
@@ -222,11 +228,11 @@ public final class Utils {
             result = 1;
         else if (url.equals(Constants.mMLBParkUrl_bullpen))
             result = 2;
-        else if (url.equals(Constants.mMLBParkUrl_bullpen_best_recommended))
+        else if (url.equals(Constants.mMLBParkUrl_mlbtown_todaybest))
             result = 3;
-        else if (url.equals(Constants.mMLBParkUrl_bullpen_best_hits))
+        else if (url.equals(Constants.mMLBParkUrl_kbotown_todaybest))
             result = 4;
-        else if (url.equals(Constants.mMLBParkUrl_bullpen_best_reply))
+        else if (url.equals(Constants.mMLBParkUrl_bullpen_todaybest))
             result = 5;
         else if (url.equals(Constants.mMLBParkUrl_bullpen1000))
             result = 6;

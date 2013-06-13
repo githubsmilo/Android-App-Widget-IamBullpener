@@ -31,14 +31,16 @@ public final class Constants {
     public static final String mMLBParkUrl_mlbtown = "http://mlbpark.donga.com/mbs/articleL.php?mbsC=mlbtown&cpage=";
     public static final String mMLBParkUrl_kbotown = "http://mlbpark.donga.com/mbs/articleL.php?mbsC=kbotown&cpage=";
     public static final String mMLBParkUrl_bullpen = "http://mlbpark.donga.com/mbs/articleL.php?mbsC=bullpen&cpage=";
-    public static final String mMLBParkUrl_bullpen_best_recommended = "http://mlbpark.donga.com/bbs/mlb_today.php?mode=11&bbs=article_bullpen&fdate=";
-    public static final String mMLBParkUrl_bullpen_best_hits = "http://mlbpark.donga.com/bbs/mlb_today.php?mode=12&bbs=article_bullpen&fdate=";
-    public static final String mMLBParkUrl_bullpen_best_reply = "http://mlbpark.donga.com/bbs/mlb_today.php?mode=13&bbs=article_bullpen&fdate=";
+    public static final String mMLBParkUrl_mlbtown_todaybest = mMLBParkUrl_base + "/MLBTOWN_TODAYBEST";
+    public static final String mMLBParkUrl_kbotown_todaybest = mMLBParkUrl_base + "/KBOTOWN_TODAYBEST";
+    public static final String mMLBParkUrl_bullpen_todaybest = mMLBParkUrl_base + "/BULLPEN_TODAYBEST";
     public static final String mMLBParkUrl_bullpen1000 = "http://mlbpark.donga.com/mbs/articleL.php?mbsC=bullpen&mbsW=search&select=hit&opt=1&keyword=1000&cpage=";
     public static final String mMLBParkUrl_bullpen2000 = "http://mlbpark.donga.com/mbs/articleL.php?mbsC=bullpen&mbsW=search&select=hit&opt=1&keyword=2000&cpage=";
     
     public enum PARSING_RESULT {
-        SUCCESS,
+    	SUCCESS_FULL_BOARD,
+        SUCCESS_MOBILE_BOARD,
+        SUCCESS_MOBILE_TODAY_BEST,
         FAILED_IO_EXCEPTION,
         FAILED_JSON_EXCEPTION,
         FAILED_STACK_OVERFLOW,
