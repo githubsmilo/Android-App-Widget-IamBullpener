@@ -40,7 +40,7 @@
     <string name="btn_ok">OK</string>
     <string name="btn_cancel">Cancel</string>
     
-    <string name="appInfo">sMiLoListener@gmail.com\nTwitter:@sMiLoListener</string>
+    <string name="appInfo">sMiLoListener@gmail.com</string>
     <string name="appVersion">0.1_130613</string>
 
 </resources>
