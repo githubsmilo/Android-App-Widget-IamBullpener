@@ -85,15 +85,15 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
                 String contentWriter = mParsedJSONObject.optString(JSON_WRITER);
                 if (contentTitle != null && contentTitle.length() > 0) {
                     if (contentWriter != null && contentWriter.length() > 0) {
-                        rv.setTextViewText(R.id.contentRowTitleText, "[" + contentWriter + "] " + contentTitle);
+                        rv.setTextViewText(R.id.contentRowTitleText, "[" + contentWriter + "]\n" + contentTitle);
                     } else {
-                        rv.setTextViewText(R.id.contentRowTitleText, "[writer not existed]" + contentTitle);
+                        rv.setTextViewText(R.id.contentRowTitleText, "[" + mContext.getResources().getString(R.string.text_writer_not_existed) + "]\n" + contentTitle);
                     }
                 } else {
                     if (contentWriter != null && contentWriter.length() > 0) {
-                        rv.setTextViewText(R.id.contentRowTitleText, "[" + contentWriter + "]");
+                        rv.setTextViewText(R.id.contentRowTitleText, "[" + contentWriter + "]\n" + mContext.getResources().getString(R.string.text_title_not_existed));
                     } else {
-                        rv.setTextViewText(R.id.contentRowTitleText, "[writer not existed] title not existed");
+                        rv.setTextViewText(R.id.contentRowTitleText, "[" + mContext.getResources().getString(R.string.text_writer_not_existed) + "]\n" + mContext.getResources().getString(R.string.text_title_not_existed));
                     }
                 }
                 
