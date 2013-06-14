@@ -37,6 +37,7 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
     
     // For SharedPreferences.
     private static final String mSharedPreferenceName = "Bullpen";
+    private static final String mKeyCompleteToSetup = "key_complete_to_setup";
     private static final String mKeyPermitMobileConnection = "key_permit_mobile_connection";
     private static final String mKeyRefreshTime = "key_refresh_time";
     private static final String mKeyBullpenBoardUrl = "key_bullpen_board_url";
@@ -77,6 +78,7 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
                     // Save configuration info.
                     SharedPreferences pref = context.getSharedPreferences(mSharedPreferenceName, Context.MODE_PRIVATE);
                     SharedPreferences.Editor editor = pref.edit();
+                    editor.putBoolean(mKeyCompleteToSetup, true);
                     editor.putBoolean(mKeyPermitMobileConnection, selectedPermitMobileConnectionType);
                     editor.putInt(mKeyRefreshTime, selectedRefreshTimeType);
                     editor.putInt(mKeyBullpenBoardUrl, selectedBullpenBoardType);
@@ -330,6 +332,12 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
     
     private void setRemoteViewToShowItem(Context context, AppWidgetManager awm, int appWidgetId, int pageNum) {
     
+        // Check abnormal case
+        if (mSelectedBullpenBoardUrl == null) {
+            Log.e(TAG, "setRemoteViewToShowItem - mSelectedBullpenBoardUrl is null!");
+            return;
+        }
+        
         Intent intent = null;
         PendingIntent pendingIntent = null;
         
@@ -462,16 +470,19 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
         // Load configuration info.
         SharedPreferences pref = context.getSharedPreferences(mSharedPreferenceName, Context.MODE_PRIVATE);
         
+        boolean isCompleteToSetup = pref.getBoolean(mKeyCompleteToSetup, false);
         mSelectedPermitMobileConnection = pref.getBoolean(mKeyPermitMobileConnection, Constants.DEFAULT_PERMIT_MOBILE_CONNECTION);
         mSelectedRefreshTime = Utils.getRefreshTime(pref.getInt(mKeyRefreshTime, Constants.DEFAULT_REFRESH_TIME_TYPE));
         mSelectedBullpenBoardUrl = Utils.getBullpenBoardUrl(pref.getInt(mKeyBullpenBoardUrl, Constants.DEFAULT_BULLPEN_BOARD_TYPE));
 
-        // Set urgent alarm to update list as soon as possible.
-        AppWidgetManager awm = AppWidgetManager.getInstance(context);
-        int[] appWidgetIds = awm.getAppWidgetIds(new ComponentName(context, getClass()));
+        if (isCompleteToSetup) {
+            // Set urgent alarm to update list as soon as possible.
+            AppWidgetManager awm = AppWidgetManager.getInstance(context);
+            int[] appWidgetIds = awm.getAppWidgetIds(new ComponentName(context, getClass()));
 
-        for (int i = 0 ; i < appWidgetIds.length ; i++) {
-            setNewAlarm(context, appWidgetIds[i], Constants.DEFAULT_PAGE_NUM, true);
+            for (int i = 0 ; i < appWidgetIds.length ; i++) {
+                setNewAlarm(context, appWidgetIds[i], Constants.DEFAULT_PAGE_NUM, true);
+            }
         }
         
         super.onEnabled(context);
