@@ -467,6 +467,10 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
         Log.i(TAG, "onEnabled");
         removePreviousAlarm();
 
+    	// Initialize global variables.
+        mIsSkipFirstCallListViewService = true;
+        mIsSkipFirstCallContentService = true;
+        
         // Load configuration info.
         SharedPreferences pref = context.getSharedPreferences(mSharedPreferenceName, Context.MODE_PRIVATE);
         
