@@ -32,6 +32,7 @@ import java.util.List;
 public class BullpenListViewFactory implements RemoteViewsService.RemoteViewsFactory {
 
     private static final String TAG = "BullpenListViewFactory";
+    private static final boolean DEBUG = true;
 
     private static List<listItem> mListItems = new ArrayList<listItem>();
     private static Context mContext;
@@ -60,7 +61,7 @@ public class BullpenListViewFactory implements RemoteViewsService.RemoteViewsFac
                 AppWidgetManager.INVALID_APPWIDGET_ID);
         mSelectedBullpenBoardUrl = intent.getStringExtra(Constants.EXTRA_LIST_URL);
         mPageNum = intent.getIntExtra(Constants.EXTRA_PAGE_NUM, Constants.DEFAULT_PAGE_NUM);
-        Log.i(TAG, "constructor - mSelectedBullpenBoardUrl[" + mSelectedBullpenBoardUrl +
+        if (DEBUG) Log.i(TAG, "constructor - mSelectedBullpenBoardUrl[" + mSelectedBullpenBoardUrl +
                 "], mPageNum[" + mPageNum + "], mAppWidgetId[" + mAppWidgetId + "]");
         
         setupIntentListener();
@@ -106,13 +107,13 @@ public class BullpenListViewFactory implements RemoteViewsService.RemoteViewsFac
 
     @Override
     public void onDataSetChanged() {
-        Log.i(TAG, "onDataSetChanged - mSelectedBullpenBoardUrl[" + mSelectedBullpenBoardUrl + "], mPageNum[" + mPageNum + "]");
+    	if (DEBUG) Log.i(TAG, "onDataSetChanged - mSelectedBullpenBoardUrl[" + mSelectedBullpenBoardUrl + "], mPageNum[" + mPageNum + "]");
 
         if (mSelectedBullpenBoardUrl == null) {
-            Log.e(TAG, "onDataSetChanged - mSelectedBullpenBoardUrl is null!");
+        	if (DEBUG) Log.e(TAG, "onDataSetChanged - mSelectedBullpenBoardUrl is null!");
             return;
         } else if (mPageNum < Constants.DEFAULT_PAGE_NUM) {
-            Log.e(TAG, "onDatasetChanged - mPageNum is invalid![" + mPageNum + "]");
+        	if (DEBUG) Log.e(TAG, "onDatasetChanged - mPageNum is invalid![" + mPageNum + "]");
             return;
         }
 
@@ -124,15 +125,15 @@ public class BullpenListViewFactory implements RemoteViewsService.RemoteViewsFac
             	mParsingResult = parseMLBParkMobileBoard(mSelectedBullpenBoardUrl + mPageNum);
             }
         } catch (IOException e) {
-            Log.e(TAG, "onDataSetChanged - IOException![" + e.toString() + "]");
+        	if (DEBUG) Log.e(TAG, "onDataSetChanged - IOException![" + e.toString() + "]");
             e.printStackTrace();
             mParsingResult = PARSING_RESULT.FAILED_IO_EXCEPTION;
         } catch (JSONException e) {
-            Log.e(TAG, "onDataSetChanged - JSONException![" + e.toString() + "]");
+        	if (DEBUG) Log.e(TAG, "onDataSetChanged - JSONException![" + e.toString() + "]");
             e.printStackTrace();
             mParsingResult = PARSING_RESULT.FAILED_JSON_EXCEPTION;
         } catch (StackOverflowError e) {
-            Log.e(TAG, "onDataSetChanged - StackOverflowError![" + e.toString() + "]");
+        	if (DEBUG) Log.e(TAG, "onDataSetChanged - StackOverflowError![" + e.toString() + "]");
             e.printStackTrace();
             mParsingResult = PARSING_RESULT.FAILED_STACK_OVERFLOW;
         }
@@ -275,11 +276,11 @@ public class BullpenListViewFactory implements RemoteViewsService.RemoteViewsFac
         		}
         	}
 
-        	Log.i(TAG, "parseMLBParkTodayBest - done!");
+        	if (DEBUG) Log.i(TAG, "parseMLBParkTodayBest - done!");
         	return PARSING_RESULT.SUCCESS_MOBILE_TODAY_BEST;
         	
         } else {
-            Log.e(TAG, "parseMLBParkTodayBest - Cannot find today best element.");
+        	if (DEBUG) Log.e(TAG, "parseMLBParkTodayBest - Cannot find today best element.");
             return PARSING_RESULT.FAILED_UNKNOWN;
         }
 	}
@@ -370,10 +371,10 @@ public class BullpenListViewFactory implements RemoteViewsService.RemoteViewsFac
                     break;
             }
             
-            Log.i(TAG, "parseMLBParkMobileBoard - done!");
+            if (DEBUG) Log.i(TAG, "parseMLBParkMobileBoard - done!");
             return PARSING_RESULT.SUCCESS_MOBILE_BOARD;
         } else {
-            Log.e(TAG, "parseMLBParkMobileBoard - Cannot find article list.");
+        	if (DEBUG) Log.e(TAG, "parseMLBParkMobileBoard - Cannot find article list.");
             return PARSING_RESULT.FAILED_UNKNOWN;
         }
     }
@@ -429,7 +430,7 @@ public class BullpenListViewFactory implements RemoteViewsService.RemoteViewsFac
                 addedItemCount++;
                 
                 if (addedItemCount == Constants.LISTVIEW_MAX_ITEM_COUNT) {
-                    Log.i(TAG, "parseMLBParkFullBoard - done!");
+                	if (DEBUG) Log.i(TAG, "parseMLBParkFullBoard - done!");
                     return PARSING_RESULT.SUCCESS_FULL_BOARD;
                 }
             }
@@ -447,7 +448,7 @@ public class BullpenListViewFactory implements RemoteViewsService.RemoteViewsFac
 	                mAppWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
 	                mSelectedBullpenBoardUrl = intent.getStringExtra(Constants.EXTRA_LIST_URL);
 	                mPageNum = intent.getIntExtra(Constants.EXTRA_PAGE_NUM, Constants.DEFAULT_PAGE_NUM);
-	                Log.i(TAG, "onReceive - update mSelectedBullpenBoardUrl[" + mSelectedBullpenBoardUrl + 
+	                if (DEBUG) Log.i(TAG, "onReceive - update mSelectedBullpenBoardUrl[" + mSelectedBullpenBoardUrl + 
 	                        "], mPageNum[" + mPageNum + "], mAppWidgetId[" + mAppWidgetId + "]");
 	            }
 	        };

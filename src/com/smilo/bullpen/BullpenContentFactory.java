@@ -38,6 +38,7 @@ import java.util.List;
 public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFactory {
 
     private static final String TAG = "BullpenContentFactory";
+    private static final boolean DEBUG = true;
 
     private static JSONObject mParsedJSONObject = null;
     private static Context mContext;
@@ -63,7 +64,7 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
                 AppWidgetManager.INVALID_APPWIDGET_ID);
         mSelectedItemUrl = intent.getStringExtra(Constants.EXTRA_ITEM_URL);
         mPageNum = intent.getIntExtra(Constants.EXTRA_PAGE_NUM, Constants.DEFAULT_PAGE_NUM);
-        Log.i(TAG, "constructor - mSelectedItemUrl[" + mSelectedItemUrl +
+        if (DEBUG) Log.i(TAG, "constructor - mSelectedItemUrl[" + mSelectedItemUrl +
                 "], mPageNum[" + mPageNum + "], mAppWidgetId[" + mAppWidgetId + "]");
         
         setupIntentListener();
@@ -118,7 +119,7 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
                         }
                         String bodyImage = obj.optString(JSON_BODY_IMAGE);
                         if (bodyImage != null && bodyImage.length() > 0) {
-                            Log.i(TAG, "getViewAt - image[" + bodyImage + "]");
+                        	if (DEBUG) Log.i(TAG, "getViewAt - image[" + bodyImage + "]");
                             // TODO : manage bitmap
                             RemoteViews rvBodyImage = new RemoteViews(mContext.getPackageName(), R.layout.content_row_image);
                             Bitmap bitmap = null;
@@ -130,15 +131,15 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
                                     rvBodyImage.setImageViewBitmap(R.id.contentRowImage, bitmap);
                                 }
                             } catch (IOException e) {
-                                Log.e(TAG, "getViewAt - getImageBitmap - IOException![" + e.toString() + "]");
+                            	if (DEBUG) Log.e(TAG, "getViewAt - getImageBitmap - IOException![" + e.toString() + "]");
                                 e.printStackTrace();
                                 rvBodyImage.setImageViewBitmap(R.id.contentRowImage, null);
                             } catch (RuntimeException e) {
-                                Log.e(TAG, "getViewAt - getImageBitmap - RuntimeException![" + e.toString() + "]");
+                            	if (DEBUG) Log.e(TAG, "getViewAt - getImageBitmap - RuntimeException![" + e.toString() + "]");
                                 e.printStackTrace();
                                 rvBodyImage.setImageViewBitmap(R.id.contentRowImage, null);
                             } catch (OutOfMemoryError e) {
-                                Log.e(TAG, "getViewAt - getImageBitmap - OutOfMemoryError![" + e.toString() + "]");
+                            	if (DEBUG) Log.e(TAG, "getViewAt - getImageBitmap - OutOfMemoryError![" + e.toString() + "]");
                                 e.printStackTrace();
                                 rvBodyImage.setImageViewBitmap(R.id.contentRowImage, null);
                             }
@@ -203,10 +204,10 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
     
     @Override
     public void onDataSetChanged() {
-        Log.i(TAG, "onDataSetChanged - mSelectedItemUrl[" + mSelectedItemUrl + "]");
+    	if (DEBUG) Log.i(TAG, "onDataSetChanged - mSelectedItemUrl[" + mSelectedItemUrl + "]");
 
         if (mSelectedItemUrl == null) {
-            Log.e(TAG, "onDataSetChanged - mSelectedItemUrl is null!");
+        	if (DEBUG) Log.e(TAG, "onDataSetChanged - mSelectedItemUrl is null!");
             return;
         }
         
@@ -214,15 +215,15 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
         try {
             mParsingResult = parseMLBParkHtmlDataMobileVer(mSelectedItemUrl);
         } catch (IOException e) {
-            Log.e(TAG, "onDataSetChanged - parseMLBParkHtmlDataMobileVer - IOException![" + e.toString() + "]");
+        	if (DEBUG) Log.e(TAG, "onDataSetChanged - parseMLBParkHtmlDataMobileVer - IOException![" + e.toString() + "]");
             e.printStackTrace();
             mParsingResult = PARSING_RESULT.FAILED_IO_EXCEPTION;
         } catch (JSONException e) {
-            Log.e(TAG, "onDataSetChanged - parseMLBParkHtmlDataMobileVer - JSONException![" + e.toString() + "]");
+        	if (DEBUG) Log.e(TAG, "onDataSetChanged - parseMLBParkHtmlDataMobileVer - JSONException![" + e.toString() + "]");
             e.printStackTrace();
             mParsingResult = PARSING_RESULT.FAILED_JSON_EXCEPTION;
         } catch (StackOverflowError e) {
-            Log.e(TAG, "onDataSetChanged - parseMLBParkHtmlDataMobileVer - StackOverflowError![" + e.toString() + "]");
+        	if (DEBUG) Log.e(TAG, "onDataSetChanged - parseMLBParkHtmlDataMobileVer - StackOverflowError![" + e.toString() + "]");
             e.printStackTrace();
             mParsingResult = PARSING_RESULT.FAILED_STACK_OVERFLOW;
         }
@@ -431,7 +432,7 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
         // Save parsed result.
         mParsedJSONObject = obj;
         //Log.i(TAG, "parseMLBParkHtmlDataMobileVer - mParsedJSONString[" + obj.toString(4) + "]");
-        Log.i(TAG, "parseMLBParkHtmlDataMobileVer - done!");
+        if (DEBUG) Log.i(TAG, "parseMLBParkHtmlDataMobileVer - done!");
         
         return PARSING_RESULT.SUCCESS_MOBILE_BOARD;
     }
@@ -448,7 +449,7 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
         is.close();
 
         if (bitmap == null) {
-            Log.e(TAG, "getImageBitmap - bitmap is null!");
+        	if (DEBUG) Log.e(TAG, "getImageBitmap - bitmap is null!");
             return null;
         } else {
             Bitmap resizeBitmap = null;
@@ -464,15 +465,15 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
                 }
                 
                 if (resizeBitmap == null) {
-                    Log.e(TAG, "getImageBitmap - resizeBitmap is null!");
+                	if (DEBUG) Log.e(TAG, "getImageBitmap - resizeBitmap is null!");
                     return null;
                 } else {
                     bitmap.recycle();
-                    Log.i(TAG, "getImageBitmap - resizeBitmap[" + resizeBitmap.getWidth() + "," + resizeBitmap.getHeight() + "] is ok!");
+                    if (DEBUG) Log.i(TAG, "getImageBitmap - resizeBitmap[" + resizeBitmap.getWidth() + "," + resizeBitmap.getHeight() + "] is ok!");
                     return resizeBitmap;
                 }
             } else {
-                Log.i(TAG, "getImageBitmap - bitmap[" + bitmapWidth + "," + bitmapHeight + "] is ok!");
+            	if (DEBUG) Log.i(TAG, "getImageBitmap - bitmap[" + bitmapWidth + "," + bitmapHeight + "] is ok!");
                 return bitmap;
             }
         }
@@ -487,7 +488,7 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
                     mAppWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
                     mSelectedItemUrl = intent.getStringExtra(Constants.EXTRA_ITEM_URL);
                     mPageNum = intent.getIntExtra(Constants.EXTRA_PAGE_NUM, Constants.DEFAULT_PAGE_NUM);
-                    Log.i(TAG, "onReceive - update mSelectedItemUrl[" + mSelectedItemUrl + 
+                    if (DEBUG) Log.i(TAG, "onReceive - update mSelectedItemUrl[" + mSelectedItemUrl + 
                             "], mPageNum[" + mPageNum + "], mAppWidgetId[" + mAppWidgetId + "]");
                 }
             };

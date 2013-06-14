@@ -7,7 +7,7 @@
     <string name="action_settings">Settings</string>
 
     <!-- Bullpen ListView & Content -->
-    <string name="remoteViewTitle_Default">잠시 기다려 주세요.</string>
+    <string name="remoteViewTitle_Default">Wait..</string>
     <string name="remoteViewTitle_LostInternet">인터넷 연결 안됨</string>
     <string name="remoteViewTitle_MlbTown">MLB 타운</string>
     <string name="remoteViewTitle_KboTown">KBO 타운</string>

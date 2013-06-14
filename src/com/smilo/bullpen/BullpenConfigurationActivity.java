@@ -18,6 +18,7 @@ import android.widget.Spinner;
 public class BullpenConfigurationActivity extends Activity {
 
     private static final String TAG = "BullpenConfigurationActivity";
+    private static final boolean DEBUG = true;
     
     private int mAppWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID;
     
@@ -101,7 +102,7 @@ public class BullpenConfigurationActivity extends Activity {
     
     View.OnClickListener mBtnOkOnClickListener = new View.OnClickListener() {
         public void onClick(View v) {
-            Log.i(TAG, "Button OK clicked");
+            if (DEBUG) Log.i(TAG, "Button OK clicked");
 
             if (mSelectedRefreshTimeType < 0) {
                 mSelectedRefreshTimeType = 0;
@@ -113,7 +114,7 @@ public class BullpenConfigurationActivity extends Activity {
             CheckBox cb = (CheckBox)findViewById(R.id.cbMobileConnection);
             boolean selectedPermitMobileConnectionType = cb.isChecked();
             
-            Log.i(TAG, "selectedPermitMobileConnectionType[" + selectedPermitMobileConnectionType +
+            if (DEBUG) Log.i(TAG, "selectedPermitMobileConnectionType[" + selectedPermitMobileConnectionType +
                     "], mSelectedRefreshTimeType[" + mSelectedRefreshTimeType + 
                     "], mSelectedBullpenBoardType[" + mSelectedBullpenBoardType + "]");
             
@@ -135,7 +136,7 @@ public class BullpenConfigurationActivity extends Activity {
     
     View.OnClickListener mBtnCancelOnClickListener = new View.OnClickListener() {
         public void onClick(View v) {
-            Log.i(TAG, "Button Cancel clicked");
+        	if (DEBUG) Log.i(TAG, "Button Cancel clicked");
             final Context context = BullpenConfigurationActivity.this;
 
             if (mIsExecutedBySettingButton == false) {

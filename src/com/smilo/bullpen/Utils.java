@@ -8,18 +8,13 @@ import android.net.NetworkInfo;
 import android.util.Log;
 import android.widget.Toast;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.Locale;
-
 public final class Utils {
 
     private static final String TAG = "BullpenUtils";
+    private static final boolean DEBUG = true;
     
     public static boolean isInternetConnected(Context context, boolean selectedPermitMobileConnection) {
-    	Log.i(TAG, "isInternetConnected - selectedPermitMobileConnection[" + selectedPermitMobileConnection + "]");
+    	if (DEBUG) Log.i(TAG, "isInternetConnected - selectedPermitMobileConnection[" + selectedPermitMobileConnection + "]");
     	
         ConnectivityManager cm =  (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         

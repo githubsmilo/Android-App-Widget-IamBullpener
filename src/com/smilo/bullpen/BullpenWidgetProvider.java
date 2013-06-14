@@ -17,7 +17,8 @@ import android.widget.RemoteViews;
 public class BullpenWidgetProvider extends AppWidgetProvider {
 
     private static final String TAG = "BullpenWidgetProvider";
-
+    private static final boolean DEBUG = true;
+    
     // the pending intent to broadcast alarm.
     private static PendingIntent mSender;
     
@@ -61,11 +62,11 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
         int appWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,  AppWidgetManager.INVALID_APPWIDGET_ID);
         AppWidgetManager awm = AppWidgetManager.getInstance(context);
         int[] appWidgetIds = awm.getAppWidgetIds(new ComponentName(context, getClass()));
-        Log.i(TAG, "onReceive - action[" + action + "], appWidgetId[" + appWidgetId + "], pageNum[" + pageNum +
+        if (DEBUG) Log.i(TAG, "onReceive - action[" + action + "], appWidgetId[" + appWidgetId + "], pageNum[" + pageNum +
                 "], appWidgetsNum[" + appWidgetIds.length + "]");
         
         for (int i = 0 ; i < appWidgetIds.length ; i++) {
-        	Log.i(TAG, "onReceive - current appWidgetId[" + appWidgetIds[i] + "]");
+        	if (DEBUG) Log.i(TAG, "onReceive - current appWidgetId[" + appWidgetIds[i] + "]");
         	
         	if (appWidgetId == appWidgetIds[i]) {
 
@@ -105,7 +106,7 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
                 } else if ((action.equals(Constants.ACTION_APPWIDGET_UPDATE)) ||
                                     (action.equals(Constants.ACTION_SHOW_LIST))) {
                     if (Utils.isInternetConnected(context, mSelectedPermitMobileConnection) == false) {
-                        Log.e(TAG, "onReceive - Internet is not connected!");
+                    	if (DEBUG) Log.e(TAG, "onReceive - Internet is not connected!");
                         return;
                     } else {
                         refreshAlarmSetting(context, appWidgetId, pageNum);
@@ -129,7 +130,7 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
                     context.sendBroadcast(buildUpdateItemUrlIntent(appWidgetId, pageNum));
                     
                     if (Utils.isInternetConnected(context, mSelectedPermitMobileConnection) == false) {
-                        Log.e(TAG, "onReceive - Internet is not connected!");
+                    	if (DEBUG) Log.e(TAG, "onReceive - Internet is not connected!");
                         return;
                     } else {
                         setRemoteViewToShowItem(context, awm, appWidgetId, pageNum);
@@ -150,7 +151,7 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
     
     private Intent buildUpdateListUrlIntent(int appWidgetId, int pageNum) {
         if (mSelectedBullpenBoardUrl == null) {
-            Log.e(TAG, "buildUpdateListUrlIntent - mSelectedBullpenBoardUrl is null!");
+        	if (DEBUG) Log.e(TAG, "buildUpdateListUrlIntent - mSelectedBullpenBoardUrl is null!");
             return null;            
         }
         
@@ -164,7 +165,7 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
     
     private Intent buildUpdateItemUrlIntent(int appWidgetId, int pageNum) {
         if (mSelectedItemUrl == null) {
-            Log.e(TAG, "buildUpdateItemUrlIntent - mSelectedItemUrl is null!");
+        	if (DEBUG) Log.e(TAG, "buildUpdateItemUrlIntent - mSelectedItemUrl is null!");
             return null;            
         }
         
@@ -187,7 +188,7 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
     
     private Intent buildShowItemIntent(Context context, int appWidgetId, int pageNum, boolean isAddSelectedItemUri) {
         if (isAddSelectedItemUri == true && mSelectedItemUrl == null) {
-            Log.e(TAG, "buildShowItemIntent - mSelectedItemUrl is null!");
+        	if (DEBUG) Log.e(TAG, "buildShowItemIntent - mSelectedItemUrl is null!");
             return null;            
         }
         
@@ -233,7 +234,7 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
         rv.setOnClickPendingIntent(R.id.btnLostInternetSetting, pendingIntent);
         
         // Update widget.
-        Log.i(TAG, "updateAppWidget [LostInternetConnection]");
+        if (DEBUG) Log.i(TAG, "updateAppWidget [LostInternetConnection]");
         awm.updateAppWidget(appWidgetId, rv);
     }
     
@@ -241,7 +242,7 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
 
         // Check abnormal case
         if (mSelectedBullpenBoardUrl == null) {
-            Log.e(TAG, "setRemoteViewToShowList - mSelectedBullpenBoardUrl is null!");
+        	if (DEBUG) Log.e(TAG, "setRemoteViewToShowList - mSelectedBullpenBoardUrl is null!");
             return;
         }
         
@@ -317,7 +318,7 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
         rv.setPendingIntentTemplate(R.id.listView, linkPendingIntent);
     
         // Update widget.
-        Log.i(TAG, "updateAppWidget [BaseballListViewService]");
+        if (DEBUG) Log.i(TAG, "updateAppWidget [BaseballListViewService]");
         awm.updateAppWidget(appWidgetId, rv);
         
         // On first call, we need not execute notifyAppWidgetViewDataChanged()
@@ -325,7 +326,7 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
         if (mIsSkipFirstCallListViewService) {
             mIsSkipFirstCallListViewService = false;
         } else {
-            Log.i(TAG, "notifyAppWidgetViewDataChanged [BaseballListViewService]");
+        	if (DEBUG) Log.i(TAG, "notifyAppWidgetViewDataChanged [BaseballListViewService]");
             awm.notifyAppWidgetViewDataChanged(appWidgetId, R.id.listView);
         }
     }
@@ -334,7 +335,7 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
     
         // Check abnormal case
         if (mSelectedBullpenBoardUrl == null) {
-            Log.e(TAG, "setRemoteViewToShowItem - mSelectedBullpenBoardUrl is null!");
+        	if (DEBUG) Log.e(TAG, "setRemoteViewToShowItem - mSelectedBullpenBoardUrl is null!");
             return;
         }
         
@@ -381,7 +382,7 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
         rv.setPendingIntentTemplate(R.id.contentView, linkPendingIntent);
     
         // Update widget.
-        Log.i(TAG, "updateAppWidget [BaseballContentService]");
+        if (DEBUG) Log.i(TAG, "updateAppWidget [BaseballContentService]");
         awm.updateAppWidget(appWidgetId, rv);
 
         // On first call, we need not execute notifyAppWidgetViewDataChanged()
@@ -389,7 +390,7 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
         if (mIsSkipFirstCallContentService) {
             mIsSkipFirstCallContentService = false;
         } else {
-            Log.i(TAG, "notifyAppWidgetViewDataChanged [BaseballContentService]");
+        	if (DEBUG) Log.i(TAG, "notifyAppWidgetViewDataChanged [BaseballContentService]");
             awm.notifyAppWidgetViewDataChanged(appWidgetId, R.id.contentView);
         }
     }
@@ -407,7 +408,7 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
     }
     
     private void setNewAlarm(Context context, int appWidgetId, int pageNum, boolean isUrgentMode) {
-        Log.i(TAG, "setNewAlarm - appWidgetId[" + appWidgetId + "], pageNum[" + pageNum + "]");
+    	if (DEBUG) Log.i(TAG, "setNewAlarm - appWidgetId[" + appWidgetId + "], pageNum[" + pageNum + "]");
 
         Intent updateIntent = new Intent();
         updateIntent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
@@ -423,7 +424,7 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
     }
 
     private void removePreviousAlarm() {
-        Log.i(TAG, "removePreviousAlarm");
+    	if (DEBUG) Log.i(TAG, "removePreviousAlarm");
 
         if (mManager != null && mSender != null) {
             mSender.cancel();
@@ -438,19 +439,19 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
 
     @Override
     public void onUpdate(Context context, AppWidgetManager awm, int[] appWidgetIds) {
-        Log.i(TAG, "onUpdate");
+    	if (DEBUG) Log.i(TAG, "onUpdate");
         super.onUpdate(context, awm, appWidgetIds);
     }
 
     @Override
     public void onDeleted(Context context, int[] appWidgetIds) {
-        Log.i(TAG, "onDeleted");
+    	if (DEBUG) Log.i(TAG, "onDeleted");
         super.onDeleted(context, appWidgetIds);
     }
 
     @Override
     public void onDisabled(Context context) {
-        Log.i(TAG, "onDisabled");
+    	if (DEBUG) Log.i(TAG, "onDisabled");
         removePreviousAlarm();
         
         // Delete all saved data.
@@ -464,7 +465,7 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
 
     @Override
     public void onEnabled(Context context) {
-        Log.i(TAG, "onEnabled");
+    	if (DEBUG) Log.i(TAG, "onEnabled");
         removePreviousAlarm();
 
     	// Initialize global variables.
@@ -479,6 +480,11 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
         mSelectedRefreshTime = Utils.getRefreshTime(pref.getInt(mKeyRefreshTime, Constants.DEFAULT_REFRESH_TIME_TYPE));
         mSelectedBullpenBoardUrl = Utils.getBullpenBoardUrl(pref.getInt(mKeyBullpenBoardUrl, Constants.DEFAULT_BULLPEN_BOARD_TYPE));
 
+        if (DEBUG) Log.i(TAG, "onEnabled - isCompleteToSetup[" + isCompleteToSetup + "]");
+        if (DEBUG) Log.i(TAG, "onEnabled - mSelectedPermitMobileConnection[" + mSelectedPermitMobileConnection + "]");
+        if (DEBUG) Log.i(TAG, "onEnabled - mSelectedRefreshTime[" + mSelectedRefreshTime + "]");
+        if (DEBUG) Log.i(TAG, "onEnabled - mSelectedBullpenBoardUrl[" + mSelectedBullpenBoardUrl + "]");
+        
         if (isCompleteToSetup) {
             // Set urgent alarm to update list as soon as possible.
             AppWidgetManager awm = AppWidgetManager.getInstance(context);
