@@ -219,6 +219,12 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
     
     private void setRemoteViewToShowList(Context context, AppWidgetManager awm, int appWidgetId, int pageNum) {
 
+        // Check abnormal case
+        if (mSelectedBullpenBoardUrl == null) {
+            Log.e(TAG, "setRemoteViewToShowList - mSelectedBullpenBoardUrl is null!");
+            return;
+        }
+        
         Intent intent = null;
         PendingIntent pendingIntent = null;
         
@@ -364,11 +370,11 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
         // If user wants to refresh, set new alarm.
         } else {
             removePreviousAlarm();
-            setNewAlarm(context, appWidgetId, pageNum);
+            setNewAlarm(context, appWidgetId, pageNum, false);
         }
     }
     
-    private void setNewAlarm(Context context, int appWidgetId, int pageNum) {
+    private void setNewAlarm(Context context, int appWidgetId, int pageNum, boolean isUrgentMode) {
         Log.i(TAG, "setNewAlarm - appWidgetId[" + appWidgetId + "], pageNum[" + pageNum + "]");
 
         Intent updateIntent = new Intent();
@@ -378,6 +384,7 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
         updateIntent.setClass(context, BullpenWidgetProvider.class);
         
         long alarmTime = System.currentTimeMillis() + (mSelectedRefreshTime <= 0 ? Constants.DEFAULT_INTERVAL_AT_MILLIS : mSelectedRefreshTime);
+        if (isUrgentMode) alarmTime = 0;
         mSender = PendingIntent.getBroadcast(context, 0, updateIntent, 0);
         mManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         mManager.set(AlarmManager.RTC, alarmTime, mSender);
