@@ -144,9 +144,6 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
                     }
                 }
                 
-                // Add a divider between body and title.
-                rv.addView(R.id.contentRowCommentLayout, rvDivider);
-                
                 // Set text of content comment.
                 JSONArray commentArray = mParsedJSONObject.optJSONArray(JSON_COMMENT);
                 if (commentArray != null && commentArray.length() > 0) {
@@ -171,8 +168,8 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
                                 rvComment.setTextViewText(R.id.contentRowText, "[" + mContext.getResources().getString(R.string.text_writer_not_existed) + "]\n" + mContext.getResources().getString(R.string.text_comment_not_existed));
                             }
                         }
-                        rv.addView(R.id.contentRowCommentLayout, rvComment);
                         rv.addView(R.id.contentRowCommentLayout, rvDivider);
+                        rv.addView(R.id.contentRowCommentLayout, rvComment);
                     }
                 }
                 break;
