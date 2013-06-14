@@ -57,20 +57,22 @@ public class BullpenConfigurationActivity extends Activity {
         
         initializeRadioButton(isPermitMobileConnection);
         initializeSpinners(refreshTimeType, bullpenBoardType);
-        initializeEditText();
+        //initializeEditText();
         initializeButtons();
     }
 
+    /*
     private void initializeEditText() {
-		EditText et = (EditText)findViewById(R.id.editBlackList);
-		
-		// TODO
-		et.setFocusable(false);
-	}
+        EditText et = (EditText)findViewById(R.id.editBlackList);
+        
+        // TODO
+        et.setFocusable(false);
+    }
+    */
 
-	private void initializeRadioButton(boolean isPermitMobileConnection) {
-    	CheckBox cb = (CheckBox)findViewById(R.id.cbMobileConnection);
-    	cb.setChecked(isPermitMobileConnection);
+    private void initializeRadioButton(boolean isPermitMobileConnection) {
+        CheckBox cb = (CheckBox)findViewById(R.id.cbMobileConnection);
+        cb.setChecked(isPermitMobileConnection);
     }
     
     private void initializeSpinners(int refreshTypeType, int bullpenBoardType) {
@@ -109,8 +111,8 @@ public class BullpenConfigurationActivity extends Activity {
             boolean selectedPermitMobileConnectionType = cb.isChecked();
             
             Log.i(TAG, "selectedPermitMobileConnectionType[" + selectedPermitMobileConnectionType +
-            		"], mSelectedRefreshTimeType[" + mSelectedRefreshTimeType + 
-            		"], mSelectedBullpenBoardType[" + mSelectedBullpenBoardType + "]");
+                    "], mSelectedRefreshTimeType[" + mSelectedRefreshTimeType + 
+                    "], mSelectedBullpenBoardType[" + mSelectedBullpenBoardType + "]");
             
             final Context context = BullpenConfigurationActivity.this;
             Intent initIntent = new Intent(context, BullpenWidgetProvider.class);
