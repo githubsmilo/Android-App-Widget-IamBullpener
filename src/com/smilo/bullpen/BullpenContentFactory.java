@@ -284,12 +284,14 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
             // Find the same pattern with <div class='article'>. This means the title of this article.
             if (value != null && value.equals("article")) {
                 Element h3 = div.getContent().getFirstElement("h3");
-                String itemTitle = h3.getTextExtractor().toString();
-                //Log.i(TAG, "parseMLBParkHtmlDataMobileVer - parsed title[" + itemTitle + "]");
-                
-                // Put itemTitle to the 'obj' JSONObject.
-                obj.put(JSON_TITLE, itemTitle);
-                continue;
+                if ((h3 != null) && (h3.isEmpty() == false)) {
+                    String itemTitle = h3.getTextExtractor().toString();
+                    //Log.i(TAG, "parseMLBParkHtmlDataMobileVer - parsed title[" + itemTitle + "]");
+                    
+                    // Put itemTitle to the 'obj' JSONObject.
+                    obj.put(JSON_TITLE, itemTitle);
+                    continue;
+                }
             
             // Find the same pattern with <div class='w'>. This means the writer of this article.
             } else if (value != null && value.equals("w")) {
