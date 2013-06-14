@@ -17,12 +17,13 @@
             android:paddingLeft="10dp"
             android:paddingRight="10dp" />
     
-    <!-- body (text + image) -->
+    <!-- body (text + image) applied 30% alpha -->
     <LinearLayout
         android:id="@+id/contentRowBodyLayout"
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="#4D000000"
         android:paddingBottom="5dp" >
         <!-- Add dynamic view here -->
     </LinearLayout>
