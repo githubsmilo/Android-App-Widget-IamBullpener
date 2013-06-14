@@ -124,8 +124,13 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
                             Bitmap bitmap = null;
                             try {
                                 bitmap = getImageBitmap(bodyImage);
-                                Log.i(TAG, "getViewAt - getImageBitmap - bitmap is ok!");
-                                rvBodyImage.setImageViewBitmap(R.id.contentRowImage, bitmap);
+                                if (bitmap == null) {
+                                	Log.e(TAG, "getViewAt - getImageBitmap - bitmap is null!");
+                                	rvBodyImage.setImageViewBitmap(R.id.contentRowImage, null);
+                                } else {
+	                                Log.i(TAG, "getViewAt - getImageBitmap - bitmap is ok!");
+	                                rvBodyImage.setImageViewBitmap(R.id.contentRowImage, bitmap);
+                                }
                             } catch (IOException e) {
                                 Log.e(TAG, "getViewAt - getImageBitmap - IOException![" + e.toString() + "]");
                                 e.printStackTrace();
