@@ -258,15 +258,21 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
         rv.setRemoteAdapter(appWidgetId, R.id.listView, serviceIntent);
         rv.setScrollPosition(R.id.listView, 0); // Scroll to top
 
-        // Set title of the remoteViews.
+        
         if (Utils.isTodayBestUrl(mSelectedBullpenBoardUrl)) {
+        	// Set title of the remoteViews.
         	rv.setTextViewText(R.id.textListTitle, Utils.getRemoteViewTitle(context, mSelectedBullpenBoardUrl));
-        	
+            
         	rv.setViewVisibility(R.id.btnListNavPrev, View.GONE);
         	rv.setViewVisibility(R.id.btnListNavNext, View.GONE);
         } else {
+        	// Set title of the remoteViews.
             rv.setTextViewText(R.id.textListTitle, Utils.getRemoteViewTitleWithPageNum(context, mSelectedBullpenBoardUrl, pageNum));
-
+            intent = buildRefreshListIntent(context, appWidgetId, Constants.DEFAULT_PAGE_NUM);
+            pendingIntent = PendingIntent.getBroadcast(
+                    context, PENDING_INTENT_REQUEST_CODE.REQUEST_TOP.ordinal(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
+            rv.setOnClickPendingIntent(R.id.textListTitle, pendingIntent);
+            
             // Set prev button of the removeViews.
         	rv.setViewVisibility(R.id.btnListNavPrev, View.VISIBLE);
             intent = buildRefreshListIntent(context, appWidgetId, (pageNum > Constants.DEFAULT_PAGE_NUM ? pageNum - 1 : pageNum));
