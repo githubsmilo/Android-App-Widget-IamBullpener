@@ -23,9 +23,12 @@ public final class Constants {
     public static final String EXTRA_LIST_URL = PACKAGE_NAME + ".EXTRA_LIST_URL"; 
     public static final String EXTRA_PAGE_NUM = PACKAGE_NAME + ".EXTRA_PAGE_NUM";
 
-    public static final int DEFAULT_INTERVAL_AT_MILLIS = 20000;
     public static final int LISTVIEW_MAX_ITEM_COUNT = 20;
+    public static final int DEFAULT_INTERVAL_AT_MILLIS = 20000;
     public static final int DEFAULT_PAGE_NUM = 1;
+    public static final boolean DEFAULT_PERMIT_MOBILE_CONNECTION = false;
+    public static final int DEFAULT_REFRESH_TIME_TYPE = 0;
+    public static final int DEFAULT_BULLPEN_BOARD_TYPE = 0;
 
     public static final String mMLBParkUrl_base = "http://mlbpark.donga.com";
     public static final String mMLBParkUrl_mlbtown = "http://mlbpark.donga.com/mbs/articleL.php?mbsC=mlbtown&cpage=";

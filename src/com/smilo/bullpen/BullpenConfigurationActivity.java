@@ -51,9 +51,12 @@ public class BullpenConfigurationActivity extends Activity {
             mIsExecutedBySettingButton = true;
         }
         
-        boolean isPermitMobileConnection = extras.getBoolean(Constants.EXTRA_PERMIT_MOBILE_CONNECTION_TYPE, false);
-        int refreshTimeType = extras.getInt(Constants.EXTRA_REFRESH_TIME_TYPE, 0);
-        int bullpenBoardType = extras.getInt(Constants.EXTRA_BULLPEN_BOARD_TYPE, 0);
+        boolean isPermitMobileConnection = extras.getBoolean(
+                Constants.EXTRA_PERMIT_MOBILE_CONNECTION_TYPE, Constants.DEFAULT_PERMIT_MOBILE_CONNECTION);
+        int refreshTimeType = extras.getInt(
+                Constants.EXTRA_REFRESH_TIME_TYPE, Constants.DEFAULT_REFRESH_TIME_TYPE);
+        int bullpenBoardType = extras.getInt(
+                Constants.EXTRA_BULLPEN_BOARD_TYPE, Constants.DEFAULT_BULLPEN_BOARD_TYPE);
         
         initializeRadioButton(isPermitMobileConnection);
         initializeSpinners(refreshTimeType, bullpenBoardType);
