@@ -125,11 +125,9 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
                             try {
                                 bitmap = getImageBitmap(bodyImage);
                                 if (bitmap == null) {
-                                	Log.e(TAG, "getViewAt - getImageBitmap - bitmap is null!");
-                                	rvBodyImage.setImageViewBitmap(R.id.contentRowImage, null);
+                                    rvBodyImage.setImageViewBitmap(R.id.contentRowImage, null);
                                 } else {
-	                                Log.i(TAG, "getViewAt - getImageBitmap - bitmap is ok!");
-	                                rvBodyImage.setImageViewBitmap(R.id.contentRowImage, bitmap);
+                                    rvBodyImage.setImageViewBitmap(R.id.contentRowImage, bitmap);
                                 }
                             } catch (IOException e) {
                                 Log.e(TAG, "getViewAt - getImageBitmap - IOException![" + e.toString() + "]");
@@ -439,16 +437,45 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
     }
     
     private Bitmap getImageBitmap(String url) throws IOException, RuntimeException, OutOfMemoryError { 
-        Bitmap bm = null; 
+        Bitmap bitmap = null; 
         URL aURL = new URL(url); 
         URLConnection conn = aURL.openConnection(); 
         conn.connect(); 
         InputStream is = conn.getInputStream(); 
         BufferedInputStream bis = new BufferedInputStream(is); 
-        bm = BitmapFactory.decodeStream(bis);
+        bitmap = BitmapFactory.decodeStream(bis);
         bis.close(); 
         is.close();
-        return bm; 
+
+        if (bitmap == null) {
+            Log.e(TAG, "getImageBitmap - bitmap is null!");
+            return null;
+        } else {
+            Bitmap resizeBitmap = null;
+            int bitmapWidth = bitmap.getWidth();
+            int bitmapHeight = bitmap.getHeight();
+            if (bitmapWidth > Constants.BITMAP_MAX_SIZE || bitmapHeight > Constants.BITMAP_MAX_SIZE) {
+                if (bitmapWidth > bitmapHeight) {
+                    resizeBitmap = Bitmap.createScaledBitmap(
+                            bitmap, Constants.BITMAP_MAX_SIZE, (bitmapHeight * Constants.BITMAP_MAX_SIZE)/bitmapWidth, true);
+                } else {
+                    resizeBitmap = Bitmap.createScaledBitmap(
+                            bitmap, (bitmapWidth * Constants.BITMAP_MAX_SIZE)/bitmapHeight, Constants.BITMAP_MAX_SIZE, true);
+                }
+                
+                if (resizeBitmap == null) {
+                    Log.e(TAG, "getImageBitmap - resizeBitmap is null!");
+                    return null;
+                } else {
+                    bitmap.recycle();
+                    Log.i(TAG, "getImageBitmap - resizeBitmap[" + resizeBitmap.getWidth() + "," + resizeBitmap.getHeight() + "] is ok!");
+                    return resizeBitmap;
+                }
+            } else {
+                Log.i(TAG, "getImageBitmap - bitmap[" + bitmapWidth + "," + bitmapHeight + "] is ok!");
+                return bitmap;
+            }
+        }
     } 
     
     private void setupIntentListener() {

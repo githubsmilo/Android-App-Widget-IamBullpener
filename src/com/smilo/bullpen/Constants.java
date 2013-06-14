@@ -24,6 +24,7 @@ public final class Constants {
     public static final String EXTRA_PAGE_NUM = PACKAGE_NAME + ".EXTRA_PAGE_NUM";
 
     public static final int LISTVIEW_MAX_ITEM_COUNT = 20;
+    public static final int BITMAP_MAX_SIZE = 800;
     public static final int DEFAULT_INTERVAL_AT_MILLIS = 20000;
     public static final int DEFAULT_PAGE_NUM = 1;
     public static final boolean DEFAULT_PERMIT_MOBILE_CONNECTION = false;
