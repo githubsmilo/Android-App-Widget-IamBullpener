@@ -38,15 +38,21 @@ import java.util.List;
 public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFactory {
 
     private static final String TAG = "BullpenContentFactory";
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = Constants.DEBUG_MODE;
 
-    private static JSONObject mParsedJSONObject = null;
     private static Context mContext;
-    private static int mAppWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID;
-    private static String mSelectedItemUrl = null;
+    private static JSONObject mParsedJSONObject = null;
     private static BroadcastReceiver mIntentListener;
     private static PARSING_RESULT mParsingResult = PARSING_RESULT.FAILED_UNKNOWN;
-    private static int mPageNum = Constants.DEFAULT_PAGE_NUM;
+    
+    // intent item list
+    private static int mAppWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID;
+    private static int mPageNum = Constants.ERROR_PAGE_NUM;
+    //private static int mBoardType = Constants.ERROR_BOARD_TYPE;
+    //private static int mRefreshTimetype = Constants.ERROR_REFRESH_TIME_TYPE;
+    //private static boolean mIsPermitMobileConnectionType = Constants.ERROR_PERMIT_MOBILE_CONNECTION_TYPE;
+    
+    private static String mSelectedItemUrl = null;
     
     private static final String JSON_TITLE = "title";
     private static final String JSON_WRITER = "writer";
@@ -59,13 +65,12 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
 
     public BullpenContentFactory(Context context, Intent intent) {
         mContext = context;
-        mAppWidgetId = intent.getIntExtra(
-                AppWidgetManager.EXTRA_APPWIDGET_ID,
-                AppWidgetManager.INVALID_APPWIDGET_ID);
-        mSelectedItemUrl = intent.getStringExtra(Constants.EXTRA_ITEM_URL);
+        mAppWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
         mPageNum = intent.getIntExtra(Constants.EXTRA_PAGE_NUM, Constants.DEFAULT_PAGE_NUM);
-        if (DEBUG) Log.i(TAG, "constructor - mSelectedItemUrl[" + mSelectedItemUrl +
-                "], mPageNum[" + mPageNum + "], mAppWidgetId[" + mAppWidgetId + "]");
+        mSelectedItemUrl = intent.getStringExtra(Constants.EXTRA_ITEM_URL);
+        
+        if (DEBUG) Log.i(TAG, "constructor - mAppWidgetId[" + mAppWidgetId +
+        		"], mPageNum[" + mPageNum + "], mSelectedItemUrl[" + mSelectedItemUrl + "]");
         
         setupIntentListener();
     }
@@ -484,12 +489,13 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
             mIntentListener = new BroadcastReceiver() {
                 @Override
                 public void onReceive(Context context, Intent intent) {
-                    // Update mSelectedItemUrl through Broadcast Intent.
+                    // Update intent list items through Broadcast Intent.
                     mAppWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
-                    mSelectedItemUrl = intent.getStringExtra(Constants.EXTRA_ITEM_URL);
                     mPageNum = intent.getIntExtra(Constants.EXTRA_PAGE_NUM, Constants.DEFAULT_PAGE_NUM);
-                    if (DEBUG) Log.i(TAG, "onReceive - update mSelectedItemUrl[" + mSelectedItemUrl + 
-                            "], mPageNum[" + mPageNum + "], mAppWidgetId[" + mAppWidgetId + "]");
+                    mSelectedItemUrl = intent.getStringExtra(Constants.EXTRA_ITEM_URL);
+
+                    if (DEBUG) Log.i(TAG, "onReceive - update mAppWidgetId[" + mAppWidgetId +
+                    		"], mPageNum[" + mPageNum + "], mSelectedItemUrl[" + mSelectedItemUrl + "]");
                 }
             };
             IntentFilter filter = new IntentFilter();

@@ -18,11 +18,11 @@ import android.widget.Spinner;
 public class BullpenConfigurationActivity extends Activity {
 
     private static final String TAG = "BullpenConfigurationActivity";
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = Constants.DEBUG_MODE;
     
     private int mAppWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID;
-    
-    private int mSelectedRefreshTimeType = -1, mSelectedBullpenBoardType = -1;
+    private int mSelectedBullpenBoardType = Constants.ERROR_BOARD_TYPE;
+    private int mSelectedRefreshTimeType = Constants.ERROR_REFRESH_TIME_TYPE;
     
     private boolean mIsExecutedBySettingButton = false;
     
@@ -47,17 +47,18 @@ public class BullpenConfigurationActivity extends Activity {
             finish();
         }
 
-        if (extras.containsKey(Constants.EXTRA_REFRESH_TIME_TYPE) &&
-              extras.containsKey(Constants.EXTRA_BULLPEN_BOARD_TYPE)) {
+        if (extras.containsKey(Constants.EXTRA_PERMIT_MOBILE_CONNECTION_TYPE) &&
+            extras.containsKey(Constants.EXTRA_REFRESH_TIME_TYPE) &&
+            extras.containsKey(Constants.EXTRA_BOARD_TYPE)) {
             mIsExecutedBySettingButton = true;
         }
         
         boolean isPermitMobileConnection = extras.getBoolean(
-                Constants.EXTRA_PERMIT_MOBILE_CONNECTION_TYPE, Constants.DEFAULT_PERMIT_MOBILE_CONNECTION);
+                Constants.EXTRA_PERMIT_MOBILE_CONNECTION_TYPE, Constants.DEFAULT_PERMIT_MOBILE_CONNECTION_TYPE);
         int refreshTimeType = extras.getInt(
                 Constants.EXTRA_REFRESH_TIME_TYPE, Constants.DEFAULT_REFRESH_TIME_TYPE);
         int bullpenBoardType = extras.getInt(
-                Constants.EXTRA_BULLPEN_BOARD_TYPE, Constants.DEFAULT_BULLPEN_BOARD_TYPE);
+                Constants.EXTRA_BOARD_TYPE, Constants.DEFAULT_BOARD_TYPE);
         
         initializeRadioButton(isPermitMobileConnection);
         initializeSpinners(refreshTimeType, bullpenBoardType);
@@ -124,7 +125,7 @@ public class BullpenConfigurationActivity extends Activity {
             initIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, mAppWidgetId);
             initIntent.putExtra(Constants.EXTRA_PERMIT_MOBILE_CONNECTION_TYPE, selectedPermitMobileConnectionType);
             initIntent.putExtra(Constants.EXTRA_REFRESH_TIME_TYPE, mSelectedRefreshTimeType);
-            initIntent.putExtra(Constants.EXTRA_BULLPEN_BOARD_TYPE, mSelectedBullpenBoardType);
+            initIntent.putExtra(Constants.EXTRA_BOARD_TYPE, mSelectedBullpenBoardType);
             context.sendBroadcast(initIntent);
             
             Intent resultValue = new Intent();

@@ -32,17 +32,20 @@ import java.util.List;
 public class BullpenListViewFactory implements RemoteViewsService.RemoteViewsFactory {
 
     private static final String TAG = "BullpenListViewFactory";
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = Constants.DEBUG_MODE;
 
-    private static List<listItem> mListItems = new ArrayList<listItem>();
     private static Context mContext;
-    private static int mAppWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID;
-    private static String mSelectedBullpenBoardUrl = null;
+    private static List<listItem> mListItems = new ArrayList<listItem>();
     private static BroadcastReceiver mIntentListener;
     private static PARSING_RESULT mParsingResult = PARSING_RESULT.FAILED_UNKNOWN;
-    private static int mPageNum = Constants.DEFAULT_PAGE_NUM;
-    
     private static int mAddedTodayBestItemCount = 0;
+    
+    // intent item list
+    private static int mAppWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID;
+    private static int mPageNum = Constants.ERROR_PAGE_NUM;
+    private static int mBoardType = Constants.ERROR_BOARD_TYPE;
+    //private static int mRefreshTimetype = Constants.ERROR_REFRESH_TIME_TYPE;
+    //private static boolean mIsPermitMobileConnectionType = Constants.ERROR_PERMIT_MOBILE_CONNECTION_TYPE;
 
     private class listItem {
         public String itemTitle;
@@ -56,13 +59,12 @@ public class BullpenListViewFactory implements RemoteViewsService.RemoteViewsFac
 
     public BullpenListViewFactory(Context context, Intent intent) {
         mContext = context;
-        mAppWidgetId = intent.getIntExtra(
-                AppWidgetManager.EXTRA_APPWIDGET_ID,
-                AppWidgetManager.INVALID_APPWIDGET_ID);
-        mSelectedBullpenBoardUrl = intent.getStringExtra(Constants.EXTRA_LIST_URL);
+        mAppWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
         mPageNum = intent.getIntExtra(Constants.EXTRA_PAGE_NUM, Constants.DEFAULT_PAGE_NUM);
-        if (DEBUG) Log.i(TAG, "constructor - mSelectedBullpenBoardUrl[" + mSelectedBullpenBoardUrl +
-                "], mPageNum[" + mPageNum + "], mAppWidgetId[" + mAppWidgetId + "]");
+        mBoardType = intent.getIntExtra(Constants.EXTRA_BOARD_TYPE, Constants.DEFAULT_BOARD_TYPE);
+
+        if (DEBUG) Log.i(TAG, "constructor - mAppWidgetId[" + mAppWidgetId + 
+        		"], mPageNum[" + mPageNum + "], mBoardType[" + mBoardType + "]");
         
         setupIntentListener();
     }
@@ -107,22 +109,22 @@ public class BullpenListViewFactory implements RemoteViewsService.RemoteViewsFac
 
     @Override
     public void onDataSetChanged() {
-    	if (DEBUG) Log.i(TAG, "onDataSetChanged - mSelectedBullpenBoardUrl[" + mSelectedBullpenBoardUrl + "], mPageNum[" + mPageNum + "]");
+    	if (DEBUG) Log.i(TAG, "onDataSetChanged - mBoardType[" + mBoardType + "], mPageNum[" + mPageNum + "]");
 
-        if (mSelectedBullpenBoardUrl == null) {
-        	if (DEBUG) Log.e(TAG, "onDataSetChanged - mSelectedBullpenBoardUrl is null!");
+        if (mBoardType == Constants.ERROR_BOARD_TYPE) {
+        	if (DEBUG) Log.e(TAG, "onDataSetChanged - mBoardType is invalid![" + mBoardType + "]");
             return;
-        } else if (mPageNum < Constants.DEFAULT_PAGE_NUM) {
+        } else if (mPageNum == Constants.ERROR_PAGE_NUM) {
         	if (DEBUG) Log.e(TAG, "onDatasetChanged - mPageNum is invalid![" + mPageNum + "]");
             return;
         }
 
         // Parse MLBPark html data and add items to the widget item array list.
         try {
-            if (Utils.isTodayBestUrl(mSelectedBullpenBoardUrl)) {
-                mParsingResult = parseMLBParkTodayBest(mSelectedBullpenBoardUrl);
+            if (Utils.isTodayBestBoardType(mBoardType)) {
+                mParsingResult = parseMLBParkTodayBest(Utils.getBoardUrl(mBoardType));
             } else {
-            	mParsingResult = parseMLBParkMobileBoard(mSelectedBullpenBoardUrl + mPageNum);
+            	mParsingResult = parseMLBParkMobileBoard(Utils.getBoardUrl(mBoardType) + mPageNum);
             }
         } catch (IOException e) {
         	if (DEBUG) Log.e(TAG, "onDataSetChanged - IOException![" + e.toString() + "]");
@@ -189,7 +191,7 @@ public class BullpenListViewFactory implements RemoteViewsService.RemoteViewsFac
     	// Initialize widget item array list here.
         mListItems.clear();
 
-        Source source = new Source(new URL(Constants.mMLBParkUrl_base));
+        Source source = new Source(new URL(Constants.URL_BASE));
         source.fullSequentialParse();
         
         // Find the same pattern with <div class='today_best'>. This means the 'today best' and we can find three items.
@@ -204,9 +206,9 @@ public class BullpenListViewFactory implements RemoteViewsService.RemoteViewsFac
             String classAttr = div.getAttributeValue("class");
             if (classAttr != null && classAttr.equals("today_best")) {
             	foundTodayBest++;
-            	if ((urlAddress.equals(Constants.mMLBParkUrl_mlbtown_todaybest) && foundTodayBest == 1) ||
-            		(urlAddress.equals(Constants.mMLBParkUrl_kbotown_todaybest) && foundTodayBest == 2) ||
-            		(urlAddress.equals(Constants.mMLBParkUrl_bullpen_todaybest) && foundTodayBest == 3)) {
+            	if ((urlAddress.equals(Constants.URL_MLB_TOWN_TODAY_BEST) && foundTodayBest == 1) ||
+            		(urlAddress.equals(Constants.URL_KBO_TOWN_TODAY_BEST) && foundTodayBest == 2) ||
+            		(urlAddress.equals(Constants.URL_BULLPEN_TODAY_BEST) && foundTodayBest == 3)) {
 	            	targetDiv = div;
 	            	break;
             	}
@@ -236,7 +238,7 @@ public class BullpenListViewFactory implements RemoteViewsService.RemoteViewsFac
         					url = ((StartTag)nodeSeg).getAttributeValue("href");
         					if (url.startsWith("/")) {
                                 StringBuffer strBuf = new StringBuffer();
-                                strBuf.append(Constants.mMLBParkUrl_base);
+                                strBuf.append(Constants.URL_BASE);
                                 strBuf.append(url);
                                 url = strBuf.toString();
                             }
@@ -327,7 +329,7 @@ public class BullpenListViewFactory implements RemoteViewsService.RemoteViewsFac
                            url = ((StartTag)nodeSeg).getAttributeValue("href");
                            if (url.startsWith("/")) {
                                StringBuffer strBuf = new StringBuffer();
-                               strBuf.append(Constants.mMLBParkUrl_base);
+                               strBuf.append(Constants.URL_BASE);
                                strBuf.append(url);
                                url = strBuf.toString();
                            }
@@ -418,7 +420,7 @@ public class BullpenListViewFactory implements RemoteViewsService.RemoteViewsFac
                 String url = content.getURIAttributes().get(0).getValue();
                 if (url.startsWith("/")) {
                     StringBuffer strBuf = new StringBuffer();
-                    strBuf.append(Constants.mMLBParkUrl_base);
+                    strBuf.append(Constants.URL_BASE);
                     strBuf.append(url);
                     url = strBuf.toString();
                 }
@@ -444,12 +446,13 @@ public class BullpenListViewFactory implements RemoteViewsService.RemoteViewsFac
 	        mIntentListener = new BroadcastReceiver() {
 	            @Override
 	            public void onReceive(Context context, Intent intent) {
-	                // Update mSelectedBullpenBoardUrl through Broadcast Intent.
+	                // Update itent items through Broadcast Intent.
 	                mAppWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
-	                mSelectedBullpenBoardUrl = intent.getStringExtra(Constants.EXTRA_LIST_URL);
+	                mBoardType = intent.getIntExtra(Constants.EXTRA_BOARD_TYPE, Constants.DEFAULT_BOARD_TYPE);
 	                mPageNum = intent.getIntExtra(Constants.EXTRA_PAGE_NUM, Constants.DEFAULT_PAGE_NUM);
-	                if (DEBUG) Log.i(TAG, "onReceive - update mSelectedBullpenBoardUrl[" + mSelectedBullpenBoardUrl + 
-	                        "], mPageNum[" + mPageNum + "], mAppWidgetId[" + mAppWidgetId + "]");
+	                
+	                if (DEBUG) Log.i(TAG, "onReceive - update mAppWidgetId[" + mAppWidgetId + 
+	                		"], mPageNum[" + mPageNum + "], mBoardType[" + mBoardType + "]");
 	            }
 	        };
 	        IntentFilter filter = new IntentFilter();
