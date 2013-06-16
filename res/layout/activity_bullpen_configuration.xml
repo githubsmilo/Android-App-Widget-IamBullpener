@@ -14,14 +14,16 @@
 
         <TextView
             android:id="@+id/textPermitMobileConnection"
-            android:layout_width="100dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:text="@string/text_permitMobileConnection" />
 
         <CheckBox
             android:id="@+id/cbMobileConnection"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_weight="0.5"
             android:checked="true" />
 
     </LinearLayout>
@@ -36,15 +38,17 @@
 
         <TextView
             android:id="@+id/textRefreshTime"
-            android:layout_width="100dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:text="@string/text_refreshTime" />
                 
 	    <Spinner
 	        android:id="@+id/spinRefreshTime"
-	        android:layout_width="150dp"
+	        android:layout_width="match_parent"
 	        android:layout_height="wrap_content"
 	        android:drawSelectorOnTop="true"
+	        android:layout_weight="0.5"
 	        android:prompt="@string/prompt_refreshTime" />
     </LinearLayout>
 
@@ -58,15 +62,17 @@
 	    
         <TextView
             android:id="@+id/textBullpenBoard"
-            android:layout_width="100dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:text="@string/text_bullpenBoard" />
                 
 	    <Spinner
 	        android:id="@+id/spinBullpenBoard"
-	        android:layout_width="150dp"
+	        android:layout_width="match_parent"
 	        android:layout_height="wrap_content"
 	        android:drawSelectorOnTop="true"
+	        android:layout_weight="0.5"
 	        android:prompt="@string/prompt_bullpenBoard" />
     </LinearLayout>
 <!-- 
@@ -80,15 +86,17 @@
         
         <TextView
             android:id="@+id/textBlackList"
-            android:layout_width="100dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:text="@string/text_blackList" />
 
         <EditText
             android:id="@+id/editBlackList"
-            android:layout_width="150dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:drawSelectorOnTop="true"
+            android:layout_weight="0.5"
             android:hint="@string/text_blackList_not_implemented"
             android:ems="10" >
 
@@ -107,14 +115,16 @@
         
         <TextView
             android:id="@+id/textAppInfo"
-            android:layout_width="100dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:text="@string/text_appInfo" />
                 
         <TextView
             android:id="@+id/appInfo"
-            android:layout_width="150dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_weight="0.5"
             android:text="@string/appInfo" />
     </LinearLayout>
 
@@ -130,16 +140,16 @@
             android:id="@+id/btnCancel"
             style="?android:attr/buttonBarButtonStyle"
             android:layout_width="match_parent"
-            android:layout_weight="1"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:text="@string/btn_cancel" />
 
         <Button
             android:id="@+id/btnOk"
             style="?android:attr/buttonBarButtonStyle"
             android:layout_width="match_parent"
-            android:layout_weight="1"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:text="@string/btn_ok" />
     </LinearLayout>
 

@@ -10,7 +10,6 @@
         android:layout_height="wrap_content"
         android:background="@color/dark_green"
         android:paddingLeft="10dp"
-        android:paddingRight="10dp"
         android:orientation="horizontal" >
         
         <TextView
@@ -26,7 +25,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_marginRight="10dp"
             android:layout_toLeftOf="@+id/btnContentRefresh"
             android:background="@drawable/up_button_selector"
             android:contentDescription="@string/btn_top" />
@@ -36,7 +34,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_marginRight="10dp"
             android:layout_toLeftOf="@+id/btnContentSetting"
             android:background="@drawable/reload_button_selector"
             android:contentDescription="@string/btn_refresh" />
