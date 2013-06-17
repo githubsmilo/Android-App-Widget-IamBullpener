@@ -35,9 +35,9 @@ import java.net.URLConnection;
 import java.util.Iterator;
 import java.util.List;
 
-public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFactory {
+public class ContentsFactory implements RemoteViewsService.RemoteViewsFactory {
 
-    private static final String TAG = "BullpenContentFactory";
+    private static final String TAG = "ContentsFactory";
     private static final boolean DEBUG = Constants.DEBUG_MODE;
 
     private static Context mContext;
@@ -63,7 +63,7 @@ public class BullpenContentFactory implements RemoteViewsService.RemoteViewsFact
     private static final String JSON_COMMENT_WRITER = "commentWriter";
     private static final String JSON_COMMENT_TEXT = "commentText";
 
-    public BullpenContentFactory(Context context, Intent intent) {
+    public ContentsFactory(Context context, Intent intent) {
         mContext = context;
         mAppWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
         mPageNum = intent.getIntExtra(Constants.EXTRA_PAGE_NUM, Constants.DEFAULT_PAGE_NUM);

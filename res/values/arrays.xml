@@ -8,7 +8,7 @@
         <item>30분</item>
         <item>새로 고침 안함</item>
     </string-array>
-    <string-array name="bullpenBoard">
+    <string-array name="board">
         <item>MLB 타운</item>
         <item>KBO 타운</item>
         <item>BULLPEN</item>

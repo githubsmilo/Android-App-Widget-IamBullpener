@@ -17,7 +17,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <receiver
-            android:name="com.smilo.bullpen.BullpenWidgetProvider"
+            android:name="com.smilo.bullpen.WidgetProvider"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -29,14 +29,14 @@
         </receiver>
 
         <service
-            android:name="com.smilo.bullpen.BullpenListViewService"
+            android:name="com.smilo.bullpen.ListViewService"
             android:permission="android.permission.BIND_REMOTEVIEWS" />
         <service
-            android:name="com.smilo.bullpen.BullpenContentService"
+            android:name="com.smilo.bullpen.ContentsService"
             android:permission="android.permission.BIND_REMOTEVIEWS" />
 
         <activity
-            android:name="com.smilo.bullpen.BullpenConfigurationActivity"
+            android:name="com.smilo.bullpen.ConfigurationActivity"
             android:theme="@android:style/Theme.Dialog"
             android:windowSoftInputMode="stateAlwaysHidden"
             android:allowTaskReparenting="false"

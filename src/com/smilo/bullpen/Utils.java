@@ -9,7 +9,7 @@ import android.widget.Toast;
 
 public final class Utils {
 
-    private static final String TAG = "BullpenUtils";
+    private static final String TAG = "Utils";
     private static final boolean DEBUG = Constants.DEBUG_MODE;
 
     public static boolean isInternetConnected(Context context, boolean isPermitMobileConnection) {

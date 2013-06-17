@@ -11,7 +11,7 @@ public final class Constants {
     public static final String ACTION_APPWIDGET_ENABLD = "android.appwidget.action.APPWIDGET_ENABLED";
     public static final String ACTION_APPWIDGET_UPDATE = "android.appwidget.action.APPWIDGET_UPDATE";
     
-    // Actions defined by BaseballWidget
+    // Actions defined by appWidget
     public static final String ACTION_INIT_LIST = PACKAGE_NAME + ".INIT_LIST";
     public static final String ACTION_REFRESH_LIST = PACKAGE_NAME + ".REFRESH_LIST";
     public static final String ACTION_SHOW_LIST = PACKAGE_NAME + ".SHOW_LIST";
@@ -36,6 +36,16 @@ public final class Constants {
     public static final boolean ERROR_PERMIT_MOBILE_CONNECTION_TYPE = false;
     public static final int     ERROR_REFRESH_TIME_TYPE = -1;
     public static final int     ERROR_BOARD_TYPE = -1;
+    
+    public enum PARSING_RESULT {
+    	SUCCESS_FULL_BOARD,
+        SUCCESS_MOBILE_BOARD,
+        SUCCESS_MOBILE_TODAY_BEST,
+        FAILED_IO_EXCEPTION,
+        FAILED_JSON_EXCEPTION,
+        FAILED_STACK_OVERFLOW,
+        FAILED_UNKNOWN,
+    };
     
     public static final String URL_BASE = "http://mlbpark.donga.com";
     public static final String URL_MLB_TOWN = "http://mlbpark.donga.com/mbs/articleL.php?mbsC=mlbtown&cpage=";
@@ -70,14 +80,4 @@ public final class Constants {
     public static final int REFRESH_TIME_TYPE_20_MIN = 3;
     public static final int REFRESH_TIME_TYPE_30_MIN = 4;
     public static final int REFRESH_TIME_TYPE_STOP   = 5;
-
-    public enum PARSING_RESULT {
-    	SUCCESS_FULL_BOARD,
-        SUCCESS_MOBILE_BOARD,
-        SUCCESS_MOBILE_TODAY_BEST,
-        FAILED_IO_EXCEPTION,
-        FAILED_JSON_EXCEPTION,
-        FAILED_STACK_OVERFLOW,
-        FAILED_UNKNOWN,
-    };
 }

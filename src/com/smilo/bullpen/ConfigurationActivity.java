@@ -15,13 +15,13 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Spinner;
 
-public class BullpenConfigurationActivity extends Activity {
+public class ConfigurationActivity extends Activity {
 
-    private static final String TAG = "BullpenConfigurationActivity";
+    private static final String TAG = "ConfigurationActivity";
     private static final boolean DEBUG = Constants.DEBUG_MODE;
     
     private int mAppWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID;
-    private int mSelectedBullpenBoardType = Constants.ERROR_BOARD_TYPE;
+    private int mSelectedBoardType = Constants.ERROR_BOARD_TYPE;
     private int mSelectedRefreshTimeType = Constants.ERROR_REFRESH_TIME_TYPE;
     
     private boolean mIsExecutedBySettingButton = false;
@@ -34,7 +34,7 @@ public class BullpenConfigurationActivity extends Activity {
         // out of the widget placement if they press the back button.
         setResult(RESULT_CANCELED);
         
-        setContentView(R.layout.activity_bullpen_configuration);
+        setContentView(R.layout.configuration_activity);
         
         Intent intent = getIntent();
         Bundle extras = intent.getExtras();
@@ -57,11 +57,11 @@ public class BullpenConfigurationActivity extends Activity {
                 Constants.EXTRA_PERMIT_MOBILE_CONNECTION_TYPE, Constants.DEFAULT_PERMIT_MOBILE_CONNECTION_TYPE);
         int refreshTimeType = extras.getInt(
                 Constants.EXTRA_REFRESH_TIME_TYPE, Constants.DEFAULT_REFRESH_TIME_TYPE);
-        int bullpenBoardType = extras.getInt(
+        int boardType = extras.getInt(
                 Constants.EXTRA_BOARD_TYPE, Constants.DEFAULT_BOARD_TYPE);
         
         initializeRadioButton(isPermitMobileConnection);
-        initializeSpinners(refreshTimeType, bullpenBoardType);
+        initializeSpinners(refreshTimeType, boardType);
         //initializeEditText();
         initializeButtons();
     }
@@ -80,7 +80,7 @@ public class BullpenConfigurationActivity extends Activity {
         cb.setChecked(isPermitMobileConnection);
     }
     
-    private void initializeSpinners(int refreshTypeType, int bullpenBoardType) {
+    private void initializeSpinners(int refreshTypeType, int boardType) {
         Spinner spinRefreshTime = (Spinner)findViewById(R.id.spinRefreshTime);
         ArrayAdapter<CharSequence> adapterRefreshTime = ArrayAdapter.createFromResource(this, R.array.refreshTime, android.R.layout.simple_spinner_item);
         adapterRefreshTime.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -88,12 +88,12 @@ public class BullpenConfigurationActivity extends Activity {
         spinRefreshTime.setOnItemSelectedListener(mSpinRefreshTimeSelectedListener);
         spinRefreshTime.setSelection(refreshTypeType);
 
-        Spinner spinBullpenBoard = (Spinner)findViewById(R.id.spinBullpenBoard);
-        ArrayAdapter<CharSequence> adapterBullpenBoard = ArrayAdapter.createFromResource(this, R.array.bullpenBoard, android.R.layout.simple_spinner_item);
-        adapterBullpenBoard.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinBullpenBoard.setAdapter(adapterBullpenBoard);
-        spinBullpenBoard.setOnItemSelectedListener(mSpinBullpenBoardSelectedListener);
-        spinBullpenBoard.setSelection(bullpenBoardType);
+        Spinner spinBoard = (Spinner)findViewById(R.id.spinBoard);
+        ArrayAdapter<CharSequence> adapterBoard = ArrayAdapter.createFromResource(this, R.array.board, android.R.layout.simple_spinner_item);
+        adapterBoard.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinBoard.setAdapter(adapterBoard);
+        spinBoard.setOnItemSelectedListener(mSpinBoardSelectedListener);
+        spinBoard.setSelection(boardType);
     }
 
     private void initializeButtons() {
@@ -108,8 +108,8 @@ public class BullpenConfigurationActivity extends Activity {
             if (mSelectedRefreshTimeType < 0) {
                 mSelectedRefreshTimeType = 0;
             }
-            if (mSelectedBullpenBoardType < 0) {
-                mSelectedBullpenBoardType = 0;
+            if (mSelectedBoardType < 0) {
+                mSelectedBoardType = 0;
             }
             
             CheckBox cb = (CheckBox)findViewById(R.id.cbMobileConnection);
@@ -117,15 +117,15 @@ public class BullpenConfigurationActivity extends Activity {
             
             if (DEBUG) Log.i(TAG, "selectedPermitMobileConnectionType[" + selectedPermitMobileConnectionType +
                     "], mSelectedRefreshTimeType[" + mSelectedRefreshTimeType + 
-                    "], mSelectedBullpenBoardType[" + mSelectedBullpenBoardType + "]");
+                    "], mSelectedBoardType[" + mSelectedBoardType + "]");
             
-            final Context context = BullpenConfigurationActivity.this;
-            Intent initIntent = new Intent(context, BullpenWidgetProvider.class);
+            final Context context = ConfigurationActivity.this;
+            Intent initIntent = new Intent(context, WidgetProvider.class);
             initIntent.setAction(Constants.ACTION_INIT_LIST);
             initIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, mAppWidgetId);
             initIntent.putExtra(Constants.EXTRA_PERMIT_MOBILE_CONNECTION_TYPE, selectedPermitMobileConnectionType);
             initIntent.putExtra(Constants.EXTRA_REFRESH_TIME_TYPE, mSelectedRefreshTimeType);
-            initIntent.putExtra(Constants.EXTRA_BOARD_TYPE, mSelectedBullpenBoardType);
+            initIntent.putExtra(Constants.EXTRA_BOARD_TYPE, mSelectedBoardType);
             context.sendBroadcast(initIntent);
             
             Intent resultValue = new Intent();
@@ -138,10 +138,10 @@ public class BullpenConfigurationActivity extends Activity {
     View.OnClickListener mBtnCancelOnClickListener = new View.OnClickListener() {
         public void onClick(View v) {
         	if (DEBUG) Log.i(TAG, "Button Cancel clicked");
-            final Context context = BullpenConfigurationActivity.this;
+            final Context context = ConfigurationActivity.this;
 
             if (mIsExecutedBySettingButton == false) {
-                BullpenWidgetProvider.removeWidget(context, mAppWidgetId);
+                WidgetProvider.removeWidget(context, mAppWidgetId);
             }
             finish();
         }
@@ -157,9 +157,9 @@ public class BullpenConfigurationActivity extends Activity {
         }
     };
     
-    Spinner.OnItemSelectedListener mSpinBullpenBoardSelectedListener = new AdapterView.OnItemSelectedListener() {
+    Spinner.OnItemSelectedListener mSpinBoardSelectedListener = new AdapterView.OnItemSelectedListener() {
         public void onItemSelected(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
-            mSelectedBullpenBoardType = arg2;
+            mSelectedBoardType = arg2;
         }
 
         public void onNothingSelected(AdapterView<?> arg0) {
@@ -170,7 +170,7 @@ public class BullpenConfigurationActivity extends Activity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.bullpen_configuration, menu);
+        getMenuInflater().inflate(R.menu.menu_configuration, menu);
         return true;
     }
 }

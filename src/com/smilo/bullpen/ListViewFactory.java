@@ -29,9 +29,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class BullpenListViewFactory implements RemoteViewsService.RemoteViewsFactory {
+public class ListViewFactory implements RemoteViewsService.RemoteViewsFactory {
 
-    private static final String TAG = "BullpenListViewFactory";
+    private static final String TAG = "ListViewFactory";
     private static final boolean DEBUG = Constants.DEBUG_MODE;
 
     private static Context mContext;
@@ -57,7 +57,7 @@ public class BullpenListViewFactory implements RemoteViewsService.RemoteViewsFac
         }
     }
 
-    public BullpenListViewFactory(Context context, Intent intent) {
+    public ListViewFactory(Context context, Intent intent) {
         mContext = context;
         mAppWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
         mPageNum = intent.getIntExtra(Constants.EXTRA_PAGE_NUM, Constants.DEFAULT_PAGE_NUM);

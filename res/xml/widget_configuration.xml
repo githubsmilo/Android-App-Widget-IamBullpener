@@ -4,7 +4,7 @@
   android:minHeight="294dp"
   android:updatePeriodMillis="0"
   android:initialLayout="@layout/list"
-  android:configure="com.smilo.bullpen.BullpenConfigurationActivity"
+  android:configure="com.smilo.bullpen.ConfigurationActivity"
   android:autoAdvanceViewId="@+id/listView"
   android:resizeMode="horizontal|vertical" >
   <!--

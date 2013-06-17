@@ -61,19 +61,19 @@
         android:orientation="horizontal" >
 	    
         <TextView
-            android:id="@+id/textBullpenBoard"
+            android:id="@+id/textBoard"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/text_bullpenBoard" />
+            android:text="@string/text_board" />
                 
 	    <Spinner
-	        android:id="@+id/spinBullpenBoard"
+	        android:id="@+id/spinBoard"
 	        android:layout_width="match_parent"
 	        android:layout_height="wrap_content"
 	        android:drawSelectorOnTop="true"
 	        android:layout_weight="0.5"
-	        android:prompt="@string/prompt_bullpenBoard" />
+	        android:prompt="@string/prompt_board" />
     </LinearLayout>
 <!-- 
     <LinearLayout

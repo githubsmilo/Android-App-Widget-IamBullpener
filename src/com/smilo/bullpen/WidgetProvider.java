@@ -14,15 +14,15 @@ import android.util.Log;
 import android.view.View;
 import android.widget.RemoteViews;
 
-public class BullpenWidgetProvider extends AppWidgetProvider {
+public class WidgetProvider extends AppWidgetProvider {
 
-    private static final String TAG = "BullpenWidgetProvider";
+    private static final String TAG = "WidgetProvider";
     private static final boolean DEBUG = Constants.DEBUG_MODE;
     
     // the pending intent to broadcast alarm.
     private static PendingIntent mSender;
     
-    // the alarm manager to refresh bullpen widget periodically.
+    // the alarm manager to refresh app widget periodically.
     private static AlarmManager mManager;
 
     // Flag to skip notifyAppWidgetViewDataChanged() call on boot.
@@ -30,7 +30,7 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
     private static boolean mIsSkipFirstCallContentService = true;
     
     // For SharedPreferences.
-    private static final String mSharedPreferenceName = "Bullpen";
+    private static final String mSharedPreferenceName = Constants.PACKAGE_NAME;
     private static final String mKeyCompleteToSetup = "key_complete_to_setup";
     private static final String mKeyPermitMobileConnectionType = "key_permit_mobile_connection_type";
     private static final String mKeyRefreshTimeType = "key_refresh_time_type";
@@ -48,16 +48,16 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
     private static class intentItem {
         int widgetId = AppWidgetManager.INVALID_APPWIDGET_ID;
         int pageNumber = Constants.ERROR_PAGE_NUM;
-        int bullpenBoardType = Constants.ERROR_BOARD_TYPE;
+        int boardType = Constants.ERROR_BOARD_TYPE;
         int refreshType = Constants.ERROR_REFRESH_TIME_TYPE;
         boolean isPermitMobileConnection = Constants.ERROR_PERMIT_MOBILE_CONNECTION_TYPE;
         
-        intentItem(int appWidgetId, int pageNum, int boardType, int refreshTimeType, boolean isPermitMobileConnectionType) {
-        	widgetId = appWidgetId;
-        	pageNumber = pageNum;
-        	bullpenBoardType = boardType;
-        	refreshType = refreshTimeType;
-        	isPermitMobileConnection = isPermitMobileConnectionType;
+        intentItem(int initAppWidgetId, int initPageNum, int initBoardType, int initRefreshTimeType, boolean initIsPermitMobileConnectionType) {
+        	widgetId = initAppWidgetId;
+        	pageNumber = initPageNum;
+        	boardType = initBoardType;
+        	refreshType = initRefreshTimeType;
+        	isPermitMobileConnection = initIsPermitMobileConnectionType;
         }
         
         int getAppWidgetId() {
@@ -69,7 +69,7 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
         }
         
         int getBoardType() {
-        	return bullpenBoardType;
+        	return boardType;
         }
         
         int getRefreshTimeType() {
@@ -85,7 +85,7 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
         }
         
 		public String toString() {
-        	return ("appWidgetId[" + widgetId + "], pageNum[" + pageNumber + "], boardType[" + bullpenBoardType +
+        	return ("appWidgetId[" + widgetId + "], pageNum[" + pageNumber + "], boardType[" + boardType +
         			"], refreshTimeType[" + refreshType + "], isPermitMobileConnectionType[" + isPermitMobileConnection + "]");
         }
     }
@@ -138,7 +138,7 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
                     editor.putInt(mKeyBoardType, boardType);
                     editor.commit();
 
-                    // Send broadcast intent to update mSelectedBullpenBoardUrl and pageNum variable on the BullpenListViewFactory.
+                    // Send broadcast intent to update some variables on the ListViewFactory.
                     context.sendBroadcast(buildUpdateListInfoIntent(item));
                     
                     if (Utils.isInternetConnected(context, permitMobileConnectionType) == false) {
@@ -162,19 +162,19 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
                     }
 
                 } else if (action.equals(Constants.ACTION_REFRESH_LIST)){                    
-                    // Send broadcast intent to update mSelectedBullpenBoardUrl and pageNum variable on the BullpenListViewFactory.
+                    // Send broadcast intent to update some variables on the ListViewFactory.
                     context.sendBroadcast(buildUpdateListInfoIntent(item));
                     
                     // Broadcast ACTION_SHOW_LIST intent.
                     context.sendBroadcast(buildShowListIntent(context, item));
                     
                 // This intent will be called when some item selected.
-                // EXTRA_ITEM_URL was already filled in the BullpenListViewFactory - getViewAt().
+                // EXTRA_ITEM_URL was already filled in the ListViewFactory - getViewAt().
                 } else if (action.equals(Constants.ACTION_SHOW_ITEM)) {
                     removePreviousAlarm();
                     String selectedItemUrl = intent.getStringExtra(Constants.EXTRA_ITEM_URL);
 
-                    // Send broadcast intent to update mSelectedItemUrl variable on the BullpenContentFactory.
+                    // Send broadcast intent to update some variables on the ContentsFactory.
                     context.sendBroadcast(buildUpdateItemInfoIntent(item, selectedItemUrl));
                     
                     if (Utils.isInternetConnected(context, permitMobileConnectionType) == false) {
@@ -281,7 +281,7 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
         awm.updateAppWidget(item.getAppWidgetId(), rv);
         
         // On first call, we need not execute notifyAppWidgetViewDataChanged()
-        // because onDataSetChanged() is called automatically after BullpenListViewFactory is created.
+        // because onDataSetChanged() is called automatically after ListViewFactory is created.
         if (mIsSkipFirstCallListViewService) {
             mIsSkipFirstCallListViewService = false;
         } else {
@@ -331,7 +331,7 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
         awm.updateAppWidget(item.getAppWidgetId(), rv);
 
         // On first call, we need not execute notifyAppWidgetViewDataChanged()
-        // because onDataSetChanged() is called automatically after BullpenContentFactory is created.
+        // because onDataSetChanged() is called automatically after ContentsFactory is created.
         if (mIsSkipFirstCallContentService) {
             mIsSkipFirstCallContentService = false;
         } else {
@@ -401,7 +401,7 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
     
     private Intent buildRefreshListIntent(Context context, intentItem item) {
     	Intent intent = buildBaseIntent(item);
-        intent.setClass(context, BullpenWidgetProvider.class);
+        intent.setClass(context, WidgetProvider.class);
         intent.setAction(Constants.ACTION_REFRESH_LIST);
     	
         return intent;
@@ -409,7 +409,7 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
     
     private Intent buildShowListIntent(Context context, intentItem item) {
     	Intent intent = buildBaseIntent(item);
-        intent.setClass(context, BullpenWidgetProvider.class);
+        intent.setClass(context, WidgetProvider.class);
         intent.setAction(Constants.ACTION_SHOW_LIST);
         
         return intent;
@@ -417,7 +417,7 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
     
     private Intent buildShowItemIntent(Context context, intentItem item, String selectedItemUrl) {
     	Intent intent = buildBaseIntent(item);
-        intent.setClass(context, BullpenWidgetProvider.class);  
+        intent.setClass(context, WidgetProvider.class);  
         intent.setAction(Constants.ACTION_SHOW_ITEM);
         if (selectedItemUrl != null)
             intent.putExtra(Constants.EXTRA_ITEM_URL, selectedItemUrl);
@@ -427,7 +427,7 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
     
     private Intent buildConfigurationActivityIntent(Context context, intentItem item) {
     	Intent intent = buildBaseIntent(item);
-    	intent.setClass(context, BullpenConfigurationActivity.class);
+    	intent.setClass(context, ConfigurationActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
         return intent;
@@ -435,14 +435,14 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
     
     private Intent buildListViewServiceIntent(Context context, intentItem item) {
     	Intent intent = buildBaseIntent(item);
-    	intent.setClass(context, BullpenListViewService.class);
+    	intent.setClass(context, ListViewService.class);
         
         return intent;
     }
     
     private Intent buildContentServiceIntent(Context context, intentItem item, String selectedItemUrl) {
     	Intent intent = buildBaseIntent(item);
-    	intent.setClass(context, BullpenContentService.class);
+    	intent.setClass(context, ContentsService.class);
     	intent.putExtra(Constants.EXTRA_ITEM_URL, selectedItemUrl);
     	
     	return intent;
@@ -450,7 +450,7 @@ public class BullpenWidgetProvider extends AppWidgetProvider {
     
     private Intent buildWidgetUpdateIntent(Context context, intentItem item) {
     	Intent intent = buildBaseIntent(item);
-    	intent.setClass(context, BullpenWidgetProvider.class);
+    	intent.setClass(context, WidgetProvider.class);
     	intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
     	
     	return intent;
