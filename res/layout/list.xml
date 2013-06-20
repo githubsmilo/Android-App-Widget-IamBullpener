@@ -10,44 +10,71 @@
         android:layout_height="wrap_content"
         android:background="@color/dark_green"
         android:paddingLeft="10dp"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"
         android:orientation="horizontal" >
         
-	    <TextView
-	        android:id="@+id/textListTitle"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:layout_centerVertical="true"
-	        android:textAppearance="?android:attr/textAppearanceLarge"
-	        android:text="@string/remoteViewTitle_Default" />
+        <TextView
+            android:id="@+id/textListTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="@string/remoteViewTitle_Default" />
+                
+    </RelativeLayout>
+        
+    <ListView
+            android:id="@+id/listView"
+            android:layout_width="match_parent"
+            android:layout_height="0dip"
+            android:layout_weight="1"
+            android:layout_marginBottom="2dp"
+            android:cacheColorHint="#00000000" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/dark_green"
+        android:orientation="horizontal" >
+
+        <ImageButton
+            android:id="@+id/btnListNavTop"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:background="@drawable/up_button_selector"
+            android:contentDescription="@string/btn_top" />
 
         <ImageButton
             android:id="@+id/btnListNavPrev"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_toLeftOf="@+id/btnListNavNext"
+            android:layout_toRightOf="@+id/btnListNavTop"
             android:background="@drawable/prev_button_selector"
             android:contentDescription="@string/btn_prev" />
-<!--  
-        <ImageButton
-            android:id="@+id/btnListNavTop"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_toLeftOf="@+id/btnListNavNext"
-            android:background="@drawable/up_button_selector"
-            android:contentDescription="@string/btn_top" />
--->
+
         <ImageButton
             android:id="@+id/btnListNavNext"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_toLeftOf="@+id/btnListRefresh"
+            android:layout_toRightOf="@+id/btnListNavPrev"
             android:background="@drawable/next_button_selector"
             android:contentDescription="@string/btn_next" />
 
-	    <ImageButton
+        <ImageButton
+            android:id="@+id/btnSearch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toLeftOf="@+id/btnListRefresh"
+            android:background="@drawable/search_button_selector"
+            android:contentDescription="@string/btn_search" />
+        
+        <ImageButton
             android:id="@+id/btnListRefresh"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -55,25 +82,16 @@
             android:layout_toLeftOf="@+id/btnListSetting"
             android:background="@drawable/reload_button_selector"
             android:contentDescription="@string/btn_refresh" />
-	           
-	    <ImageButton
-	        android:id="@+id/btnListSetting"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:layout_alignParentRight="true"
-	        android:layout_centerVertical="true"
-	        android:background="@drawable/setting_button_selector"
-	        android:contentDescription="@string/btn_setting" />
-
-    </RelativeLayout>
         
-    <ListView
-            android:id="@+id/listView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginBottom="2dp"
-            android:cacheColorHint="#00000000" />
-
+        <ImageButton
+            android:id="@+id/btnListSetting"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:background="@drawable/setting_button_selector"
+            android:contentDescription="@string/btn_setting" />
+	</RelativeLayout>
 </LinearLayout>
 
 <!-- background image url : http://www.hdwallpapersdesktop.com/iPad/Miscellaneous/imagepages/image2.htm -->

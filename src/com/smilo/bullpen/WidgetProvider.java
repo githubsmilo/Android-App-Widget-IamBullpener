@@ -53,40 +53,40 @@ public class WidgetProvider extends AppWidgetProvider {
         boolean isPermitMobileConnection = Constants.ERROR_PERMIT_MOBILE_CONNECTION_TYPE;
         
         intentItem(int initAppWidgetId, int initPageNum, int initBoardType, int initRefreshTimeType, boolean initIsPermitMobileConnectionType) {
-        	widgetId = initAppWidgetId;
-        	pageNumber = initPageNum;
-        	boardType = initBoardType;
-        	refreshType = initRefreshTimeType;
-        	isPermitMobileConnection = initIsPermitMobileConnectionType;
+            widgetId = initAppWidgetId;
+            pageNumber = initPageNum;
+            boardType = initBoardType;
+            refreshType = initRefreshTimeType;
+            isPermitMobileConnection = initIsPermitMobileConnectionType;
         }
         
         int getAppWidgetId() {
-        	return widgetId;
+            return widgetId;
         }
         
         int getPageNum() {
-        	return pageNumber;
+            return pageNumber;
         }
         
         int getBoardType() {
-        	return boardType;
+            return boardType;
         }
         
         int getRefreshTimeType() {
-        	return refreshType;
+            return refreshType;
         }
         
         boolean getPermitMobileConnectionType() {
-        	return isPermitMobileConnection;
+            return isPermitMobileConnection;
         }
         
         void setPageNum(int pageNum) {
-        	pageNumber = pageNum;
+            pageNumber = pageNum;
         }
         
-		public String toString() {
-        	return ("appWidgetId[" + widgetId + "], pageNum[" + pageNumber + "], boardType[" + boardType +
-        			"], refreshTimeType[" + refreshType + "], isPermitMobileConnectionType[" + isPermitMobileConnection + "]");
+        public String toString() {
+            return ("appWidgetId[" + widgetId + "], pageNum[" + pageNumber + "], boardType[" + boardType +
+                    "], refreshTimeType[" + refreshType + "], isPermitMobileConnectionType[" + isPermitMobileConnection + "]");
         }
     }
 
@@ -98,15 +98,15 @@ public class WidgetProvider extends AppWidgetProvider {
         
         // get intent items.
         int appWidgetId = intent.getIntExtra(
-        		AppWidgetManager.EXTRA_APPWIDGET_ID,  AppWidgetManager.INVALID_APPWIDGET_ID);
+                AppWidgetManager.EXTRA_APPWIDGET_ID,  AppWidgetManager.INVALID_APPWIDGET_ID);
         int pageNum = intent.getIntExtra(
-        		Constants.EXTRA_PAGE_NUM, Constants.ERROR_PAGE_NUM);
+                Constants.EXTRA_PAGE_NUM, Constants.ERROR_PAGE_NUM);
         int boardType = intent.getIntExtra(
-        		Constants.EXTRA_BOARD_TYPE, Constants.ERROR_BOARD_TYPE);
+                Constants.EXTRA_BOARD_TYPE, Constants.ERROR_BOARD_TYPE);
         int refreshTimeType = intent.getIntExtra(
-        		Constants.EXTRA_REFRESH_TIME_TYPE, Constants.ERROR_REFRESH_TIME_TYPE);
+                Constants.EXTRA_REFRESH_TIME_TYPE, Constants.ERROR_REFRESH_TIME_TYPE);
         boolean permitMobileConnectionType = intent.getBooleanExtra(
-        		Constants.EXTRA_PERMIT_MOBILE_CONNECTION_TYPE, Constants.ERROR_PERMIT_MOBILE_CONNECTION_TYPE);
+                Constants.EXTRA_PERMIT_MOBILE_CONNECTION_TYPE, Constants.ERROR_PERMIT_MOBILE_CONNECTION_TYPE);
 
         // Create intentItem instance.
         intentItem item = new intentItem(appWidgetId, pageNum, boardType, 
@@ -116,19 +116,19 @@ public class WidgetProvider extends AppWidgetProvider {
         int[] appWidgetIds = awm.getAppWidgetIds(new ComponentName(context, getClass()));
         
         if (DEBUG) Log.i(TAG, "onReceive - action[" + action + "], intentItem[" + item.toString() + 
-        		"], appWidgetsNum[" + appWidgetIds.length + "]");
+                "], appWidgetsNum[" + appWidgetIds.length + "]");
         
         for (int i = 0 ; i < appWidgetIds.length ; i++) {
-        	if (DEBUG) Log.i(TAG, "onReceive - current appWidgetId[" + appWidgetIds[i] + "]");
-        	
-        	if (appWidgetId == appWidgetIds[i]) {
+            if (DEBUG) Log.i(TAG, "onReceive - current appWidgetId[" + appWidgetIds[i] + "]");
+            
+            if (appWidgetId == appWidgetIds[i]) {
 
                 // After setting configuration activity, this intent will be called.
                 if (action.equals(Constants.ACTION_INIT_LIST)) {
-                	// Initialize pageNum to 1.
-                	if (DEBUG) Log.i(TAG, "onReceive - Set pageNum to 1 on ACTION_INIT_LIST");
-                	item.setPageNum(Constants.DEFAULT_PAGE_NUM);
-                	
+                    // Initialize pageNum to 1.
+                    if (DEBUG) Log.i(TAG, "onReceive - Set pageNum to 1 on ACTION_INIT_LIST");
+                    item.setPageNum(Constants.DEFAULT_PAGE_NUM);
+                    
                     // Save configuration info.
                     SharedPreferences pref = context.getSharedPreferences(mSharedPreferenceName, Context.MODE_PRIVATE);
                     SharedPreferences.Editor editor = pref.edit();
@@ -154,7 +154,7 @@ public class WidgetProvider extends AppWidgetProvider {
                 } else if ((action.equals(Constants.ACTION_APPWIDGET_UPDATE)) ||
                            (action.equals(Constants.ACTION_SHOW_LIST))) {
                     if (Utils.isInternetConnected(context, permitMobileConnectionType) == false) {
-                    	if (DEBUG) Log.e(TAG, "onReceive - Internet is not connected!");
+                        if (DEBUG) Log.e(TAG, "onReceive - Internet is not connected!");
                         return;
                     } else {
                         refreshAlarmSetting(context, item);
@@ -178,19 +178,19 @@ public class WidgetProvider extends AppWidgetProvider {
                     context.sendBroadcast(buildUpdateItemInfoIntent(item, selectedItemUrl));
                     
                     if (Utils.isInternetConnected(context, permitMobileConnectionType) == false) {
-                    	if (DEBUG) Log.e(TAG, "onReceive - Internet is not connected!");
+                        if (DEBUG) Log.e(TAG, "onReceive - Internet is not connected!");
                         return;
                     } else {
                         setRemoteViewToShowItem(context, awm, item, selectedItemUrl);
                     }
                 }
-        	}
+            }
         }
     }
 
     private void setRemoteViewToShowLostInternetConnection(Context context, AppWidgetManager awm, intentItem item) {
-    	if (DEBUG) Log.i(TAG, "setRemoteViewToShowLostInternetConnection - intentItem[" + item.toString() + "]");
-    	
+        if (DEBUG) Log.i(TAG, "setRemoteViewToShowLostInternetConnection - intentItem[" + item.toString() + "]");
+        
         // Create new remoteViews
         RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.lost_internet_connection);
 
@@ -198,12 +198,12 @@ public class WidgetProvider extends AppWidgetProvider {
         
         // Set refresh button of the remoteViews.
         pi = PendingIntent.getBroadcast(context, PENDING_INTENT_REQUEST_CODE.REQUEST_REFRESH.ordinal(),
-        		                        buildRefreshListIntent(context, item), PendingIntent.FLAG_UPDATE_CURRENT);
+                                        buildRefreshListIntent(context, item), PendingIntent.FLAG_UPDATE_CURRENT);
         rv.setOnClickPendingIntent(R.id.btnLostInternetRefresh, pi);
         
         // Set setting button of the remoteViews.
         pi = PendingIntent.getActivity(context, PENDING_INTENT_REQUEST_CODE.REQUEST_SETTING.ordinal(), 
-        		                       buildConfigurationActivityIntent(context, item), PendingIntent.FLAG_UPDATE_CURRENT);
+                                       buildConfigurationActivityIntent(context, item), PendingIntent.FLAG_UPDATE_CURRENT);
         rv.setOnClickPendingIntent(R.id.btnLostInternetSetting, pi);
         
         // Update widget.
@@ -212,8 +212,8 @@ public class WidgetProvider extends AppWidgetProvider {
     }
     
     private void setRemoteViewToShowList(Context context, AppWidgetManager awm, intentItem item) {
-    	if (DEBUG) Log.i(TAG, "setRemoteViewToShowList - intentItem[" + item.toString() + "]");
-    	
+        if (DEBUG) Log.i(TAG, "setRemoteViewToShowList - intentItem[" + item.toString() + "]");
+        
         // Create new remoteViews.
         RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.list);
         
@@ -226,35 +226,38 @@ public class WidgetProvider extends AppWidgetProvider {
         PendingIntent pi = null;
         
         if (Utils.isTodayBestBoardType(item.getBoardType())) {
-        	// Set title of the remoteViews.
-        	rv.setTextViewText(R.id.textListTitle, Utils.getBoardTitle(context, item.getBoardType()));
+            // Set title of the remoteViews.
+            rv.setTextViewText(R.id.textListTitle, Utils.getBoardTitle(context, item.getBoardType()));
             
-        	rv.setViewVisibility(R.id.btnListNavPrev, View.GONE);
-        	rv.setViewVisibility(R.id.btnListNavNext, View.GONE);
+            rv.setViewVisibility(R.id.btnListNavPrev, View.GONE);
+            rv.setViewVisibility(R.id.btnListNavNext, View.GONE);
         } else {
-        	// Save pageNum.
-        	int currentPageNum = item.getPageNum();
-        	
-        	// Set title of the remoteViews.
+            // Save pageNum.
+            int currentPageNum = item.getPageNum();
+            
+            // Set title of the remoteViews.
             rv.setTextViewText(R.id.textListTitle, (Utils.getBoardTitle(context, item.getBoardType()) + " - " + currentPageNum));
-            item.setPageNum(Constants.DEFAULT_PAGE_NUM);
-            pi = PendingIntent.getBroadcast(context, PENDING_INTENT_REQUEST_CODE.REQUEST_TOP.ordinal(), 
-                                            buildRefreshListIntent(context, item), PendingIntent.FLAG_UPDATE_CURRENT);
-            rv.setOnClickPendingIntent(R.id.textListTitle, pi);
             
             // Set prev button of the removeViews.
-        	rv.setViewVisibility(R.id.btnListNavPrev, View.VISIBLE);
-        	if (currentPageNum > Constants.DEFAULT_PAGE_NUM)
-        	    item.setPageNum(currentPageNum - 1);
-        	pi = PendingIntent.getBroadcast(context, PENDING_INTENT_REQUEST_CODE.REQUEST_PREV.ordinal(), 
-            		                        buildRefreshListIntent(context, item), PendingIntent.FLAG_UPDATE_CURRENT);
+            rv.setViewVisibility(R.id.btnListNavPrev, View.VISIBLE);
+            if (currentPageNum > Constants.DEFAULT_PAGE_NUM)
+                item.setPageNum(currentPageNum - 1);
+            pi = PendingIntent.getBroadcast(context, PENDING_INTENT_REQUEST_CODE.REQUEST_PREV.ordinal(),
+                    buildRefreshListIntent(context, item), PendingIntent.FLAG_UPDATE_CURRENT);
             rv.setOnClickPendingIntent(R.id.btnListNavPrev, pi);
-            
+
+           // Set top button of the removeViews.
+            rv.setViewVisibility(R.id.btnListNavTop, View.VISIBLE);
+            item.setPageNum(Constants.DEFAULT_PAGE_NUM);
+            pi = PendingIntent.getBroadcast(context, PENDING_INTENT_REQUEST_CODE.REQUEST_TOP.ordinal(),
+                    buildRefreshListIntent(context, item), PendingIntent.FLAG_UPDATE_CURRENT);
+              rv.setOnClickPendingIntent(R.id.btnListNavTop, pi);
+
             // Set next button of the remoteViews.
-        	rv.setViewVisibility(R.id.btnListNavNext, View.VISIBLE);
-        	item.setPageNum(currentPageNum + 1);
-        	pi = PendingIntent.getBroadcast(context, PENDING_INTENT_REQUEST_CODE.REQUEST_NEXT.ordinal(),
-            		                        buildRefreshListIntent(context, item), PendingIntent.FLAG_UPDATE_CURRENT);
+            rv.setViewVisibility(R.id.btnListNavNext, View.VISIBLE);
+            item.setPageNum(currentPageNum + 1);
+            pi = PendingIntent.getBroadcast(context, PENDING_INTENT_REQUEST_CODE.REQUEST_NEXT.ordinal(),
+                    buildRefreshListIntent(context, item), PendingIntent.FLAG_UPDATE_CURRENT);
             rv.setOnClickPendingIntent(R.id.btnListNavNext, pi);
             
             // Restore pageNum to the intent item.
@@ -263,17 +266,17 @@ public class WidgetProvider extends AppWidgetProvider {
 
         // Set refresh button of the remoteViews.
         pi = PendingIntent.getBroadcast(context, PENDING_INTENT_REQUEST_CODE.REQUEST_REFRESH.ordinal(), 
-        		                        buildRefreshListIntent(context, item), PendingIntent.FLAG_UPDATE_CURRENT);
+                                        buildRefreshListIntent(context, item), PendingIntent.FLAG_UPDATE_CURRENT);
         rv.setOnClickPendingIntent(R.id.btnListRefresh, pi);
         
         // Set setting button of the remoteViews.
         pi = PendingIntent.getActivity(context, PENDING_INTENT_REQUEST_CODE.REQUEST_SETTING.ordinal(), 
-        		                       buildConfigurationActivityIntent(context, item), PendingIntent.FLAG_UPDATE_CURRENT);
+                                       buildConfigurationActivityIntent(context, item), PendingIntent.FLAG_UPDATE_CURRENT);
         rv.setOnClickPendingIntent(R.id.btnListSetting, pi);
         
         // Set a pending intent for click event to the remoteViews.
         PendingIntent clickPi = PendingIntent.getBroadcast(context, 0, 
-        		                       buildShowItemIntent(context, item, null), PendingIntent.FLAG_UPDATE_CURRENT);
+                                       buildShowItemIntent(context, item, null), PendingIntent.FLAG_UPDATE_CURRENT);
         rv.setPendingIntentTemplate(R.id.listView, clickPi);
     
         // Update widget.
@@ -285,14 +288,14 @@ public class WidgetProvider extends AppWidgetProvider {
         if (mIsSkipFirstCallListViewService) {
             mIsSkipFirstCallListViewService = false;
         } else {
-        	if (DEBUG) Log.i(TAG, "notifyAppWidgetViewDataChanged [BaseballListViewService]");
+            if (DEBUG) Log.i(TAG, "notifyAppWidgetViewDataChanged [BaseballListViewService]");
             awm.notifyAppWidgetViewDataChanged(item.getAppWidgetId(), R.id.listView);
         }
     }
     
     private void setRemoteViewToShowItem(Context context, AppWidgetManager awm, intentItem item, String selectedItemUrl) {
-    	if (DEBUG) Log.i(TAG, "setRemoteViewToShowItem - intentItem[" + item.toString() + "], selectedItemUrl[" + selectedItemUrl + "]");
-    	
+        if (DEBUG) Log.i(TAG, "setRemoteViewToShowItem - intentItem[" + item.toString() + "], selectedItemUrl[" + selectedItemUrl + "]");
+        
         // Create new remoteViews.
         RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.content);
         
@@ -308,22 +311,22 @@ public class WidgetProvider extends AppWidgetProvider {
 
         // Set top button of the remoteViews.
         pi = PendingIntent.getBroadcast(context, PENDING_INTENT_REQUEST_CODE.REQUEST_TOP.ordinal(),
-        		                        buildRefreshListIntent(context, item), PendingIntent.FLAG_UPDATE_CURRENT);
+                                        buildRefreshListIntent(context, item), PendingIntent.FLAG_UPDATE_CURRENT);
         rv.setOnClickPendingIntent(R.id.btnContentNavTop, pi);
         
         // Set refresh button of the remoteViews.
         pi = PendingIntent.getBroadcast(context, PENDING_INTENT_REQUEST_CODE.REQUEST_REFRESH.ordinal(), 
-        		                        buildShowItemIntent(context, item, selectedItemUrl), PendingIntent.FLAG_UPDATE_CURRENT);
+                                        buildShowItemIntent(context, item, selectedItemUrl), PendingIntent.FLAG_UPDATE_CURRENT);
         rv.setOnClickPendingIntent(R.id.btnContentRefresh, pi);
         
         // Set setting button of the remoteViews.
         pi = PendingIntent.getActivity(context, PENDING_INTENT_REQUEST_CODE.REQUEST_SETTING.ordinal(), 
-        		                       buildConfigurationActivityIntent(context, item), PendingIntent.FLAG_UPDATE_CURRENT);
+                                       buildConfigurationActivityIntent(context, item), PendingIntent.FLAG_UPDATE_CURRENT);
         rv.setOnClickPendingIntent(R.id.btnContentSetting, pi);
         
         // Set a pending intent for click event to the remoteViews.
         PendingIntent clickPi = PendingIntent.getBroadcast(context, 0, 
-        		                       buildShowListIntent(context, item), PendingIntent.FLAG_UPDATE_CURRENT);
+                                       buildShowListIntent(context, item), PendingIntent.FLAG_UPDATE_CURRENT);
         rv.setPendingIntentTemplate(R.id.contentView, clickPi);
     
         // Update widget.
@@ -335,7 +338,7 @@ public class WidgetProvider extends AppWidgetProvider {
         if (mIsSkipFirstCallContentService) {
             mIsSkipFirstCallContentService = false;
         } else {
-        	if (DEBUG) Log.i(TAG, "setRemoteViewToShowItem - notifyAppWidgetViewDataChanged [BaseballContentService]");
+            if (DEBUG) Log.i(TAG, "setRemoteViewToShowItem - notifyAppWidgetViewDataChanged [BaseballContentService]");
             awm.notifyAppWidgetViewDataChanged(item.getAppWidgetId(), R.id.contentView);
         }
     }
@@ -353,7 +356,7 @@ public class WidgetProvider extends AppWidgetProvider {
     }
     
     private void setNewAlarm(Context context, intentItem item, boolean isUrgentMode) {
-    	if (DEBUG) Log.i(TAG, "setNewAlarm - intentItem[" + item.toString() + "], isUrgentMode[" + isUrgentMode + "]");
+        if (DEBUG) Log.i(TAG, "setNewAlarm - intentItem[" + item.toString() + "], isUrgentMode[" + isUrgentMode + "]");
 
         int selectedRefreshTime = Utils.getRefreshTime(item.getRefreshTimeType());
         long alarmTime = System.currentTimeMillis() + (selectedRefreshTime <= 0 ? Constants.DEFAULT_INTERVAL : selectedRefreshTime);
@@ -364,7 +367,7 @@ public class WidgetProvider extends AppWidgetProvider {
     }
 
     private void removePreviousAlarm() {
-    	if (DEBUG) Log.i(TAG, "removePreviousAlarm");
+        if (DEBUG) Log.i(TAG, "removePreviousAlarm");
 
         if (mManager != null && mSender != null) {
             mSender.cancel();
@@ -373,42 +376,42 @@ public class WidgetProvider extends AppWidgetProvider {
     }
 
     private Intent buildBaseIntent(intentItem item) {
-		Intent intent = new Intent();
-		intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, item.getAppWidgetId());
-		intent.putExtra(Constants.EXTRA_PAGE_NUM, item.getPageNum());
-		intent.putExtra(Constants.EXTRA_BOARD_TYPE, item.getBoardType());
-		intent.putExtra(Constants.EXTRA_REFRESH_TIME_TYPE, item.getRefreshTimeType());
-		intent.putExtra(Constants.EXTRA_PERMIT_MOBILE_CONNECTION_TYPE, item.getPermitMobileConnectionType());
-		
-		return intent;
+        Intent intent = new Intent();
+        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, item.getAppWidgetId());
+        intent.putExtra(Constants.EXTRA_PAGE_NUM, item.getPageNum());
+        intent.putExtra(Constants.EXTRA_BOARD_TYPE, item.getBoardType());
+        intent.putExtra(Constants.EXTRA_REFRESH_TIME_TYPE, item.getRefreshTimeType());
+        intent.putExtra(Constants.EXTRA_PERMIT_MOBILE_CONNECTION_TYPE, item.getPermitMobileConnectionType());
+        
+        return intent;
     }
     
     private Intent buildUpdateListInfoIntent(intentItem item) {
-    	Intent intent = buildBaseIntent(item);
-    	intent.setAction(Constants.ACTION_UPDATE_LIST_URL);
+        Intent intent = buildBaseIntent(item);
+        intent.setAction(Constants.ACTION_UPDATE_LIST_URL);
         
         return intent;
     }
     
     private Intent buildUpdateItemInfoIntent(intentItem item, String selectedItemUrl) {
-    	Intent intent = buildBaseIntent(item);
-    	intent.setAction(Constants.ACTION_UPDATE_ITEM_URL);
-    	if (selectedItemUrl != null)
+        Intent intent = buildBaseIntent(item);
+        intent.setAction(Constants.ACTION_UPDATE_ITEM_URL);
+        if (selectedItemUrl != null)
             intent.putExtra(Constants.EXTRA_ITEM_URL, selectedItemUrl);
         
         return intent;
     }
     
     private Intent buildRefreshListIntent(Context context, intentItem item) {
-    	Intent intent = buildBaseIntent(item);
+        Intent intent = buildBaseIntent(item);
         intent.setClass(context, WidgetProvider.class);
         intent.setAction(Constants.ACTION_REFRESH_LIST);
-    	
+        
         return intent;
     }
     
     private Intent buildShowListIntent(Context context, intentItem item) {
-    	Intent intent = buildBaseIntent(item);
+        Intent intent = buildBaseIntent(item);
         intent.setClass(context, WidgetProvider.class);
         intent.setAction(Constants.ACTION_SHOW_LIST);
         
@@ -416,7 +419,7 @@ public class WidgetProvider extends AppWidgetProvider {
     }
     
     private Intent buildShowItemIntent(Context context, intentItem item, String selectedItemUrl) {
-    	Intent intent = buildBaseIntent(item);
+        Intent intent = buildBaseIntent(item);
         intent.setClass(context, WidgetProvider.class);  
         intent.setAction(Constants.ACTION_SHOW_ITEM);
         if (selectedItemUrl != null)
@@ -426,34 +429,34 @@ public class WidgetProvider extends AppWidgetProvider {
     }
     
     private Intent buildConfigurationActivityIntent(Context context, intentItem item) {
-    	Intent intent = buildBaseIntent(item);
-    	intent.setClass(context, ConfigurationActivity.class);
+        Intent intent = buildBaseIntent(item);
+        intent.setClass(context, ConfigurationActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
         return intent;
     }
     
     private Intent buildListViewServiceIntent(Context context, intentItem item) {
-    	Intent intent = buildBaseIntent(item);
-    	intent.setClass(context, ListViewService.class);
+        Intent intent = buildBaseIntent(item);
+        intent.setClass(context, ListViewService.class);
         
         return intent;
     }
     
     private Intent buildContentServiceIntent(Context context, intentItem item, String selectedItemUrl) {
-    	Intent intent = buildBaseIntent(item);
-    	intent.setClass(context, ContentsService.class);
-    	intent.putExtra(Constants.EXTRA_ITEM_URL, selectedItemUrl);
-    	
-    	return intent;
+        Intent intent = buildBaseIntent(item);
+        intent.setClass(context, ContentsService.class);
+        intent.putExtra(Constants.EXTRA_ITEM_URL, selectedItemUrl);
+        
+        return intent;
     }
     
     private Intent buildWidgetUpdateIntent(Context context, intentItem item) {
-    	Intent intent = buildBaseIntent(item);
-    	intent.setClass(context, WidgetProvider.class);
-    	intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
-    	
-    	return intent;
+        Intent intent = buildBaseIntent(item);
+        intent.setClass(context, WidgetProvider.class);
+        intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
+        
+        return intent;
     }
 
     public static void removeWidget(Context context, int appWidgetId) {
@@ -463,19 +466,19 @@ public class WidgetProvider extends AppWidgetProvider {
 
     @Override
     public void onUpdate(Context context, AppWidgetManager awm, int[] appWidgetIds) {
-    	if (DEBUG) Log.i(TAG, "onUpdate");
+        if (DEBUG) Log.i(TAG, "onUpdate");
         super.onUpdate(context, awm, appWidgetIds);
     }
 
     @Override
     public void onDeleted(Context context, int[] appWidgetIds) {
-    	if (DEBUG) Log.i(TAG, "onDeleted");
+        if (DEBUG) Log.i(TAG, "onDeleted");
         super.onDeleted(context, appWidgetIds);
     }
 
     @Override
     public void onDisabled(Context context) {
-    	if (DEBUG) Log.i(TAG, "onDisabled");
+        if (DEBUG) Log.i(TAG, "onDisabled");
         removePreviousAlarm();
         
         // Delete all saved data.
@@ -489,10 +492,10 @@ public class WidgetProvider extends AppWidgetProvider {
 
     @Override
     public void onEnabled(Context context) {
-    	if (DEBUG) Log.i(TAG, "onEnabled");
+        if (DEBUG) Log.i(TAG, "onEnabled");
         removePreviousAlarm();
 
-    	// Initialize global variables.
+        // Initialize global variables.
         mIsSkipFirstCallListViewService = true;
         mIsSkipFirstCallContentService = true;
         
@@ -504,7 +507,7 @@ public class WidgetProvider extends AppWidgetProvider {
         if (isCompleteToSetup) {
             int boardType = pref.getInt(mKeyBoardType, Constants.ERROR_BOARD_TYPE);
             int refreshTimeType = pref.getInt(mKeyRefreshTimeType, Constants.ERROR_REFRESH_TIME_TYPE);
-        	boolean permitMobileConnectionType = pref.getBoolean(mKeyPermitMobileConnectionType, Constants.ERROR_PERMIT_MOBILE_CONNECTION_TYPE);
+            boolean permitMobileConnectionType = pref.getBoolean(mKeyPermitMobileConnectionType, Constants.ERROR_PERMIT_MOBILE_CONNECTION_TYPE);
 
             // Set urgent alarm to update widget as soon as possible.
             AppWidgetManager awm = AppWidgetManager.getInstance(context);
@@ -512,7 +515,7 @@ public class WidgetProvider extends AppWidgetProvider {
 
             for (int i = 0 ; i < appWidgetIds.length ; i++) {
                 intentItem item = new intentItem(appWidgetIds[i], Constants.DEFAULT_PAGE_NUM,
-                		                         boardType, refreshTimeType, permitMobileConnectionType);
+                        boardType, refreshTimeType, permitMobileConnectionType);
                 
                 setNewAlarm(context, item, true);
             }
