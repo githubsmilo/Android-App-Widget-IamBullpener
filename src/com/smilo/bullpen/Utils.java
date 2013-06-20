@@ -21,6 +21,12 @@ public final class Utils {
                 return true;
         }
 
+        // Check bluetooth
+        NetworkInfo niBluetooth = cm.getNetworkInfo(ConnectivityManager.TYPE_BLUETOOTH);
+        if ((niBluetooth != null) && (niBluetooth.isConnected() == true)) {
+                return true;
+        }
+
         // Check mobile.
         if (isPermitMobileConnection) {
             NetworkInfo mobileWifi = cm.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
