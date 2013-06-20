@@ -126,6 +126,8 @@ public class WidgetProvider extends AppWidgetProvider {
 
                 // After setting configuration activity, this intent will be called.
                 if (action.equals(Constants.ACTION_INIT_LIST)) {
+                	removePreviousAlarm();
+                	
                     // Save configuration info.
                     SharedPreferences pref = context.getSharedPreferences(mSharedPreferenceName, Context.MODE_PRIVATE);
                     SharedPreferences.Editor editor = pref.edit();
@@ -158,7 +160,9 @@ public class WidgetProvider extends AppWidgetProvider {
                         setRemoteViewToShowList(context, awm, item);
                     }
 
-                } else if (action.equals(Constants.ACTION_REFRESH_LIST)){                    
+                } else if (action.equals(Constants.ACTION_REFRESH_LIST)){    
+                	removePreviousAlarm();
+                	
                     // Send broadcast intent to update some variables on the ListViewFactory.
                     context.sendBroadcast(buildUpdateListInfoIntent(item));
                     
@@ -169,6 +173,7 @@ public class WidgetProvider extends AppWidgetProvider {
                 // EXTRA_ITEM_URL was already filled in the ListViewFactory - getViewAt().
                 } else if (action.equals(Constants.ACTION_SHOW_ITEM)) {
                     removePreviousAlarm();
+                    
                     String selectedItemUrl = intent.getStringExtra(Constants.EXTRA_ITEM_URL);
 
                     // Send broadcast intent to update some variables on the ContentsFactory.
@@ -183,7 +188,20 @@ public class WidgetProvider extends AppWidgetProvider {
                 
                 // After setting search activity, this intent will be called.
                 } else if (action.equals(Constants.ACTION_SEARCH)) {
+                	removePreviousAlarm();
                 	
+                	int selectedSearchCategoryType = intent.getIntExtra(
+                			Constants.EXTRA_SEARCH_CATEGORY_TYPE, Constants.DEFAULT_SEARCH_CATEGORY_TYPE);
+                	int selectedSearchSubjectType = intent.getIntExtra(
+                			Constants.EXTRA_SEARCH_SUBJECT_TYPE, Constants.DEFAULT_SEARCH_SUBJECT_TYPE);
+                	String selectedSearchKeyword = intent.getStringExtra(Constants.EXTRA_SEARCH_KEYWORD);
+                	
+                	// Send broadcast intent to update some variables on the ListViewFactory.
+                    context.sendBroadcast(buildUpdateListInfoIntentForSearchMode(
+                    		item, selectedSearchCategoryType, selectedSearchSubjectType, selectedSearchKeyword));
+                    
+                    // Broadcast ACTION_SHOW_LIST intent.
+                    context.sendBroadcast(buildShowListIntent(context, item));
                 }
             }
         }
@@ -233,6 +251,7 @@ public class WidgetProvider extends AppWidgetProvider {
             rv.setViewVisibility(R.id.btnListNavTop, View.GONE);
             rv.setViewVisibility(R.id.btnListNavPrev, View.GONE);
             rv.setViewVisibility(R.id.btnListNavNext, View.GONE);
+            rv.setViewVisibility(R.id.btnListSearch, View.GONE);
         } else {
             // Save pageNum.
             int currentPageNum = item.getPageNum();
@@ -395,15 +414,27 @@ public class WidgetProvider extends AppWidgetProvider {
     
     private Intent buildUpdateListInfoIntent(intentItem item) {
         Intent intent = buildBaseIntent(item);
-        intent.setAction(Constants.ACTION_UPDATE_LIST_URL);
+        intent.setAction(Constants.ACTION_UPDATE_LIST_INFO);
+        
+        return intent;
+    }
+    
+    private Intent buildUpdateListInfoIntentForSearchMode(intentItem item,
+    		int selectedSearchCategoryType, int selectedSearchSubjectType, String selectedSearchKeyword) {
+        Intent intent = buildBaseIntent(item);
+        intent.setAction(Constants.ACTION_UPDATE_LIST_INFO);
+        intent.putExtra(Constants.EXTRA_SEARCH_CATEGORY_TYPE, selectedSearchCategoryType);
+        intent.putExtra(Constants.EXTRA_SEARCH_SUBJECT_TYPE, selectedSearchSubjectType);
+        if (selectedSearchKeyword != null && selectedSearchKeyword.length() > 0)
+        	intent.putExtra(Constants.EXTRA_SEARCH_KEYWORD, selectedSearchKeyword);
         
         return intent;
     }
     
     private Intent buildUpdateItemInfoIntent(intentItem item, String selectedItemUrl) {
         Intent intent = buildBaseIntent(item);
-        intent.setAction(Constants.ACTION_UPDATE_ITEM_URL);
-        if (selectedItemUrl != null)
+        intent.setAction(Constants.ACTION_UPDATE_ITEM_INFO);
+        if (selectedItemUrl != null && selectedItemUrl.length() > 0)
             intent.putExtra(Constants.EXTRA_ITEM_URL, selectedItemUrl);
         
         return intent;

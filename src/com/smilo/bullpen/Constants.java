@@ -16,8 +16,8 @@ public final class Constants {
     public static final String ACTION_REFRESH_LIST = PACKAGE_NAME + ".REFRESH_LIST";
     public static final String ACTION_SHOW_LIST = PACKAGE_NAME + ".SHOW_LIST";
     public static final String ACTION_SHOW_ITEM = PACKAGE_NAME + ".SHOW_ITEM";
-    public static final String ACTION_UPDATE_ITEM_URL = PACKAGE_NAME + ".UPDATE_ITEM_URL";
-    public static final String ACTION_UPDATE_LIST_URL = PACKAGE_NAME + ".UPDATE_LIST_URL";
+    public static final String ACTION_UPDATE_ITEM_INFO = PACKAGE_NAME + ".UPDATE_ITEM_INFO";
+    public static final String ACTION_UPDATE_LIST_INFO = PACKAGE_NAME + ".UPDATE_LIST_INFO";
     public static final String ACTION_SEARCH = PACKAGE_NAME + ".SEARCH";
     public static final String EXTRA_PAGE_NUM = PACKAGE_NAME + ".EXTRA_PAGE_NUM";
     public static final String EXTRA_BOARD_TYPE = PACKAGE_NAME + ".BOARD_TYPE";
@@ -69,6 +69,9 @@ public final class Constants {
     public static final String URL_BULLPEN_1000 = "http://mlbpark.donga.com/mbs/articleL.php?mbsC=bullpen&mbsW=search&select=hit&opt=1&keyword=1000&cpage=";
     public static final String URL_BULLPEN_2000 = "http://mlbpark.donga.com/mbs/articleL.php?mbsC=bullpen&mbsW=search&select=hit&opt=1&keyword=2000&cpage=";
     
+    public static final String URL_PARAMETER_SEARCH_CATEGORY = "&mbsW=search&select=";
+    public static final String URL_PARAMETER_SEARCH_KEYWORD = "&keyword=";
+    
     public static final int BOARD_TYPE_MLB_TOWN = 0;
     public static final int BOARD_TYPE_KBO_TOWN = 1;
     public static final int BOARD_TYPE_BULLPEN  = 2;
@@ -93,6 +96,13 @@ public final class Constants {
     public static final int REFRESH_TIME_TYPE_30_MIN = 4;
     public static final int REFRESH_TIME_TYPE_STOP   = 5;
     
+    public static final String SEARCH_CATEGORY_PARAMETER_TITLE ="stt";
+    public static final String SEARCH_CATEGORY_PARAMETER_TITLE_CONTENTS ="sct";
+    public static final String SEARCH_CATEGORY_PARAMETER_ID ="sid";
+    public static final String SEARCH_CATEGORY_PARAMETER_WRITER ="swt";
+    public static final String SEARCH_CATEGORY_PARAMETER_SUBJECT ="spf";
+    public static final String SEARCH_CATEGORY_PARAMETER_HITS ="hit";
+    
     public static final int SEARCH_CATEGORY_TYPE_TITLE = 0;
     public static final int SEARCH_CATEGORY_TYPE_TITLE_CONTENTS = 1;
     public static final int SEARCH_CATEGORY_TYPE_ID = 2;
@@ -100,29 +110,55 @@ public final class Constants {
     public static final int SEARCH_CATEGORY_TYPE_SUBJECT = 4;
     public static final int SEARCH_CATEGORY_TYPE_HITS = 5;
     
-    public static final int SEARCH_SUBJECT_TYPE_0 = 0; // 정치
-    public static final int SEARCH_SUBJECT_TYPE_1 = 1; // 19금
-    public static final int SEARCH_SUBJECT_TYPE_2 = 2; // 단문
-    public static final int SEARCH_SUBJECT_TYPE_3 = 3; // 펌글
-    public static final int SEARCH_SUBJECT_TYPE_4 = 4; // 게임
-    public static final int SEARCH_SUBJECT_TYPE_5 = 5; // 질문
-    public static final int SEARCH_SUBJECT_TYPE_6 = 6; // 17금
-    public static final int SEARCH_SUBJECT_TYPE_7 = 7; // 음악
-    public static final int SEARCH_SUBJECT_TYPE_8 = 8; // 응원
-    public static final int SEARCH_SUBJECT_TYPE_9 = 9; // COB
-    public static final int SEARCH_SUBJECT_TYPE_10 = 10; // 뻘글
-    public static final int SEARCH_SUBJECT_TYPE_11 = 11; // SK
-    public static final int SEARCH_SUBJECT_TYPE_12 = 12; // 두산
-    public static final int SEARCH_SUBJECT_TYPE_13 = 13; // 롯데
-    public static final int SEARCH_SUBJECT_TYPE_14 = 14; // 삼성
-    public static final int SEARCH_SUBJECT_TYPE_15 = 15; // 한화
-    public static final int SEARCH_SUBJECT_TYPE_16 = 16; // KIA
-    public static final int SEARCH_SUBJECT_TYPE_17 = 17; // 넥센
-    public static final int SEARCH_SUBJECT_TYPE_18 = 18; // LG
-    public static final int SEARCH_SUBJECT_TYPE_19 = 19; // NC
-    public static final int SEARCH_SUBJECT_TYPE_20 = 20; // 후기
-    public static final int SEARCH_SUBJECT_TYPE_21 = 21; // 채팅
-    public static final int SEARCH_SUBJECT_TYPE_22 = 22; // 짤방
-    public static final int SEARCH_SUBJECT_TYPE_23 = 23; // 경제
-    public static final int SEARCH_SUBJECT_TYPE_24 = 24; // 아이돌
+    public static final String SEARCH_SUBJECT_PARAMETER_1 = "1"; // 정치
+    public static final String SEARCH_SUBJECT_PARAMETER_2 = "2"; // 19금
+    public static final String SEARCH_SUBJECT_PARAMETER_3 = "3"; // 단문
+    public static final String SEARCH_SUBJECT_PARAMETER_4 = "4"; // 펌글
+    public static final String SEARCH_SUBJECT_PARAMETER_5 = "5"; // 게임
+    public static final String SEARCH_SUBJECT_PARAMETER_6 = "6"; // 질문
+    public static final String SEARCH_SUBJECT_PARAMETER_7 = "7"; // 17금
+    public static final String SEARCH_SUBJECT_PARAMETER_8 = "8"; // 음악
+    public static final String SEARCH_SUBJECT_PARAMETER_9 = "9"; // 응원
+    public static final String SEARCH_SUBJECT_PARAMETER_10 = "10"; // COB
+    public static final String SEARCH_SUBJECT_PARAMETER_11 = "11"; // 뻘글
+    public static final String SEARCH_SUBJECT_PARAMETER_12 = "12"; // SK
+    public static final String SEARCH_SUBJECT_PARAMETER_13 = "13"; // 두산
+    public static final String SEARCH_SUBJECT_PARAMETER_14 = "14"; // 롯데
+    public static final String SEARCH_SUBJECT_PARAMETER_15 = "15"; // 삼성
+    public static final String SEARCH_SUBJECT_PARAMETER_16 = "16"; // 한화
+    public static final String SEARCH_SUBJECT_PARAMETER_17 = "17"; // KIA
+    public static final String SEARCH_SUBJECT_PARAMETER_18 = "18"; // 넥센
+    public static final String SEARCH_SUBJECT_PARAMETER_19 = "19"; // LG
+    public static final String SEARCH_SUBJECT_PARAMETER_20 = "25"; // NC !!!!!
+    public static final String SEARCH_SUBJECT_PARAMETER_21 = "20"; // 후기
+    public static final String SEARCH_SUBJECT_PARAMETER_22 = "21"; // 채팅
+    public static final String SEARCH_SUBJECT_PARAMETER_23 = "22"; // 짤방
+    public static final String SEARCH_SUBJECT_PARAMETER_24 = "23"; // 경제
+    public static final String SEARCH_SUBJECT_PARAMETER_25 = "24"; // 아이돌
+
+    public static final int SEARCH_SUBJECT_TYPE_1 = 0; // 정치
+    public static final int SEARCH_SUBJECT_TYPE_2 = 1; // 19금
+    public static final int SEARCH_SUBJECT_TYPE_3 = 2; // 단문
+    public static final int SEARCH_SUBJECT_TYPE_4 = 3; // 펌글
+    public static final int SEARCH_SUBJECT_TYPE_5 = 4; // 게임
+    public static final int SEARCH_SUBJECT_TYPE_6 = 5; // 질문
+    public static final int SEARCH_SUBJECT_TYPE_7 = 6; // 17금
+    public static final int SEARCH_SUBJECT_TYPE_8 = 7; // 음악
+    public static final int SEARCH_SUBJECT_TYPE_9 = 8; // 응원
+    public static final int SEARCH_SUBJECT_TYPE_10 = 9; // COB
+    public static final int SEARCH_SUBJECT_TYPE_11 = 10; // 뻘글
+    public static final int SEARCH_SUBJECT_TYPE_12 = 11; // SK
+    public static final int SEARCH_SUBJECT_TYPE_13 = 12; // 두산
+    public static final int SEARCH_SUBJECT_TYPE_14 = 13; // 롯데
+    public static final int SEARCH_SUBJECT_TYPE_15 = 14; // 삼성
+    public static final int SEARCH_SUBJECT_TYPE_16 = 15; // 한화
+    public static final int SEARCH_SUBJECT_TYPE_17 = 16; // KIA
+    public static final int SEARCH_SUBJECT_TYPE_18 = 17; // 넥센
+    public static final int SEARCH_SUBJECT_TYPE_19 = 18; // LG
+    public static final int SEARCH_SUBJECT_TYPE_20 = 19; // NC
+    public static final int SEARCH_SUBJECT_TYPE_21 = 20; // 후기
+    public static final int SEARCH_SUBJECT_TYPE_22 = 21; // 채팅
+    public static final int SEARCH_SUBJECT_TYPE_23 = 22; // 짤방
+    public static final int SEARCH_SUBJECT_TYPE_24 = 23; // 경제
+    public static final int SEARCH_SUBJECT_TYPE_25 = 24; // 아이돌
 }

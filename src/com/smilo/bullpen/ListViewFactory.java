@@ -38,7 +38,7 @@ public class ListViewFactory implements RemoteViewsService.RemoteViewsFactory {
     private static List<listItem> mListItems = new ArrayList<listItem>();
     private static BroadcastReceiver mIntentListener;
     private static PARSING_RESULT mParsingResult = PARSING_RESULT.FAILED_UNKNOWN;
-    private static int mAddedTodayBestItemCount = 0;
+    private static int mAddedItemCount = 0;
     
     // intent item list
     private static int mAppWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID;
@@ -46,6 +46,11 @@ public class ListViewFactory implements RemoteViewsService.RemoteViewsFactory {
     private static int mBoardType = Constants.ERROR_BOARD_TYPE;
     //private static int mRefreshTimetype = Constants.ERROR_REFRESH_TIME_TYPE;
     //private static boolean mIsPermitMobileConnectionType = Constants.ERROR_PERMIT_MOBILE_CONNECTION_TYPE;
+    
+    // Search
+    private static int mSelectedSearchCategoryType = Constants.ERROR_SEARCH_CAGETORY_TYPE;
+    private static int mSelectedSearchSubjectType = Constants.ERROR_SEARCH_SUBJECT_TYPE;
+    private static String mSelectedSearchKeyword = null;
 
     private class listItem {
         public String itemTitle;
@@ -124,7 +129,13 @@ public class ListViewFactory implements RemoteViewsService.RemoteViewsFactory {
             if (Utils.isTodayBestBoardType(mBoardType)) {
                 mParsingResult = parseMLBParkTodayBest(Utils.getBoardUrl(mBoardType));
             } else {
-            	mParsingResult = parseMLBParkMobileBoard(Utils.getBoardUrl(mBoardType) + mPageNum);
+            	if ((mSelectedSearchCategoryType == Constants.ERROR_SEARCH_CAGETORY_TYPE) ||
+            		(mSelectedSearchKeyword == null || mSelectedSearchKeyword.equals(""))) {
+            	    mParsingResult = parseMLBParkMobileBoard(Utils.getBoardUrl(mBoardType) + mPageNum);
+            	} else {
+            		mParsingResult = parseMLBParkMobileBoard(Utils.getBoardUrl(mBoardType) + mPageNum +
+            				Utils.getSearchUrl(mSelectedSearchCategoryType, mSelectedSearchSubjectType, mSelectedSearchKeyword));
+            	}
             }
         } catch (IOException e) {
         	if (DEBUG) Log.e(TAG, "onDataSetChanged - IOException![" + e.toString() + "]");
@@ -146,10 +157,9 @@ public class ListViewFactory implements RemoteViewsService.RemoteViewsFactory {
     	//Log.i(TAG, "getCount");
     	
     	if (mParsingResult == PARSING_RESULT.SUCCESS_FULL_BOARD ||
-    		mParsingResult == PARSING_RESULT.SUCCESS_MOBILE_BOARD) {
-    		return Constants.LISTVIEW_MAX_ITEM_COUNT;
-    	} else if (mParsingResult == PARSING_RESULT.SUCCESS_MOBILE_TODAY_BEST) {
-    		return mAddedTodayBestItemCount;
+    		mParsingResult == PARSING_RESULT.SUCCESS_MOBILE_BOARD ||
+    		mParsingResult == PARSING_RESULT.SUCCESS_MOBILE_TODAY_BEST) {
+    		return mAddedItemCount;
     	} else {
               return 1;
     	}
@@ -217,7 +227,7 @@ public class ListViewFactory implements RemoteViewsService.RemoteViewsFactory {
         
         if ((targetDiv != null) && (targetDiv.isEmpty() == false)) {
         	List<Element> ols = targetDiv.getAllElements(HTMLElementName.OL);
-        	mAddedTodayBestItemCount = 0;
+        	mAddedItemCount = 0;
         	
         	for (int i = 0 ; i < ols.size() ; i++) {
         		Segment seg = ols.get(i).getContent();
@@ -254,7 +264,7 @@ public class ListViewFactory implements RemoteViewsService.RemoteViewsFactory {
         					mListItems.add(item);
         					title = null;
         					url = null;
-        					mAddedTodayBestItemCount++;
+        					mAddedItemCount++;
         					isStartLiTag = false;
         				} else if (tagName.equals("strong") && isStartLiTag == true) {
         					isAddTitle = true;
@@ -308,11 +318,11 @@ public class ListViewFactory implements RemoteViewsService.RemoteViewsFactory {
 
         if ((targetUl != null) && (targetUl.isEmpty() == false)) {
             List<Element> lis = targetUl.getAllElements(HTMLElementName.LI);
-            int addedItemCount = 0;
+            mAddedItemCount = 0;
             
             for (int i = 0 ; i < lis.size() ; i++) {
                 Segment seg = lis.get(i).getContent();
-                String title = null, url = null;
+                String title = "", url = null;
                 boolean isAddTitle = false, isAddCommentNum = false;
                 //Log.i(TAG, "seg[" + seg.toString() + "]");
 
@@ -344,7 +354,10 @@ public class ListViewFactory implements RemoteViewsService.RemoteViewsFactory {
                         continue;
                         
                     } else if (nodeSeg instanceof EndTag) {
-                        // Do nothing
+                    	String tagName = ((Tag)nodeSeg).getName();
+                    	if (tagName.equals("strong")) {
+                            isAddTitle = false;
+                    	}
                         continue;
                         
                     // Ignore &bnsp;
@@ -354,8 +367,7 @@ public class ListViewFactory implements RemoteViewsService.RemoteViewsFactory {
                     // If plain text, add it to title.
                     } else {
                         if (isAddTitle) {
-                            title = nodeSeg.getTextExtractor().toString();
-                            isAddTitle = false;
+                            title += (nodeSeg.getTextExtractor().toString() + " ");
                         } else if (isAddCommentNum) {
                             title += (" [" + nodeSeg.getTextExtractor().toString() + "]");
                             isAddCommentNum = false;
@@ -367,9 +379,9 @@ public class ListViewFactory implements RemoteViewsService.RemoteViewsFactory {
                 // Add widget item array list
                 listItem item = new listItem(title, url);
                 mListItems.add(item);
-                addedItemCount++;
+                mAddedItemCount++;
 
-                if (addedItemCount == Constants.LISTVIEW_MAX_ITEM_COUNT)
+                if (mAddedItemCount == Constants.LISTVIEW_MAX_ITEM_COUNT)
                     break;
             }
             
@@ -451,12 +463,22 @@ public class ListViewFactory implements RemoteViewsService.RemoteViewsFactory {
 	                mBoardType = intent.getIntExtra(Constants.EXTRA_BOARD_TYPE, Constants.DEFAULT_BOARD_TYPE);
 	                mPageNum = intent.getIntExtra(Constants.EXTRA_PAGE_NUM, Constants.DEFAULT_PAGE_NUM);
 	                
+	                // Update search variables through Broadcast Intent.
+	                mSelectedSearchCategoryType = intent.getIntExtra(
+	                		Constants.EXTRA_SEARCH_CATEGORY_TYPE, Constants.ERROR_SEARCH_CAGETORY_TYPE);
+	                mSelectedSearchSubjectType = intent.getIntExtra(
+	                		Constants.EXTRA_SEARCH_SUBJECT_TYPE, Constants.ERROR_SEARCH_SUBJECT_TYPE);
+	                mSelectedSearchKeyword = intent.getStringExtra(Constants.EXTRA_SEARCH_KEYWORD);
+	                
 	                if (DEBUG) Log.i(TAG, "onReceive - update mAppWidgetId[" + mAppWidgetId + 
-	                		"], mPageNum[" + mPageNum + "], mBoardType[" + mBoardType + "]");
+	                		"], mPageNum[" + mPageNum + "], mBoardType[" + mBoardType +
+	                		"], mSelectedSearchCategoryType[" + mSelectedSearchCategoryType +
+	                		"], mSelectedSearchSubjectType[" + mSelectedSearchSubjectType +
+	                		"], mSelectedSearchKeyword[" + mSelectedSearchKeyword + "]");
 	            }
 	        };
 	        IntentFilter filter = new IntentFilter();
-	        filter.addAction(Constants.ACTION_UPDATE_LIST_URL);
+	        filter.addAction(Constants.ACTION_UPDATE_LIST_INFO);
 	        mContext.registerReceiver(mIntentListener, filter);
 	    }
 	}

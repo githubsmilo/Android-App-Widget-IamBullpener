@@ -499,7 +499,7 @@ public class ContentsFactory implements RemoteViewsService.RemoteViewsFactory {
                 }
             };
             IntentFilter filter = new IntentFilter();
-            filter.addAction(Constants.ACTION_UPDATE_ITEM_URL);
+            filter.addAction(Constants.ACTION_UPDATE_ITEM_INFO);
             mContext.registerReceiver(mIntentListener, filter);
         }
     }

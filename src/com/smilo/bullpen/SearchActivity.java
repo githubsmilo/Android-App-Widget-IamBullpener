@@ -88,7 +88,7 @@ public class SearchActivity extends Activity {
 		adapterSearchSubject.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		spinSearchSubject.setAdapter(adapterSearchSubject);
 		spinSearchSubject.setOnItemSelectedListener(mSpinSearchSubjectSelectedListener);
-		spinSearchSubject.setSelection(Constants.SEARCH_SUBJECT_TYPE_0);
+		spinSearchSubject.setSelection(Constants.SEARCH_SUBJECT_TYPE_1);
 	}
 
 	private void initializeButtons() {
