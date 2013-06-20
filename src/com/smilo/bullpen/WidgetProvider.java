@@ -40,6 +40,7 @@ public class WidgetProvider extends AppWidgetProvider {
         REQUEST_TOP,
         REQUEST_PREV,
         REQUEST_NEXT,
+        REQUEST_SEARCH,
         REQUEST_REFRESH,
         REQUEST_SETTING,
         REQUEST_UNKNOWN,
@@ -219,8 +220,8 @@ public class WidgetProvider extends AppWidgetProvider {
         
         // Set a remoteAdapter to the remoteViews.
         Intent serviceIntent = buildListViewServiceIntent(context, item);
-        // rv.setRemoteAdapter(R.id.listView, serviceIntent); // For API14+
-        rv.setRemoteAdapter(item.getAppWidgetId(), R.id.listView, serviceIntent);
+        rv.setRemoteAdapter(R.id.listView, serviceIntent); // For API14+
+        //rv.setRemoteAdapter(item.getAppWidgetId(), R.id.listView, serviceIntent); // For API13-
         rv.setScrollPosition(R.id.listView, 0); // Scroll to top
 
         PendingIntent pi = null;
@@ -229,6 +230,7 @@ public class WidgetProvider extends AppWidgetProvider {
             // Set title of the remoteViews.
             rv.setTextViewText(R.id.textListTitle, Utils.getBoardTitle(context, item.getBoardType()));
             
+            rv.setViewVisibility(R.id.btnListNavTop, View.GONE);
             rv.setViewVisibility(R.id.btnListNavPrev, View.GONE);
             rv.setViewVisibility(R.id.btnListNavNext, View.GONE);
         } else {
@@ -238,6 +240,13 @@ public class WidgetProvider extends AppWidgetProvider {
             // Set title of the remoteViews.
             rv.setTextViewText(R.id.textListTitle, (Utils.getBoardTitle(context, item.getBoardType()) + " - " + currentPageNum));
             
+            // Set top button of the removeViews.
+            rv.setViewVisibility(R.id.btnListNavTop, View.VISIBLE);
+            item.setPageNum(Constants.DEFAULT_PAGE_NUM);
+            pi = PendingIntent.getBroadcast(context, PENDING_INTENT_REQUEST_CODE.REQUEST_TOP.ordinal(),
+                    buildRefreshListIntent(context, item), PendingIntent.FLAG_UPDATE_CURRENT);
+              rv.setOnClickPendingIntent(R.id.btnListNavTop, pi);
+              
             // Set prev button of the removeViews.
             rv.setViewVisibility(R.id.btnListNavPrev, View.VISIBLE);
             if (currentPageNum > Constants.DEFAULT_PAGE_NUM)
@@ -245,13 +254,6 @@ public class WidgetProvider extends AppWidgetProvider {
             pi = PendingIntent.getBroadcast(context, PENDING_INTENT_REQUEST_CODE.REQUEST_PREV.ordinal(),
                     buildRefreshListIntent(context, item), PendingIntent.FLAG_UPDATE_CURRENT);
             rv.setOnClickPendingIntent(R.id.btnListNavPrev, pi);
-
-           // Set top button of the removeViews.
-            rv.setViewVisibility(R.id.btnListNavTop, View.VISIBLE);
-            item.setPageNum(Constants.DEFAULT_PAGE_NUM);
-            pi = PendingIntent.getBroadcast(context, PENDING_INTENT_REQUEST_CODE.REQUEST_TOP.ordinal(),
-                    buildRefreshListIntent(context, item), PendingIntent.FLAG_UPDATE_CURRENT);
-              rv.setOnClickPendingIntent(R.id.btnListNavTop, pi);
 
             // Set next button of the remoteViews.
             rv.setViewVisibility(R.id.btnListNavNext, View.VISIBLE);
@@ -264,14 +266,19 @@ public class WidgetProvider extends AppWidgetProvider {
             item.setPageNum(currentPageNum);
         }
 
+         // Set search button of the remoteViews.
+        pi = PendingIntent.getActivity(context, PENDING_INTENT_REQUEST_CODE.REQUEST_SEARCH.ordinal(), 
+        		buildSearchActivityIntent(context, item), PendingIntent.FLAG_UPDATE_CURRENT);
+        rv.setOnClickPendingIntent(R.id.btnListSearch, pi);
+        
         // Set refresh button of the remoteViews.
-        pi = PendingIntent.getBroadcast(context, PENDING_INTENT_REQUEST_CODE.REQUEST_REFRESH.ordinal(), 
-                                        buildRefreshListIntent(context, item), PendingIntent.FLAG_UPDATE_CURRENT);
+        pi = PendingIntent.getBroadcast(context, PENDING_INTENT_REQUEST_CODE.REQUEST_REFRESH.ordinal(),
+        		buildRefreshListIntent(context, item), PendingIntent.FLAG_UPDATE_CURRENT);
         rv.setOnClickPendingIntent(R.id.btnListRefresh, pi);
         
         // Set setting button of the remoteViews.
-        pi = PendingIntent.getActivity(context, PENDING_INTENT_REQUEST_CODE.REQUEST_SETTING.ordinal(), 
-                                       buildConfigurationActivityIntent(context, item), PendingIntent.FLAG_UPDATE_CURRENT);
+        pi = PendingIntent.getActivity(context, PENDING_INTENT_REQUEST_CODE.REQUEST_SETTING.ordinal(),
+        		buildConfigurationActivityIntent(context, item), PendingIntent.FLAG_UPDATE_CURRENT);
         rv.setOnClickPendingIntent(R.id.btnListSetting, pi);
         
         // Set a pending intent for click event to the remoteViews.
@@ -301,8 +308,8 @@ public class WidgetProvider extends AppWidgetProvider {
         
         // Set a remoteAdapter to the remoteViews.
         Intent serviceIntent = buildContentServiceIntent(context, item, selectedItemUrl);
-        // rv.setRemoteAdapter(R.id.contentView, serviceIntent); // For API14+
-        rv.setRemoteAdapter(item.getAppWidgetId(), R.id.contentView, serviceIntent);
+        rv.setRemoteAdapter(R.id.contentView, serviceIntent); // For API14+
+        //rv.setRemoteAdapter(item.getAppWidgetId(), R.id.contentView, serviceIntent); // For API13-
 
         PendingIntent pi = null;
         
@@ -431,6 +438,14 @@ public class WidgetProvider extends AppWidgetProvider {
     private Intent buildConfigurationActivityIntent(Context context, intentItem item) {
         Intent intent = buildBaseIntent(item);
         intent.setClass(context, ConfigurationActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+        return intent;
+    }
+    
+    private Intent buildSearchActivityIntent(Context context, intentItem item) {
+        Intent intent = buildBaseIntent(item);
+        intent.setClass(context, SearchActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
         return intent;

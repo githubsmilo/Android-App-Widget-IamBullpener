@@ -34,7 +34,7 @@ public class ConfigurationActivity extends Activity {
         // out of the widget placement if they press the back button.
         setResult(RESULT_CANCELED);
         
-        setContentView(R.layout.configuration_activity);
+        setContentView(R.layout.activity_configuration);
         
         Intent intent = getIntent();
         Bundle extras = intent.getExtras();
@@ -97,8 +97,8 @@ public class ConfigurationActivity extends Activity {
     }
 
     private void initializeButtons() {
-        findViewById(R.id.btnOk).setOnClickListener(mBtnOkOnClickListener);
-        findViewById(R.id.btnCancel).setOnClickListener(mBtnCancelOnClickListener);
+        findViewById(R.id.btnConfigurationOk).setOnClickListener(mBtnOkOnClickListener);
+        findViewById(R.id.btnConfigurationCancel).setOnClickListener(mBtnCancelOnClickListener);
     }
     
     View.OnClickListener mBtnOkOnClickListener = new View.OnClickListener() {

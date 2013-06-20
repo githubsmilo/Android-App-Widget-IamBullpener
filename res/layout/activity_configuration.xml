@@ -136,7 +136,7 @@
         android:orientation="horizontal" >
 
         <Button
-            android:id="@+id/btnCancel"
+            android:id="@+id/btnConfigurationCancel"
             style="?android:attr/buttonBarButtonStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -144,7 +144,7 @@
             android:text="@string/btn_cancel" />
 
         <Button
-            android:id="@+id/btnOk"
+            android:id="@+id/btnConfigurationOk"
             style="?android:attr/buttonBarButtonStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

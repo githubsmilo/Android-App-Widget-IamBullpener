@@ -10,6 +10,8 @@
         android:layout_height="wrap_content"
         android:background="@color/dark_green"
         android:paddingLeft="10dp"
+        android:paddingTop="3dp"
+        android:paddingBottom="3dp"
         android:orientation="horizontal" >
         
         <TextView
@@ -19,7 +21,25 @@
             android:layout_centerVertical="true"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:text="@string/remoteViewTitle_LostInternet" />
+    </RelativeLayout>
 
+    <TextView
+        android:id="@+id/textLostInternetConnection"
+        android:layout_width="wrap_content"
+        android:layout_height="0dip"
+        android:layout_weight="1"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:paddingBottom="10dp"
+        android:paddingLeft="10dp"
+        android:paddingTop="10dp"
+        android:text="@string/text_lost_internet_connection" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/dark_green"
+        android:orientation="horizontal" >
+        
         <ImageButton
             android:id="@+id/btnLostInternetRefresh"
             android:layout_width="wrap_content"
@@ -37,17 +57,6 @@
             android:layout_centerVertical="true"
             android:background="@drawable/setting_button_selector"
             android:contentDescription="@string/btn_setting" />
-
     </RelativeLayout>
     
-    <TextView
-        android:id="@+id/textLostInternetConnection"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:paddingBottom="10dp"
-        android:paddingLeft="10dp"
-        android:paddingTop="10dp"
-        android:text="@string/text_lost_internet_connection" />
-
 </LinearLayout>
