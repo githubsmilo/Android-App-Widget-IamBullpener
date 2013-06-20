@@ -21,8 +21,8 @@ public class ConfigurationActivity extends Activity {
     private static final boolean DEBUG = Constants.DEBUG_MODE;
     
     private int mAppWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID;
-    private int mSelectedBoardType = Constants.ERROR_BOARD_TYPE;
-    private int mSelectedRefreshTimeType = Constants.ERROR_REFRESH_TIME_TYPE;
+    private int mSelectedBoardType = Constants.DEFAULT_BOARD_TYPE;
+    private int mSelectedRefreshTimeType = Constants.DEFAULT_REFRESH_TIME_TYPE;
     
     private boolean mIsExecutedBySettingButton = false;
     
@@ -105,27 +105,22 @@ public class ConfigurationActivity extends Activity {
         public void onClick(View v) {
             if (DEBUG) Log.i(TAG, "Button OK clicked");
 
-            if (mSelectedRefreshTimeType < 0) {
-                mSelectedRefreshTimeType = 0;
-            }
-            if (mSelectedBoardType < 0) {
-                mSelectedBoardType = 0;
-            }
-            
             CheckBox cb = (CheckBox)findViewById(R.id.cbMobileConnection);
             boolean selectedPermitMobileConnectionType = cb.isChecked();
             
-            if (DEBUG) Log.i(TAG, "selectedPermitMobileConnectionType[" + selectedPermitMobileConnectionType +
-                    "], mSelectedRefreshTimeType[" + mSelectedRefreshTimeType + 
-                    "], mSelectedBoardType[" + mSelectedBoardType + "]");
+            if (DEBUG) Log.i(TAG, "mSelectedBoardType[" + mSelectedBoardType +
+            		"], mSelectedRefreshTimeType[" + mSelectedRefreshTimeType + 
+            		"], selectedPermitMobileConnectionType[" + selectedPermitMobileConnectionType + "]");
             
             final Context context = ConfigurationActivity.this;
             Intent initIntent = new Intent(context, WidgetProvider.class);
             initIntent.setAction(Constants.ACTION_INIT_LIST);
             initIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, mAppWidgetId);
-            initIntent.putExtra(Constants.EXTRA_PERMIT_MOBILE_CONNECTION_TYPE, selectedPermitMobileConnectionType);
-            initIntent.putExtra(Constants.EXTRA_REFRESH_TIME_TYPE, mSelectedRefreshTimeType);
+            initIntent.putExtra(Constants.EXTRA_PAGE_NUM, Constants.DEFAULT_PAGE_NUM);
             initIntent.putExtra(Constants.EXTRA_BOARD_TYPE, mSelectedBoardType);
+            initIntent.putExtra(Constants.EXTRA_REFRESH_TIME_TYPE, mSelectedRefreshTimeType);
+            initIntent.putExtra(Constants.EXTRA_PERMIT_MOBILE_CONNECTION_TYPE, selectedPermitMobileConnectionType);
+ 
             context.sendBroadcast(initIntent);
             
             Intent resultValue = new Intent();

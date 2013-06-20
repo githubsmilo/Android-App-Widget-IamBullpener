@@ -45,7 +45,13 @@
     <string name="btn_cancel">Cancel</string>
     <string name="text_blackList_not_implemented">구현 예정</string>
     <string name="appInfo">smilolistener@gmail.com</string>
+    
+    <!-- Search activity -->
     <string name="title_activity_search">검색</string>
-    <string name="hello_world">Hello world!</string>
+    <string name="prompt_searchCategory">카테고리</string>
+    <string name="prompt_searchSubject">말머리</string>
+    <string name="text_searchCategory">카테고리</string>
+    <string name="text_searchKeyword">검색어</string>
+    <string name="text_searchSubject">말머리</string>
 
 </resources>

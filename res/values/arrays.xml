@@ -8,6 +8,7 @@
         <item>30분</item>
         <item>새로 고침 안함</item>
     </string-array>
+    
     <string-array name="board">
         <item>MLB 타운</item>
         <item>KBO 타운</item>
@@ -17,5 +18,42 @@
         <item>BULLPEN TODAY BEST</item>
         <item>BULLPEN 조회수 1000 이상</item>
         <item>BULLPEN 조회수 2000 이상</item>
+    </string-array>
+    
+    <string-array name="searchCategory">
+        <item>제목</item>
+        <item>제목+내용</item>
+        <item>아이디</item>
+        <item>글쓴이</item>
+        <item>말머리</item>
+        <item>조회수</item>
+    </string-array>
+    
+    <string-array name="searchSubject">
+        <item>정치</item>
+        <item>19금</item>
+        <item>단문</item>
+        <item>펌글</item>
+        <item>게임</item>
+        <item>질문</item>
+        <item>17금</item>
+        <item>음악</item>
+        <item>응원</item>
+        <item>COB</item>
+        <item>뻘글</item>
+        <item>SK</item>
+        <item>두산</item>
+        <item>롯데</item>
+        <item>삼성</item>
+        <item>한화</item>
+        <item>KIA</item>
+        <item>넥센</item>
+        <item>LG</item>
+        <item>NC</item>
+        <item>후기</item>
+        <item>채팅</item>
+        <item>짤방</item>
+        <item>경제</item>
+        <item>아이돌</item>
     </string-array>
 </resources>

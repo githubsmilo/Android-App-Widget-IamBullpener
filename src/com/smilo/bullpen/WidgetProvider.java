@@ -126,17 +126,13 @@ public class WidgetProvider extends AppWidgetProvider {
 
                 // After setting configuration activity, this intent will be called.
                 if (action.equals(Constants.ACTION_INIT_LIST)) {
-                    // Initialize pageNum to 1.
-                    if (DEBUG) Log.i(TAG, "onReceive - Set pageNum to 1 on ACTION_INIT_LIST");
-                    item.setPageNum(Constants.DEFAULT_PAGE_NUM);
-                    
                     // Save configuration info.
                     SharedPreferences pref = context.getSharedPreferences(mSharedPreferenceName, Context.MODE_PRIVATE);
                     SharedPreferences.Editor editor = pref.edit();
                     editor.putBoolean(mKeyCompleteToSetup, true);
-                    editor.putBoolean(mKeyPermitMobileConnectionType, permitMobileConnectionType);
-                    editor.putInt(mKeyRefreshTimeType, refreshTimeType);
                     editor.putInt(mKeyBoardType, boardType);
+                    editor.putInt(mKeyRefreshTimeType, refreshTimeType);
+                    editor.putBoolean(mKeyPermitMobileConnectionType, permitMobileConnectionType);
                     editor.commit();
 
                     // Send broadcast intent to update some variables on the ListViewFactory.
@@ -184,6 +180,10 @@ public class WidgetProvider extends AppWidgetProvider {
                     } else {
                         setRemoteViewToShowItem(context, awm, item, selectedItemUrl);
                     }
+                
+                // After setting search activity, this intent will be called.
+                } else if (action.equals(Constants.ACTION_SEARCH)) {
+                	
                 }
             }
         }
