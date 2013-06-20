@@ -10,6 +10,8 @@
         android:layout_height="wrap_content"
         android:background="@color/dark_green"
         android:paddingLeft="10dp"
+        android:paddingTop="3dp"
+        android:paddingBottom="3dp"
         android:orientation="horizontal" >
         
         <TextView
@@ -19,13 +21,28 @@
             android:layout_centerVertical="true"
             android:textAppearance="?android:attr/textAppearanceLarge"
 	        android:text="@string/remoteViewTitle_Default" />
+    </RelativeLayout>
+        
+    <ListView
+           android:id="@+id/contentView"
+           android:layout_width="match_parent"
+           android:layout_height="0dip"
+           android:layout_weight="1"
+           android:layout_marginBottom="2dp"
+           android:cacheColorHint="#00000000" />
+        
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/dark_green"
+        android:orientation="horizontal" >
         
         <ImageButton
             android:id="@+id/btnContentNavTop"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
-            android:layout_toLeftOf="@+id/btnContentRefresh"
             android:background="@drawable/up_button_selector"
             android:contentDescription="@string/btn_top" />
         
@@ -46,14 +63,6 @@
             android:layout_centerVertical="true"
             android:background="@drawable/setting_button_selector"
             android:contentDescription="@string/btn_setting" />
-    
     </RelativeLayout>
-        
-    <ListView
-            android:id="@+id/contentView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginBottom="2dp"
-            android:cacheColorHint="#00000000" />
 
 </LinearLayout>
