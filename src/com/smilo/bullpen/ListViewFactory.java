@@ -145,7 +145,7 @@ public class ListViewFactory implements RemoteViewsService.RemoteViewsFactory {
                     mParsingResult = parseMLBParkMobileBoard(Utils.getBoardUrl(mBoardType) + mPageNum);
                 } else {
                     mParsingResult = parseMLBParkMobileBoard(Utils.getBoardUrl(mBoardType) + mPageNum +
-                            Utils.getSearchUrl(mSelectedSearchCategoryType, mSelectedSearchSubjectType, mSelectedSearchKeyword));
+                            Utils.getSearchUrl(mContext, mSelectedSearchCategoryType, mSelectedSearchSubjectType, mSelectedSearchKeyword));
                 }
             }
         } catch (IOException e) {

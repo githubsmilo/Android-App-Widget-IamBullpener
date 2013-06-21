@@ -10,13 +10,13 @@
     <string name="remoteViewTitle_Default">Wait..</string>
     <string name="remoteViewTitle_LostInternet">인터넷 연결 안됨</string>
     <string name="remoteViewTitle_MlbTown">MLB 타운</string>
-    <string name="remoteViewTitle_KboTown">KBO 타운</string>
-    <string name="remoteViewTitle_Bullpen">불펜</string>
+    <string name="remoteViewTitle_KboTown">한국야구 타운</string>
+    <string name="remoteViewTitle_Bullpen">BULLPEN</string>
     <string name="remoteViewTitle_MlbTown_TodayBest">MLB 타운 TODAY BEST</string>
-    <string name="remoteViewTitle_KboTown_TodayBest">KBO 타운 TODAY BEST</string>
-    <string name="remoteViewTitle_Bullpen_TodayBest">불펜 TODAY BEST</string>
-    <string name="remoteViewTitle_Bullpen1000">불펜 1000</string>
-    <string name="remoteViewTitle_Bullpen2000">불펜 2000</string>
+    <string name="remoteViewTitle_KboTown_TodayBest">한국야구 타운 TODAY BEST</string>
+    <string name="remoteViewTitle_Bullpen_TodayBest">BULLPEN TODAY BEST</string>
+    <string name="remoteViewTitle_Bullpen1000">BULLPEN 조회수 1000</string>
+    <string name="remoteViewTitle_Bullpen2000">BULLPEN 조회수 2000</string>
     <string name="btn_search">Search</string>
     <string name="btn_top">Top</string>
     <string name="btn_prev">Prev</string>
@@ -54,5 +54,67 @@
     <string name="text_searchKeyword">검색어</string>
     <string name="text_searchSubject">말머리</string>
     <string name="text_need_to_enter_keyword">검색어를 입력해주세요.</string>
+    
+    <!-- Search category parameter -->
+    <string name="text_category_parameter_title">stt</string>
+    <string name="text_category_parameter_title_contents">sct</string>
+    <string name="text_category_parameter_id">sid</string>
+    <string name="text_category_parameter_writer">swt</string>
+    <string name="text_category_parameter_subject">spf</string>
+    <string name="text_category_parameter_hits">hit</string>
+    
+    <!-- Search subject parameter -->
+    <string name="text_subject_parameter_1">1</string>
+    <string name="text_subject_parameter_2">2</string>
+    <string name="text_subject_parameter_3">3</string>
+    <string name="text_subject_parameter_4">4</string>
+    <string name="text_subject_parameter_5">5</string>
+    <string name="text_subject_parameter_6">6</string>
+    <string name="text_subject_parameter_7">7</string>
+    <string name="text_subject_parameter_8">8</string>
+    <string name="text_subject_parameter_9">9</string>
+    <string name="text_subject_parameter_10">10</string>
+    <string name="text_subject_parameter_11">11</string>
+    <string name="text_subject_parameter_12">12</string>
+    <string name="text_subject_parameter_13">13</string>
+    <string name="text_subject_parameter_14">14</string>
+    <string name="text_subject_parameter_15">15</string>
+    <string name="text_subject_parameter_16">16</string>
+    <string name="text_subject_parameter_17">17</string>
+    <string name="text_subject_parameter_18">18</string>
+    <string name="text_subject_parameter_19">19</string>
+    <string name="text_subject_parameter_20">25</string>
+    <string name="text_subject_parameter_21">20</string>
+    <string name="text_subject_parameter_22">21</string>
+    <string name="text_subject_parameter_23">22</string>
+    <string name="text_subject_parameter_24">23</string>
+    <string name="text_subject_parameter_25">24</string>
+    
+    <!-- Search subject list -->
+    <string name="text_subject_1">정치</string>
+    <string name="text_subject_2">19금</string>
+    <string name="text_subject_3">단문</string>
+    <string name="text_subject_4">펌글</string>
+    <string name="text_subject_5">게임</string>
+    <string name="text_subject_6">질문</string>
+    <string name="text_subject_7">17금</string>
+    <string name="text_subject_8">음악</string>
+    <string name="text_subject_9">응원</string>
+    <string name="text_subject_10">COB</string>
+    <string name="text_subject_11">뻘글</string>
+    <string name="text_subject_12">SK</string>
+    <string name="text_subject_13">두산</string>
+    <string name="text_subject_14">롯데</string>
+    <string name="text_subject_15">삼성</string>
+    <string name="text_subject_16">한화</string>
+    <string name="text_subject_17">KIA</string>
+    <string name="text_subject_18">넥센</string>
+    <string name="text_subject_19">LG</string>
+    <string name="text_subject_20">NC</string>
+    <string name="text_subject_21">후기</string>
+    <string name="text_subject_22">채팅</string>
+    <string name="text_subject_23">짤방</string>
+    <string name="text_subject_24">경제</string>
+    <string name="text_subject_25">아이돌</string>
 
 </resources>

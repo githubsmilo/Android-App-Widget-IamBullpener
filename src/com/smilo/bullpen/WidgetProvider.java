@@ -10,6 +10,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.util.Log;
 import android.view.View;
 import android.widget.RemoteViews;
@@ -211,7 +212,14 @@ public class WidgetProvider extends AppWidgetProvider {
             int currentPageNum = item.getPageNum();
             
             // Set title of the remoteViews.
-            rv.setTextViewText(R.id.textListTitle, (Utils.getBoardTitle(context, item.getBoardType()) + " - " + currentPageNum));
+            if (item.getSearchCategoryType() == Constants.ERROR_SEARCH_CAGETORY_TYPE)
+                rv.setTextViewText(R.id.textListTitle, (Utils.getBoardTitle(context, item.getBoardType()) + " - " + currentPageNum));
+            else if (item.getSearchCategoryType() == Constants.SEARCH_CATEGORY_TYPE_SUBJECT)
+                rv.setTextViewText(R.id.textListTitle, (Utils.getBoardTitle(context, item.getBoardType()) + " - " + currentPageNum +
+                        " [" + Utils.getSubjectTitle(context, item.getSearchSubjectType()) + "]"));
+            else
+                rv.setTextViewText(R.id.textListTitle, (Utils.getBoardTitle(context, item.getBoardType()) + " - " + currentPageNum + 
+                        " [" + item.getSearchKeyword() + "]"));
             
             // Set top button of the removeViews.
             rv.setViewVisibility(R.id.btnListNavTop, View.VISIBLE);
@@ -338,8 +346,9 @@ public class WidgetProvider extends AppWidgetProvider {
     private void setNewAlarm(Context context, intentItem item, boolean isUrgentMode) {
         if (DEBUG) Log.i(TAG, "setNewAlarm - intentItem[" + item.toString() + "], isUrgentMode[" + isUrgentMode + "]");
 
-        int selectedRefreshTime = Utils.getRefreshTime(item.getRefreshTimeType());
-        long alarmTime = System.currentTimeMillis() + (selectedRefreshTime <= 0 ? Constants.DEFAULT_INTERVAL : selectedRefreshTime);
+        Resources res = context.getResources();
+        int selectedRefreshTime = Utils.getRefreshTime(context, item.getRefreshTimeType());
+        long alarmTime = System.currentTimeMillis() + (selectedRefreshTime <= 0 ? res.getInteger(R.integer.int_default_interval) : selectedRefreshTime);
         if (isUrgentMode) alarmTime = 0;
         mSender = PendingIntent.getBroadcast(context, 0, buildWidgetUpdateIntent(context, item), 0);
         mManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);

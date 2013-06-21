@@ -57,22 +57,23 @@ public final class Utils {
             return false;
     }
     
-    public static int getRefreshTime(int refreshTimeType) {
+    public static int getRefreshTime(Context context, int refreshTimeType) {
+        Resources res = context.getResources();
         switch (refreshTimeType) {
             case Constants.REFRESH_TIME_TYPE_1_MIN :
-                return Constants.TIME_1_MIN;
+                return res.getInteger(R.integer.int_time_1_min);
             case Constants.REFRESH_TIME_TYPE_5_MIN :
-                return Constants.TIME_5_MIN;
+                return res.getInteger(R.integer.int_time_5_min);
             case Constants.REFRESH_TIME_TYPE_10_MIN :
-                return Constants.TIME_10_MIN;
+                return res.getInteger(R.integer.int_time_10_min);
             case Constants.REFRESH_TIME_TYPE_20_MIN :
-                return Constants.TIME_20_MIN;
+                return res.getInteger(R.integer.int_time_20_min);
             case Constants.REFRESH_TIME_TYPE_30_MIN :
-                return Constants.TIME_30_MIN;
+                return res.getInteger(R.integer.int_time_30_min);
             case Constants.REFRESH_TIME_TYPE_STOP :
-                return Constants.TIME_STOP;
+                return res.getInteger(R.integer.int_time_stop);
             default:
-                return Constants.DEFAULT_INTERVAL;
+                return res.getInteger(R.integer.int_default_interval);
         }
     }
     
@@ -123,86 +124,147 @@ public final class Utils {
         }
     }
     
-    public static String getSearchUrl(int searchCategoryType, int searchSubjectType, String searchKeyword) throws UnsupportedEncodingException {
+    public static String getSearchUrl(Context context, 
+            int searchCategoryType, int searchSubjectType, String searchKeyword) throws UnsupportedEncodingException {
+        Resources res = context.getResources();
         switch (searchCategoryType) {
             case Constants.SEARCH_CATEGORY_TYPE_TITLE:
-                return (Constants.URL_PARAMETER_SEARCH_CATEGORY + Constants.SEARCH_CATEGORY_PARAMETER_TITLE + 
+                return (Constants.URL_PARAMETER_SEARCH_CATEGORY + res.getString(R.string.text_category_parameter_title) +
                         Constants.URL_PARAMETER_SEARCH_KEYWORD + URLEncoder.encode(searchKeyword,"EUC_KR"));
             case Constants.SEARCH_CATEGORY_TYPE_TITLE_CONTENTS:
-                return (Constants.URL_PARAMETER_SEARCH_CATEGORY + Constants.SEARCH_CATEGORY_PARAMETER_TITLE_CONTENTS + 
+                return (Constants.URL_PARAMETER_SEARCH_CATEGORY + res.getString(R.string.text_category_parameter_title_contents) +
                         Constants.URL_PARAMETER_SEARCH_KEYWORD + URLEncoder.encode(searchKeyword,"EUC_KR"));
             case Constants.SEARCH_CATEGORY_TYPE_ID:
-                return (Constants.URL_PARAMETER_SEARCH_CATEGORY + Constants.SEARCH_CATEGORY_PARAMETER_ID + 
+                return (Constants.URL_PARAMETER_SEARCH_CATEGORY + res.getString(R.string.text_category_parameter_id) +
                         Constants.URL_PARAMETER_SEARCH_KEYWORD + URLEncoder.encode(searchKeyword,"EUC_KR"));
             case Constants.SEARCH_CATEGORY_TYPE_WRITER:
-                return (Constants.URL_PARAMETER_SEARCH_CATEGORY + Constants.SEARCH_CATEGORY_PARAMETER_WRITER + 
+                return (Constants.URL_PARAMETER_SEARCH_CATEGORY + res.getString(R.string.text_category_parameter_writer) +
                         Constants.URL_PARAMETER_SEARCH_KEYWORD + URLEncoder.encode(searchKeyword,"EUC_KR"));
             case Constants.SEARCH_CATEGORY_TYPE_SUBJECT:
-                return (Constants.URL_PARAMETER_SEARCH_CATEGORY + Constants.SEARCH_CATEGORY_PARAMETER_SUBJECT +
-                        Constants.URL_PARAMETER_SEARCH_KEYWORD + getSubjectUrl(searchSubjectType));
+                return (Constants.URL_PARAMETER_SEARCH_CATEGORY + res.getString(R.string.text_category_parameter_subject) +
+                        Constants.URL_PARAMETER_SEARCH_KEYWORD + getSubjectUrl(context, searchSubjectType));
             case Constants.SEARCH_CATEGORY_TYPE_HITS:
-                return (Constants.URL_PARAMETER_SEARCH_CATEGORY + Constants.SEARCH_CATEGORY_PARAMETER_HITS + 
+                return (Constants.URL_PARAMETER_SEARCH_CATEGORY + res.getString(R.string.text_category_parameter_hits) +
                         Constants.URL_PARAMETER_SEARCH_KEYWORD + URLEncoder.encode(searchKeyword,"EUC_KR"));
             default:
-                return (Constants.URL_PARAMETER_SEARCH_CATEGORY + Constants.SEARCH_CATEGORY_PARAMETER_TITLE + 
+                return (Constants.URL_PARAMETER_SEARCH_CATEGORY + res.getString(R.string.text_category_parameter_title) +
                         Constants.URL_PARAMETER_SEARCH_KEYWORD + URLEncoder.encode(searchKeyword,"EUC_KR"));
         }
     }
     
-    private static String getSubjectUrl(int searchSubjectType) {
+    public static String getSubjectTitle(Context context, int searchSubjectType) {
+        Resources res = context.getResources();
         switch (searchSubjectType) {
             case Constants.SEARCH_SUBJECT_TYPE_1:
-                return Constants.SEARCH_SUBJECT_PARAMETER_1;
+                return res.getString(R.string.text_subject_1);
             case Constants.SEARCH_SUBJECT_TYPE_2:
-                return Constants.SEARCH_SUBJECT_PARAMETER_2;
+                return res.getString(R.string.text_subject_2);
             case Constants.SEARCH_SUBJECT_TYPE_3:
-                return Constants.SEARCH_SUBJECT_PARAMETER_3;
+                return res.getString(R.string.text_subject_3);
             case Constants.SEARCH_SUBJECT_TYPE_4:
-                return Constants.SEARCH_SUBJECT_PARAMETER_4;
+                return res.getString(R.string.text_subject_4);
             case Constants.SEARCH_SUBJECT_TYPE_5:
-                return Constants.SEARCH_SUBJECT_PARAMETER_5;
+                return res.getString(R.string.text_subject_5);
             case Constants.SEARCH_SUBJECT_TYPE_6:
-                return Constants.SEARCH_SUBJECT_PARAMETER_6;
+                return res.getString(R.string.text_subject_6);
             case Constants.SEARCH_SUBJECT_TYPE_7:
-                return Constants.SEARCH_SUBJECT_PARAMETER_7;
+                return res.getString(R.string.text_subject_7);
             case Constants.SEARCH_SUBJECT_TYPE_8:
-                return Constants.SEARCH_SUBJECT_PARAMETER_8;
+                return res.getString(R.string.text_subject_8);
             case Constants.SEARCH_SUBJECT_TYPE_9:
-                return Constants.SEARCH_SUBJECT_PARAMETER_9;
+                return res.getString(R.string.text_subject_9);
             case Constants.SEARCH_SUBJECT_TYPE_10:
-                return Constants.SEARCH_SUBJECT_PARAMETER_10;
+                return res.getString(R.string.text_subject_10);
             case Constants.SEARCH_SUBJECT_TYPE_11:
-                return Constants.SEARCH_SUBJECT_PARAMETER_11;
+                return res.getString(R.string.text_subject_11);
             case Constants.SEARCH_SUBJECT_TYPE_12:
-                return Constants.SEARCH_SUBJECT_PARAMETER_12;
+                return res.getString(R.string.text_subject_12);
             case Constants.SEARCH_SUBJECT_TYPE_13:
-                return Constants.SEARCH_SUBJECT_PARAMETER_13;
+                return res.getString(R.string.text_subject_13);
             case Constants.SEARCH_SUBJECT_TYPE_14:
-                return Constants.SEARCH_SUBJECT_PARAMETER_14;
+                return res.getString(R.string.text_subject_14);
             case Constants.SEARCH_SUBJECT_TYPE_15:
-                return Constants.SEARCH_SUBJECT_PARAMETER_15;
+                return res.getString(R.string.text_subject_15);
             case Constants.SEARCH_SUBJECT_TYPE_16:
-                return Constants.SEARCH_SUBJECT_PARAMETER_16;
+                return res.getString(R.string.text_subject_16);
             case Constants.SEARCH_SUBJECT_TYPE_17:
-                return Constants.SEARCH_SUBJECT_PARAMETER_17;
+                return res.getString(R.string.text_subject_17);
             case Constants.SEARCH_SUBJECT_TYPE_18:
-                return Constants.SEARCH_SUBJECT_PARAMETER_18;
+                return res.getString(R.string.text_subject_18);
             case Constants.SEARCH_SUBJECT_TYPE_19:
-                return Constants.SEARCH_SUBJECT_PARAMETER_19;
+                return res.getString(R.string.text_subject_19);
             case Constants.SEARCH_SUBJECT_TYPE_20:
-                return Constants.SEARCH_SUBJECT_PARAMETER_20;
+                return res.getString(R.string.text_subject_20);
             case Constants.SEARCH_SUBJECT_TYPE_21:
-                return Constants.SEARCH_SUBJECT_PARAMETER_21;
+                return res.getString(R.string.text_subject_21);
             case Constants.SEARCH_SUBJECT_TYPE_22:
-                return Constants.SEARCH_SUBJECT_PARAMETER_22;
+                return res.getString(R.string.text_subject_22);
             case Constants.SEARCH_SUBJECT_TYPE_23:
-                return Constants.SEARCH_SUBJECT_PARAMETER_23;
+                return res.getString(R.string.text_subject_23);
             case Constants.SEARCH_SUBJECT_TYPE_24:
-                return Constants.SEARCH_SUBJECT_PARAMETER_24;
+                return res.getString(R.string.text_subject_24);
             case Constants.SEARCH_SUBJECT_TYPE_25:
-                return Constants.SEARCH_SUBJECT_PARAMETER_25;
+                return res.getString(R.string.text_subject_25);
             default:
-                return Constants.SEARCH_SUBJECT_PARAMETER_1;
+                return res.getString(R.string.text_subject_1);
+        }
+    }
+    
+    private static String getSubjectUrl(Context context, int searchSubjectType) {
+        Resources res = context.getResources();
+        switch (searchSubjectType) {
+            case Constants.SEARCH_SUBJECT_TYPE_1:
+                return res.getString(R.string.text_subject_parameter_1);
+            case Constants.SEARCH_SUBJECT_TYPE_2:
+                return res.getString(R.string.text_subject_parameter_2);
+            case Constants.SEARCH_SUBJECT_TYPE_3:
+                return res.getString(R.string.text_subject_parameter_3);
+            case Constants.SEARCH_SUBJECT_TYPE_4:
+                return res.getString(R.string.text_subject_parameter_4);
+            case Constants.SEARCH_SUBJECT_TYPE_5:
+                return res.getString(R.string.text_subject_parameter_5);
+            case Constants.SEARCH_SUBJECT_TYPE_6:
+                return res.getString(R.string.text_subject_parameter_6);
+            case Constants.SEARCH_SUBJECT_TYPE_7:
+                return res.getString(R.string.text_subject_parameter_7);
+            case Constants.SEARCH_SUBJECT_TYPE_8:
+                return res.getString(R.string.text_subject_parameter_8);
+            case Constants.SEARCH_SUBJECT_TYPE_9:
+                return res.getString(R.string.text_subject_parameter_9);
+            case Constants.SEARCH_SUBJECT_TYPE_10:
+                return res.getString(R.string.text_subject_parameter_10);
+            case Constants.SEARCH_SUBJECT_TYPE_11:
+                return res.getString(R.string.text_subject_parameter_11);
+            case Constants.SEARCH_SUBJECT_TYPE_12:
+                return res.getString(R.string.text_subject_parameter_12);
+            case Constants.SEARCH_SUBJECT_TYPE_13:
+                return res.getString(R.string.text_subject_parameter_13);
+            case Constants.SEARCH_SUBJECT_TYPE_14:
+                return res.getString(R.string.text_subject_parameter_14);
+            case Constants.SEARCH_SUBJECT_TYPE_15:
+                return res.getString(R.string.text_subject_parameter_15);
+            case Constants.SEARCH_SUBJECT_TYPE_16:
+                return res.getString(R.string.text_subject_parameter_16);
+            case Constants.SEARCH_SUBJECT_TYPE_17:
+                return res.getString(R.string.text_subject_parameter_17);
+            case Constants.SEARCH_SUBJECT_TYPE_18:
+                return res.getString(R.string.text_subject_parameter_18);
+            case Constants.SEARCH_SUBJECT_TYPE_19:
+                return res.getString(R.string.text_subject_parameter_19);
+            case Constants.SEARCH_SUBJECT_TYPE_20:
+                return res.getString(R.string.text_subject_parameter_20);
+            case Constants.SEARCH_SUBJECT_TYPE_21:
+                return res.getString(R.string.text_subject_parameter_21);
+            case Constants.SEARCH_SUBJECT_TYPE_22:
+                return res.getString(R.string.text_subject_parameter_22);
+            case Constants.SEARCH_SUBJECT_TYPE_23:
+                return res.getString(R.string.text_subject_parameter_23);
+            case Constants.SEARCH_SUBJECT_TYPE_24:
+                return res.getString(R.string.text_subject_parameter_24);
+            case Constants.SEARCH_SUBJECT_TYPE_25:
+                return res.getString(R.string.text_subject_parameter_25);
+            default:
+                return res.getString(R.string.text_subject_parameter_1);
         }
     }
 }

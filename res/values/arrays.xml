@@ -11,13 +11,13 @@
     
     <string-array name="board">
         <item>MLB 타운</item>
-        <item>KBO 타운</item>
+        <item>한국야구 타운</item>
         <item>BULLPEN</item>
         <item>MLB 타운 TODAY BEST</item>
-        <item>KBO 타운 TODAY BEST</item>
+        <item>한국야구 타운 TODAY BEST</item>
         <item>BULLPEN TODAY BEST</item>
-        <item>BULLPEN 조회수 1000 이상</item>
-        <item>BULLPEN 조회수 2000 이상</item>
+        <item>BULLPEN 조회수 1000</item>
+        <item>BULLPEN 조회수 2000</item>
     </string-array>
     
     <string-array name="searchCategory">

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    
+    <!-- Refresh time values -->
+    <integer name="int_default_interval">20000</integer>
+    <integer name="int_time_1_min">60000</integer>
+    <integer name="int_time_5_min">300000</integer>
+    <integer name="int_time_10_min">600000</integer>
+    <integer name="int_time_20_min">1200000</integer>
+    <integer name="int_time_30_min">1800000</integer>
+    <integer name="int_time_stop">-1</integer>
+    
+</resources>

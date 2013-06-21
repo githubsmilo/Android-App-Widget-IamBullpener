@@ -32,30 +32,18 @@ public final class Constants {
     public static final int BITMAP_MAX_SIZE = 800;
     
     // Intentitem default values
-    public static final int     DEFAULT_PAGE_NUM = 1;
-    public static final int     DEFAULT_REFRESH_TIME_TYPE = 0;
-    public static final int     DEFAULT_BOARD_TYPE = 0;
+    public static final int DEFAULT_PAGE_NUM = 1;
+    public static final int DEFAULT_REFRESH_TIME_TYPE = 0;
+    public static final int DEFAULT_BOARD_TYPE = 0;
     public static final boolean DEFAULT_PERMIT_MOBILE_CONNECTION_TYPE = false;
-    
-    // Intentitem error values
-    public static final int     ERROR_PAGE_NUM = -1;
-    public static final int     ERROR_REFRESH_TIME_TYPE = -1;
-    public static final int     ERROR_BOARD_TYPE = -1;
-    public static final boolean ERROR_PERMIT_MOBILE_CONNECTION_TYPE = false;
-    
-    public enum PARSING_RESULT {
-        SUCCESS_FULL_BOARD,
-        SUCCESS_MOBILE_BOARD,
-        SUCCESS_MOBILE_TODAY_BEST,
-        FAILED_IO_EXCEPTION,
-        FAILED_JSON_EXCEPTION,
-        FAILED_STACK_OVERFLOW,
-        FAILED_UNKNOWN,
-    };
-    
-    // Search activity
     public static final int DEFAULT_SEARCH_CATEGORY_TYPE = 0;
     public static final int DEFAULT_SEARCH_SUBJECT_TYPE = 0;
+    
+    // Intentitem error values
+    public static final int ERROR_PAGE_NUM = -1;
+    public static final int ERROR_REFRESH_TIME_TYPE = -1;
+    public static final int ERROR_BOARD_TYPE = -1;
+    public static final boolean ERROR_PERMIT_MOBILE_CONNECTION_TYPE = false;
     public static final int ERROR_SEARCH_CAGETORY_TYPE = -1;
     public static final int ERROR_SEARCH_SUBJECT_TYPE = -1;
     
@@ -71,6 +59,16 @@ public final class Constants {
     
     public static final String URL_PARAMETER_SEARCH_CATEGORY = "&mbsW=search&select=";
     public static final String URL_PARAMETER_SEARCH_KEYWORD = "&keyword=";
+
+    public enum PARSING_RESULT {
+        SUCCESS_FULL_BOARD,
+        SUCCESS_MOBILE_BOARD,
+        SUCCESS_MOBILE_TODAY_BEST,
+        FAILED_IO_EXCEPTION,
+        FAILED_JSON_EXCEPTION,
+        FAILED_STACK_OVERFLOW,
+        FAILED_UNKNOWN,
+    };
     
     public static final int BOARD_TYPE_MLB_TOWN = 0;
     public static final int BOARD_TYPE_KBO_TOWN = 1;
@@ -80,28 +78,13 @@ public final class Constants {
     public static final int BOARD_TYPE_BULLPEN_TODAY_BEST  = 5;
     public static final int BOARD_TYPE_BULLPEN_1000 = 6;
     public static final int BOARD_TYPE_BULLPEN_2000 = 7;
-    
-    public static final int DEFAULT_INTERVAL = 20000;
-    public static final int TIME_1_MIN  = 60000;
-    public static final int TIME_5_MIN  = 60000 * 5;
-    public static final int TIME_10_MIN = 60000 * 10;
-    public static final int TIME_20_MIN = 60000 * 20;
-    public static final int TIME_30_MIN = 60000 * 30;
-    public static final int TIME_STOP   = -1;
-    
+
     public static final int REFRESH_TIME_TYPE_1_MIN  = 0;
     public static final int REFRESH_TIME_TYPE_5_MIN  = 1;
     public static final int REFRESH_TIME_TYPE_10_MIN = 2;
     public static final int REFRESH_TIME_TYPE_20_MIN = 3;
     public static final int REFRESH_TIME_TYPE_30_MIN = 4;
     public static final int REFRESH_TIME_TYPE_STOP   = 5;
-    
-    public static final String SEARCH_CATEGORY_PARAMETER_TITLE ="stt";
-    public static final String SEARCH_CATEGORY_PARAMETER_TITLE_CONTENTS ="sct";
-    public static final String SEARCH_CATEGORY_PARAMETER_ID ="sid";
-    public static final String SEARCH_CATEGORY_PARAMETER_WRITER ="swt";
-    public static final String SEARCH_CATEGORY_PARAMETER_SUBJECT ="spf";
-    public static final String SEARCH_CATEGORY_PARAMETER_HITS ="hit";
     
     public static final int SEARCH_CATEGORY_TYPE_TITLE = 0;
     public static final int SEARCH_CATEGORY_TYPE_TITLE_CONTENTS = 1;
@@ -110,32 +93,6 @@ public final class Constants {
     public static final int SEARCH_CATEGORY_TYPE_SUBJECT = 4;
     public static final int SEARCH_CATEGORY_TYPE_HITS = 5;
     
-    public static final String SEARCH_SUBJECT_PARAMETER_1 = "1"; // 정치
-    public static final String SEARCH_SUBJECT_PARAMETER_2 = "2"; // 19금
-    public static final String SEARCH_SUBJECT_PARAMETER_3 = "3"; // 단문
-    public static final String SEARCH_SUBJECT_PARAMETER_4 = "4"; // 펌글
-    public static final String SEARCH_SUBJECT_PARAMETER_5 = "5"; // 게임
-    public static final String SEARCH_SUBJECT_PARAMETER_6 = "6"; // 질문
-    public static final String SEARCH_SUBJECT_PARAMETER_7 = "7"; // 17금
-    public static final String SEARCH_SUBJECT_PARAMETER_8 = "8"; // 음악
-    public static final String SEARCH_SUBJECT_PARAMETER_9 = "9"; // 응원
-    public static final String SEARCH_SUBJECT_PARAMETER_10 = "10"; // COB
-    public static final String SEARCH_SUBJECT_PARAMETER_11 = "11"; // 뻘글
-    public static final String SEARCH_SUBJECT_PARAMETER_12 = "12"; // SK
-    public static final String SEARCH_SUBJECT_PARAMETER_13 = "13"; // 두산
-    public static final String SEARCH_SUBJECT_PARAMETER_14 = "14"; // 롯데
-    public static final String SEARCH_SUBJECT_PARAMETER_15 = "15"; // 삼성
-    public static final String SEARCH_SUBJECT_PARAMETER_16 = "16"; // 한화
-    public static final String SEARCH_SUBJECT_PARAMETER_17 = "17"; // KIA
-    public static final String SEARCH_SUBJECT_PARAMETER_18 = "18"; // 넥센
-    public static final String SEARCH_SUBJECT_PARAMETER_19 = "19"; // LG
-    public static final String SEARCH_SUBJECT_PARAMETER_20 = "25"; // NC !!!!!
-    public static final String SEARCH_SUBJECT_PARAMETER_21 = "20"; // 후기
-    public static final String SEARCH_SUBJECT_PARAMETER_22 = "21"; // 채팅
-    public static final String SEARCH_SUBJECT_PARAMETER_23 = "22"; // 짤방
-    public static final String SEARCH_SUBJECT_PARAMETER_24 = "23"; // 경제
-    public static final String SEARCH_SUBJECT_PARAMETER_25 = "24"; // 아이돌
-
     public static final int SEARCH_SUBJECT_TYPE_1 = 0; // 정치
     public static final int SEARCH_SUBJECT_TYPE_2 = 1; // 19금
     public static final int SEARCH_SUBJECT_TYPE_3 = 2; // 단문
