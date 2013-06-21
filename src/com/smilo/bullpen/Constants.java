@@ -56,6 +56,7 @@ public final class Constants {
     public static final String URL_BULLPEN_TODAY_BEST = URL_BASE + "/BULLPEN_TODAYBEST";
     public static final String URL_BULLPEN_1000 = "http://mlbpark.donga.com/mbs/articleL.php?mbsC=bullpen&mbsW=search&select=hit&opt=1&keyword=1000&cpage=";
     public static final String URL_BULLPEN_2000 = "http://mlbpark.donga.com/mbs/articleL.php?mbsC=bullpen&mbsW=search&select=hit&opt=1&keyword=2000&cpage=";
+    public static final String URL_NEWS = "http://mlbpark.donga.com/bbs/list.php?bbs=mpark_kpb_news&cpage=";
     
     public static final String URL_PARAMETER_SEARCH_CATEGORY = "&mbsW=search&select=";
     public static final String URL_PARAMETER_SEARCH_KEYWORD = "&keyword=";
@@ -78,6 +79,7 @@ public final class Constants {
     public static final int BOARD_TYPE_BULLPEN_TODAY_BEST  = 5;
     public static final int BOARD_TYPE_BULLPEN_1000 = 6;
     public static final int BOARD_TYPE_BULLPEN_2000 = 7;
+    public static final int BOARD_TYPE_NEWS = 8;
 
     public static final int REFRESH_TIME_TYPE_1_MIN  = 0;
     public static final int REFRESH_TIME_TYPE_5_MIN  = 1;

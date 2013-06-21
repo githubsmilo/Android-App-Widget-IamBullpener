@@ -17,6 +17,7 @@
     <string name="remoteViewTitle_Bullpen_TodayBest">BULLPEN TODAY BEST</string>
     <string name="remoteViewTitle_Bullpen1000">BULLPEN 조회수 1000</string>
     <string name="remoteViewTitle_Bullpen2000">BULLPEN 조회수 2000</string>
+    <string name="remoteViewTitle_News">뉴스</string>
     <string name="btn_search">Search</string>
     <string name="btn_top">Top</string>
     <string name="btn_prev">Prev</string>

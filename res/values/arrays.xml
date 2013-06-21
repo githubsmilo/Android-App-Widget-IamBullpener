@@ -18,6 +18,7 @@
         <item>BULLPEN TODAY BEST</item>
         <item>BULLPEN 조회수 1000</item>
         <item>BULLPEN 조회수 2000</item>
+        <item>뉴스</item>
     </string-array>
     
     <string-array name="searchCategory">

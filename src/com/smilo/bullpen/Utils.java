@@ -81,23 +81,25 @@ public final class Utils {
         Resources res = context.getResources();
         switch (boardType) {
             case Constants.BOARD_TYPE_MLB_TOWN :
-                return (res.getString(R.string.remoteViewTitle_MlbTown));
+                return res.getString(R.string.remoteViewTitle_MlbTown);
             case Constants.BOARD_TYPE_KBO_TOWN :
-                return (res.getString(R.string.remoteViewTitle_KboTown));
+                return res.getString(R.string.remoteViewTitle_KboTown);
             case Constants.BOARD_TYPE_BULLPEN :
-                return (res.getString(R.string.remoteViewTitle_Bullpen));
+                return res.getString(R.string.remoteViewTitle_Bullpen);
             case Constants.BOARD_TYPE_MLB_TOWN_TODAY_BEST :
-                return (res.getString(R.string.remoteViewTitle_MlbTown_TodayBest));
+                return res.getString(R.string.remoteViewTitle_MlbTown_TodayBest);
             case Constants.BOARD_TYPE_KBO_TOWN_TODAY_BEST :
-                return (res.getString(R.string.remoteViewTitle_KboTown_TodayBest));
+                return res.getString(R.string.remoteViewTitle_KboTown_TodayBest);
             case Constants.BOARD_TYPE_BULLPEN_TODAY_BEST :
-                return (res.getString(R.string.remoteViewTitle_Bullpen_TodayBest));
+                return res.getString(R.string.remoteViewTitle_Bullpen_TodayBest);
             case Constants.BOARD_TYPE_BULLPEN_1000 :
-                return (res.getString(R.string.remoteViewTitle_Bullpen1000));
+                return res.getString(R.string.remoteViewTitle_Bullpen1000);
             case Constants.BOARD_TYPE_BULLPEN_2000 :
-                return (res.getString(R.string.remoteViewTitle_Bullpen2000));
+                return res.getString(R.string.remoteViewTitle_Bullpen2000);
+            case Constants.BOARD_TYPE_NEWS :
+                return res.getString(R.string.remoteViewTitle_News);
             default:
-                return (res.getString(R.string.remoteViewTitle_MlbTown));
+                return res.getString(R.string.remoteViewTitle_MlbTown);
         }
     }
     
@@ -119,6 +121,8 @@ public final class Utils {
                 return Constants.URL_BULLPEN_1000;
             case Constants.BOARD_TYPE_BULLPEN_2000 :
                 return Constants.URL_BULLPEN_2000;
+            case Constants.BOARD_TYPE_NEWS :
+                return Constants.URL_NEWS;
             default:
                 return Constants.URL_MLB_TOWN;
         }
