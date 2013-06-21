@@ -53,5 +53,6 @@
     <string name="text_searchCategory">카테고리</string>
     <string name="text_searchKeyword">검색어</string>
     <string name="text_searchSubject">말머리</string>
+    <string name="text_need_to_enter_keyword">검색어를 입력해주세요.</string>
 
 </resources>
