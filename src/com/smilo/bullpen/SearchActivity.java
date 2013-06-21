@@ -22,7 +22,7 @@ public class SearchActivity extends Activity {
     
     // intent item list
     private static int mAppWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID;
-    private static int mPageNum = Constants.ERROR_PAGE_NUM;
+    //private static int mPageNum = Constants.ERROR_PAGE_NUM; // We use default page num.
     private static int mBoardType = Constants.ERROR_BOARD_TYPE;
     private static int mRefreshTimetype = Constants.ERROR_REFRESH_TIME_TYPE;
     private static boolean mIsPermitMobileConnectionType = Constants.ERROR_PERMIT_MOBILE_CONNECTION_TYPE;
@@ -46,8 +46,8 @@ public class SearchActivity extends Activity {
         Intent intent = getIntent();
         mAppWidgetId = intent.getIntExtra(
                 AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
-        mPageNum = intent.getIntExtra(
-                Constants.EXTRA_PAGE_NUM, Constants.ERROR_PAGE_NUM);
+        //mPageNum = intent.getIntExtra(
+        //        Constants.EXTRA_PAGE_NUM, Constants.ERROR_PAGE_NUM);
         mBoardType = intent.getIntExtra(
                 Constants.EXTRA_BOARD_TYPE, Constants.ERROR_BOARD_TYPE);
         mRefreshTimetype = intent.getIntExtra(
@@ -119,7 +119,7 @@ public class SearchActivity extends Activity {
             Intent initIntent = new Intent(context, WidgetProvider.class);
             initIntent.setAction(Constants.ACTION_SEARCH);
             initIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, mAppWidgetId);
-            initIntent.putExtra(Constants.EXTRA_PAGE_NUM, mPageNum);
+            initIntent.putExtra(Constants.EXTRA_PAGE_NUM, Constants.DEFAULT_PAGE_NUM);
             initIntent.putExtra(Constants.EXTRA_BOARD_TYPE, mBoardType);
             initIntent.putExtra(Constants.EXTRA_REFRESH_TIME_TYPE, mRefreshTimetype);
             initIntent.putExtra(Constants.EXTRA_PERMIT_MOBILE_CONNECTION_TYPE, mIsPermitMobileConnectionType);
