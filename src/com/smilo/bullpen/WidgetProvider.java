@@ -245,12 +245,13 @@ public class WidgetProvider extends AppWidgetProvider {
             
             // Restore pageNum to the intent item.
             item.setPageNum(currentPageNum);
-        }
 
-         // Set search button of the remoteViews.
-        pi = PendingIntent.getActivity(context, PENDING_INTENT_REQUEST_CODE.REQUEST_SEARCH.ordinal(), 
-                buildSearchActivityIntent(context, item), PendingIntent.FLAG_UPDATE_CURRENT);
-        rv.setOnClickPendingIntent(R.id.btnListSearch, pi);
+             // Set search button of the remoteViews.
+            rv.setViewVisibility(R.id.btnListSearch, View.VISIBLE);
+            pi = PendingIntent.getActivity(context, PENDING_INTENT_REQUEST_CODE.REQUEST_SEARCH.ordinal(), 
+                    buildSearchActivityIntent(context, item), PendingIntent.FLAG_UPDATE_CURRENT);
+            rv.setOnClickPendingIntent(R.id.btnListSearch, pi);
+        }
         
         // Set refresh button of the remoteViews.
         pi = PendingIntent.getBroadcast(context, PENDING_INTENT_REQUEST_CODE.REQUEST_REFRESH.ordinal(),
