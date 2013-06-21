@@ -69,7 +69,7 @@ public class ListViewFactory implements RemoteViewsService.RemoteViewsFactory {
         mBoardType = intent.getIntExtra(Constants.EXTRA_BOARD_TYPE, Constants.DEFAULT_BOARD_TYPE);
 
         if (DEBUG) Log.i(TAG, "constructor - mAppWidgetId[" + mAppWidgetId + 
-        		"], mPageNum[" + mPageNum + "], mBoardType[" + mBoardType + "]");
+                "], mPageNum[" + mPageNum + "], mBoardType[" + mBoardType + "]");
         
         setupIntentListener();
     }
@@ -114,13 +114,13 @@ public class ListViewFactory implements RemoteViewsService.RemoteViewsFactory {
 
     @Override
     public void onDataSetChanged() {
-    	if (DEBUG) Log.i(TAG, "onDataSetChanged - mBoardType[" + mBoardType + "], mPageNum[" + mPageNum + "]");
+        if (DEBUG) Log.i(TAG, "onDataSetChanged - mBoardType[" + mBoardType + "], mPageNum[" + mPageNum + "]");
 
         if (mBoardType == Constants.ERROR_BOARD_TYPE) {
-        	if (DEBUG) Log.e(TAG, "onDataSetChanged - mBoardType is invalid![" + mBoardType + "]");
+            if (DEBUG) Log.e(TAG, "onDataSetChanged - mBoardType is invalid![" + mBoardType + "]");
             return;
         } else if (mPageNum == Constants.ERROR_PAGE_NUM) {
-        	if (DEBUG) Log.e(TAG, "onDatasetChanged - mPageNum is invalid![" + mPageNum + "]");
+            if (DEBUG) Log.e(TAG, "onDatasetChanged - mPageNum is invalid![" + mPageNum + "]");
             return;
         }
 
@@ -129,40 +129,41 @@ public class ListViewFactory implements RemoteViewsService.RemoteViewsFactory {
             if (Utils.isTodayBestBoardType(mBoardType)) {
                 mParsingResult = parseMLBParkTodayBest(Utils.getBoardUrl(mBoardType));
             } else {
-            	if ((mSelectedSearchCategoryType == Constants.ERROR_SEARCH_CAGETORY_TYPE) ||
-            		(mSelectedSearchKeyword == null || mSelectedSearchKeyword.equals(""))) {
-            	    mParsingResult = parseMLBParkMobileBoard(Utils.getBoardUrl(mBoardType) + mPageNum);
-            	} else {
-            		mParsingResult = parseMLBParkMobileBoard(Utils.getBoardUrl(mBoardType) + mPageNum +
-            				Utils.getSearchUrl(mSelectedSearchCategoryType, mSelectedSearchSubjectType, mSelectedSearchKeyword));
-            	}
+                if ((mSelectedSearchCategoryType == Constants.ERROR_SEARCH_CAGETORY_TYPE) ||
+                      ((mSelectedSearchCategoryType != Constants.SEARCH_CATEGORY_TYPE_SUBJECT) && 
+                       (mSelectedSearchKeyword == null || mSelectedSearchKeyword.equals("")))) {
+                    mParsingResult = parseMLBParkMobileBoard(Utils.getBoardUrl(mBoardType) + mPageNum);
+                } else {
+                    mParsingResult = parseMLBParkMobileBoard(Utils.getBoardUrl(mBoardType) + mPageNum +
+                            Utils.getSearchUrl(mSelectedSearchCategoryType, mSelectedSearchSubjectType, mSelectedSearchKeyword));
+                }
             }
         } catch (IOException e) {
-        	if (DEBUG) Log.e(TAG, "onDataSetChanged - IOException![" + e.toString() + "]");
+            if (DEBUG) Log.e(TAG, "onDataSetChanged - IOException![" + e.toString() + "]");
             e.printStackTrace();
             mParsingResult = PARSING_RESULT.FAILED_IO_EXCEPTION;
         } catch (JSONException e) {
-        	if (DEBUG) Log.e(TAG, "onDataSetChanged - JSONException![" + e.toString() + "]");
+            if (DEBUG) Log.e(TAG, "onDataSetChanged - JSONException![" + e.toString() + "]");
             e.printStackTrace();
             mParsingResult = PARSING_RESULT.FAILED_JSON_EXCEPTION;
         } catch (StackOverflowError e) {
-        	if (DEBUG) Log.e(TAG, "onDataSetChanged - StackOverflowError![" + e.toString() + "]");
+            if (DEBUG) Log.e(TAG, "onDataSetChanged - StackOverflowError![" + e.toString() + "]");
             e.printStackTrace();
             mParsingResult = PARSING_RESULT.FAILED_STACK_OVERFLOW;
         }
     }
 
-	@Override
+    @Override
     public int getCount() {
-    	//Log.i(TAG, "getCount");
-    	
-    	if (mParsingResult == PARSING_RESULT.SUCCESS_FULL_BOARD ||
-    		mParsingResult == PARSING_RESULT.SUCCESS_MOBILE_BOARD ||
-    		mParsingResult == PARSING_RESULT.SUCCESS_MOBILE_TODAY_BEST) {
-    		return mAddedItemCount;
-    	} else {
+        //Log.i(TAG, "getCount");
+        
+        if (mParsingResult == PARSING_RESULT.SUCCESS_FULL_BOARD ||
+            mParsingResult == PARSING_RESULT.SUCCESS_MOBILE_BOARD ||
+            mParsingResult == PARSING_RESULT.SUCCESS_MOBILE_TODAY_BEST) {
+            return mAddedItemCount;
+        } else {
               return 1;
-    	}
+        }
     }
 
     @Override
@@ -194,11 +195,11 @@ public class ListViewFactory implements RemoteViewsService.RemoteViewsFactory {
     
     @Override
     public void onDestroy() {
-    	teardownIntentListener();
+        teardownIntentListener();
     }
     
     private PARSING_RESULT parseMLBParkTodayBest(String urlAddress) throws IOException, JSONException, StackOverflowError {
-    	// Initialize widget item array list here.
+        // Initialize widget item array list here.
         mListItems.clear();
 
         Source source = new Source(new URL(Constants.URL_BASE));
@@ -215,87 +216,87 @@ public class ListViewFactory implements RemoteViewsService.RemoteViewsFactory {
             Element div = divs.get(i);
             String classAttr = div.getAttributeValue("class");
             if (classAttr != null && classAttr.equals("today_best")) {
-            	foundTodayBest++;
-            	if ((urlAddress.equals(Constants.URL_MLB_TOWN_TODAY_BEST) && foundTodayBest == 1) ||
-            		(urlAddress.equals(Constants.URL_KBO_TOWN_TODAY_BEST) && foundTodayBest == 2) ||
-            		(urlAddress.equals(Constants.URL_BULLPEN_TODAY_BEST) && foundTodayBest == 3)) {
-	            	targetDiv = div;
-	            	break;
-            	}
+                foundTodayBest++;
+                if ((urlAddress.equals(Constants.URL_MLB_TOWN_TODAY_BEST) && foundTodayBest == 1) ||
+                    (urlAddress.equals(Constants.URL_KBO_TOWN_TODAY_BEST) && foundTodayBest == 2) ||
+                    (urlAddress.equals(Constants.URL_BULLPEN_TODAY_BEST) && foundTodayBest == 3)) {
+                    targetDiv = div;
+                    break;
+                }
             }
         }
         
         if ((targetDiv != null) && (targetDiv.isEmpty() == false)) {
-        	List<Element> ols = targetDiv.getAllElements(HTMLElementName.OL);
-        	mAddedItemCount = 0;
-        	
-        	for (int i = 0 ; i < ols.size() ; i++) {
-        		Segment seg = ols.get(i).getContent();
-        		String title = null, url = null;
-        		boolean isStartLiTag = false, isAddTitle = false;
-        		int itemNum = 1;
-        		//Log.i(TAG, "seg[" + seg.toString() + "]");
-        	
-        		// Parse title and url
-        		for (Iterator<Segment> nodeIterator = seg.getNodeIterator() ; nodeIterator.hasNext();) {
-        			Segment nodeSeg = nodeIterator.next();
-        			
-        			if (nodeSeg instanceof StartTag) {
-        				String tagName = ((Tag)nodeSeg).getName();
-        				if (tagName.equals("li")) {
-        					isStartLiTag = true;
-        				} else if (tagName.equals("a") && isStartLiTag == true) {
-        					url = ((StartTag)nodeSeg).getAttributeValue("href");
-        					if (url.startsWith("/")) {
+            List<Element> ols = targetDiv.getAllElements(HTMLElementName.OL);
+            mAddedItemCount = 0;
+            
+            for (int i = 0 ; i < ols.size() ; i++) {
+                Segment seg = ols.get(i).getContent();
+                String title = null, url = null;
+                boolean isStartLiTag = false, isAddTitle = false;
+                int itemNum = 1;
+                //Log.i(TAG, "seg[" + seg.toString() + "]");
+            
+                // Parse title and url
+                for (Iterator<Segment> nodeIterator = seg.getNodeIterator() ; nodeIterator.hasNext();) {
+                    Segment nodeSeg = nodeIterator.next();
+                    
+                    if (nodeSeg instanceof StartTag) {
+                        String tagName = ((Tag)nodeSeg).getName();
+                        if (tagName.equals("li")) {
+                            isStartLiTag = true;
+                        } else if (tagName.equals("a") && isStartLiTag == true) {
+                            url = ((StartTag)nodeSeg).getAttributeValue("href");
+                            if (url.startsWith("/")) {
                                 StringBuffer strBuf = new StringBuffer();
                                 strBuf.append(Constants.URL_BASE);
                                 strBuf.append(url);
                                 url = strBuf.toString();
                             }
-        				}
-        				
-        			} else if (nodeSeg instanceof EndTag) {
-        				String tagName = ((Tag)nodeSeg).getName();
-        				if (tagName.equals("li")) {
-        					// Add widget item array list
-        					//Log.i(TAG, "parseMLBParkTodayBest - title[" + title + "],url[" + url + "]");
-        					
-        					listItem item = new listItem(title, url);
-        					mListItems.add(item);
-        					title = null;
-        					url = null;
-        					mAddedItemCount++;
-        					isStartLiTag = false;
-        				} else if (tagName.equals("strong") && isStartLiTag == true) {
-        					isAddTitle = true;
-        				}
+                        }
+                        
+                    } else if (nodeSeg instanceof EndTag) {
+                        String tagName = ((Tag)nodeSeg).getName();
+                        if (tagName.equals("li")) {
+                            // Add widget item array list
+                            //Log.i(TAG, "parseMLBParkTodayBest - title[" + title + "],url[" + url + "]");
+                            
+                            listItem item = new listItem(title, url);
+                            mListItems.add(item);
+                            title = null;
+                            url = null;
+                            mAddedItemCount++;
+                            isStartLiTag = false;
+                        } else if (tagName.equals("strong") && isStartLiTag == true) {
+                            isAddTitle = true;
+                        }
                       
-        		    // Ignore &bnsp;
-        			} else if (nodeSeg instanceof CharacterReference) {
+                    // Ignore &bnsp;
+                    } else if (nodeSeg instanceof CharacterReference) {
                         continue;
                         
                     // If plain text, add it to title.
-        			} else {
-        				if (isAddTitle) {
-        					if (i == 0) title = "[추천] " + itemNum++ + ". ";
-        					else if (i == 1) title = "[조회] " + itemNum++ + ". ";
-        					else if (i == 2) title = "[리플] " + itemNum++ + ". ";
-        					title += nodeSeg.getTextExtractor().toString();
-        					isAddTitle = false;
-        				}
-        				
-        			}
-        		}
-        	}
+                    } else {
+                        if (isAddTitle) {
+                            if (i == 0) title = "[추천] " + itemNum++ + ". ";
+                            else if (i == 1) title = "[조회] " + itemNum++ + ". ";
+                            else if (i == 2) title = "[리플] " + itemNum++ + ". ";
+                            title += nodeSeg.getTextExtractor().toString();
+                            isAddTitle = false;
+                        }
+                        
+                    }
+                }
+            }
 
-        	if (DEBUG) Log.i(TAG, "parseMLBParkTodayBest - done!");
-        	return PARSING_RESULT.SUCCESS_MOBILE_TODAY_BEST;
-        	
+            if (DEBUG) Log.i(TAG, "parseMLBParkTodayBest - done!");
+            return PARSING_RESULT.SUCCESS_MOBILE_TODAY_BEST;
+            
         } else {
-        	if (DEBUG) Log.e(TAG, "parseMLBParkTodayBest - Cannot find today best element.");
+            if (DEBUG) Log.e(TAG, "parseMLBParkTodayBest - Cannot find today best element.");
             return PARSING_RESULT.FAILED_UNKNOWN;
         }
-	}
+    }
 
     private PARSING_RESULT parseMLBParkMobileBoard(String urlAddress) throws IOException, JSONException, StackOverflowError {
         // Initialize widget item array list here.
@@ -354,10 +355,10 @@ public class ListViewFactory implements RemoteViewsService.RemoteViewsFactory {
                         continue;
                         
                     } else if (nodeSeg instanceof EndTag) {
-                    	String tagName = ((Tag)nodeSeg).getName();
-                    	if (tagName.equals("strong")) {
+                        String tagName = ((Tag)nodeSeg).getName();
+                        if (tagName.equals("strong")) {
                             isAddTitle = false;
-                    	}
+                        }
                         continue;
                         
                     // Ignore &bnsp;
@@ -388,7 +389,7 @@ public class ListViewFactory implements RemoteViewsService.RemoteViewsFactory {
             if (DEBUG) Log.i(TAG, "parseMLBParkMobileBoard - done!");
             return PARSING_RESULT.SUCCESS_MOBILE_BOARD;
         } else {
-        	if (DEBUG) Log.e(TAG, "parseMLBParkMobileBoard - Cannot find article list.");
+            if (DEBUG) Log.e(TAG, "parseMLBParkMobileBoard - Cannot find article list.");
             return PARSING_RESULT.FAILED_UNKNOWN;
         }
     }
@@ -444,7 +445,7 @@ public class ListViewFactory implements RemoteViewsService.RemoteViewsFactory {
                 addedItemCount++;
                 
                 if (addedItemCount == Constants.LISTVIEW_MAX_ITEM_COUNT) {
-                	if (DEBUG) Log.i(TAG, "parseMLBParkFullBoard - done!");
+                    if (DEBUG) Log.i(TAG, "parseMLBParkFullBoard - done!");
                     return PARSING_RESULT.SUCCESS_FULL_BOARD;
                 }
             }
@@ -454,39 +455,39 @@ public class ListViewFactory implements RemoteViewsService.RemoteViewsFactory {
     }
 
     private void setupIntentListener() {
-	    if (mIntentListener == null) {
-	        mIntentListener = new BroadcastReceiver() {
-	            @Override
-	            public void onReceive(Context context, Intent intent) {
-	                // Update itent items through Broadcast Intent.
-	                mAppWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
-	                mBoardType = intent.getIntExtra(Constants.EXTRA_BOARD_TYPE, Constants.DEFAULT_BOARD_TYPE);
-	                mPageNum = intent.getIntExtra(Constants.EXTRA_PAGE_NUM, Constants.DEFAULT_PAGE_NUM);
-	                
-	                // Update search variables through Broadcast Intent.
-	                mSelectedSearchCategoryType = intent.getIntExtra(
-	                		Constants.EXTRA_SEARCH_CATEGORY_TYPE, Constants.ERROR_SEARCH_CAGETORY_TYPE);
-	                mSelectedSearchSubjectType = intent.getIntExtra(
-	                		Constants.EXTRA_SEARCH_SUBJECT_TYPE, Constants.ERROR_SEARCH_SUBJECT_TYPE);
-	                mSelectedSearchKeyword = intent.getStringExtra(Constants.EXTRA_SEARCH_KEYWORD);
-	                
-	                if (DEBUG) Log.i(TAG, "onReceive - update mAppWidgetId[" + mAppWidgetId + 
-	                		"], mPageNum[" + mPageNum + "], mBoardType[" + mBoardType +
-	                		"], mSelectedSearchCategoryType[" + mSelectedSearchCategoryType +
-	                		"], mSelectedSearchSubjectType[" + mSelectedSearchSubjectType +
-	                		"], mSelectedSearchKeyword[" + mSelectedSearchKeyword + "]");
-	            }
-	        };
-	        IntentFilter filter = new IntentFilter();
-	        filter.addAction(Constants.ACTION_UPDATE_LIST_INFO);
-	        mContext.registerReceiver(mIntentListener, filter);
-	    }
-	}
+        if (mIntentListener == null) {
+            mIntentListener = new BroadcastReceiver() {
+                @Override
+                public void onReceive(Context context, Intent intent) {
+                    // Update itent items through Broadcast Intent.
+                    mAppWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
+                    mBoardType = intent.getIntExtra(Constants.EXTRA_BOARD_TYPE, Constants.DEFAULT_BOARD_TYPE);
+                    mPageNum = intent.getIntExtra(Constants.EXTRA_PAGE_NUM, Constants.DEFAULT_PAGE_NUM);
+                    
+                    // Update search variables through Broadcast Intent.
+                    mSelectedSearchCategoryType = intent.getIntExtra(
+                            Constants.EXTRA_SEARCH_CATEGORY_TYPE, Constants.ERROR_SEARCH_CAGETORY_TYPE);
+                    mSelectedSearchSubjectType = intent.getIntExtra(
+                            Constants.EXTRA_SEARCH_SUBJECT_TYPE, Constants.ERROR_SEARCH_SUBJECT_TYPE);
+                    mSelectedSearchKeyword = intent.getStringExtra(Constants.EXTRA_SEARCH_KEYWORD);
+                    
+                    if (DEBUG) Log.i(TAG, "onReceive - update mAppWidgetId[" + mAppWidgetId + 
+                            "], mPageNum[" + mPageNum + "], mBoardType[" + mBoardType +
+                            "], mSelectedSearchCategoryType[" + mSelectedSearchCategoryType +
+                            "], mSelectedSearchSubjectType[" + mSelectedSearchSubjectType +
+                            "], mSelectedSearchKeyword[" + mSelectedSearchKeyword + "]");
+                }
+            };
+            IntentFilter filter = new IntentFilter();
+            filter.addAction(Constants.ACTION_UPDATE_LIST_INFO);
+            mContext.registerReceiver(mIntentListener, filter);
+        }
+    }
 
-	private void teardownIntentListener() {
-	    if (mIntentListener != null) {
-	        mContext.unregisterReceiver(mIntentListener);
-	        mIntentListener = null;
-	    }
-	}
+    private void teardownIntentListener() {
+        if (mIntentListener != null) {
+            mContext.unregisterReceiver(mIntentListener);
+            mIntentListener = null;
+        }
+    }
 }

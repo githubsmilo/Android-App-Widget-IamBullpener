@@ -126,8 +126,8 @@ public class WidgetProvider extends AppWidgetProvider {
 
                 // After setting configuration activity, this intent will be called.
                 if (action.equals(Constants.ACTION_INIT_LIST)) {
-                	removePreviousAlarm();
-                	
+                    removePreviousAlarm();
+                    
                     // Save configuration info.
                     SharedPreferences pref = context.getSharedPreferences(mSharedPreferenceName, Context.MODE_PRIVATE);
                     SharedPreferences.Editor editor = pref.edit();
@@ -161,8 +161,8 @@ public class WidgetProvider extends AppWidgetProvider {
                     }
 
                 } else if (action.equals(Constants.ACTION_REFRESH_LIST)){    
-                	removePreviousAlarm();
-                	
+                    removePreviousAlarm();
+                    
                     // Send broadcast intent to update some variables on the ListViewFactory.
                     context.sendBroadcast(buildUpdateListInfoIntent(item));
                     
@@ -188,17 +188,17 @@ public class WidgetProvider extends AppWidgetProvider {
                 
                 // After setting search activity, this intent will be called.
                 } else if (action.equals(Constants.ACTION_SEARCH)) {
-                	removePreviousAlarm();
-                	
-                	int selectedSearchCategoryType = intent.getIntExtra(
-                			Constants.EXTRA_SEARCH_CATEGORY_TYPE, Constants.DEFAULT_SEARCH_CATEGORY_TYPE);
-                	int selectedSearchSubjectType = intent.getIntExtra(
-                			Constants.EXTRA_SEARCH_SUBJECT_TYPE, Constants.DEFAULT_SEARCH_SUBJECT_TYPE);
-                	String selectedSearchKeyword = intent.getStringExtra(Constants.EXTRA_SEARCH_KEYWORD);
-                	
-                	// Send broadcast intent to update some variables on the ListViewFactory.
+                    removePreviousAlarm();
+                    
+                    int selectedSearchCategoryType = intent.getIntExtra(
+                            Constants.EXTRA_SEARCH_CATEGORY_TYPE, Constants.DEFAULT_SEARCH_CATEGORY_TYPE);
+                    int selectedSearchSubjectType = intent.getIntExtra(
+                            Constants.EXTRA_SEARCH_SUBJECT_TYPE, Constants.DEFAULT_SEARCH_SUBJECT_TYPE);
+                    String selectedSearchKeyword = intent.getStringExtra(Constants.EXTRA_SEARCH_KEYWORD);
+                    
+                    // Send broadcast intent to update some variables on the ListViewFactory.
                     context.sendBroadcast(buildUpdateListInfoIntentForSearchMode(
-                    		item, selectedSearchCategoryType, selectedSearchSubjectType, selectedSearchKeyword));
+                            item, selectedSearchCategoryType, selectedSearchSubjectType, selectedSearchKeyword));
                     
                     // Broadcast ACTION_SHOW_LIST intent.
                     context.sendBroadcast(buildShowListIntent(context, item));
@@ -287,17 +287,17 @@ public class WidgetProvider extends AppWidgetProvider {
 
          // Set search button of the remoteViews.
         pi = PendingIntent.getActivity(context, PENDING_INTENT_REQUEST_CODE.REQUEST_SEARCH.ordinal(), 
-        		buildSearchActivityIntent(context, item), PendingIntent.FLAG_UPDATE_CURRENT);
+                buildSearchActivityIntent(context, item), PendingIntent.FLAG_UPDATE_CURRENT);
         rv.setOnClickPendingIntent(R.id.btnListSearch, pi);
         
         // Set refresh button of the remoteViews.
         pi = PendingIntent.getBroadcast(context, PENDING_INTENT_REQUEST_CODE.REQUEST_REFRESH.ordinal(),
-        		buildRefreshListIntent(context, item), PendingIntent.FLAG_UPDATE_CURRENT);
+                buildRefreshListIntent(context, item), PendingIntent.FLAG_UPDATE_CURRENT);
         rv.setOnClickPendingIntent(R.id.btnListRefresh, pi);
         
         // Set setting button of the remoteViews.
         pi = PendingIntent.getActivity(context, PENDING_INTENT_REQUEST_CODE.REQUEST_SETTING.ordinal(),
-        		buildConfigurationActivityIntent(context, item), PendingIntent.FLAG_UPDATE_CURRENT);
+                buildConfigurationActivityIntent(context, item), PendingIntent.FLAG_UPDATE_CURRENT);
         rv.setOnClickPendingIntent(R.id.btnListSetting, pi);
         
         // Set a pending intent for click event to the remoteViews.
@@ -420,13 +420,13 @@ public class WidgetProvider extends AppWidgetProvider {
     }
     
     private Intent buildUpdateListInfoIntentForSearchMode(intentItem item,
-    		int selectedSearchCategoryType, int selectedSearchSubjectType, String selectedSearchKeyword) {
+            int selectedSearchCategoryType, int selectedSearchSubjectType, String selectedSearchKeyword) {
         Intent intent = buildBaseIntent(item);
         intent.setAction(Constants.ACTION_UPDATE_LIST_INFO);
         intent.putExtra(Constants.EXTRA_SEARCH_CATEGORY_TYPE, selectedSearchCategoryType);
         intent.putExtra(Constants.EXTRA_SEARCH_SUBJECT_TYPE, selectedSearchSubjectType);
         if (selectedSearchKeyword != null && selectedSearchKeyword.length() > 0)
-        	intent.putExtra(Constants.EXTRA_SEARCH_KEYWORD, selectedSearchKeyword);
+            intent.putExtra(Constants.EXTRA_SEARCH_KEYWORD, selectedSearchKeyword);
         
         return intent;
     }

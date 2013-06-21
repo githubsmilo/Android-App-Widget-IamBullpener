@@ -17,7 +17,7 @@ import android.widget.Toast;
 
 public class SearchActivity extends Activity {
 
-	private static final String TAG = "SearchActivity";
+    private static final String TAG = "SearchActivity";
     private static final boolean DEBUG = Constants.DEBUG_MODE;
     
     // intent item list
@@ -33,69 +33,69 @@ public class SearchActivity extends Activity {
     private LinearLayout mLayoutSearchWord;
     private LinearLayout mLayoutSearchSubject;
     
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		
-		// Set the result to CANCELED.  This will cause the widget host to cancel
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        
+        // Set the result to CANCELED.  This will cause the widget host to cancel
         // out of the widget placement if they press the back button.
         setResult(RESULT_CANCELED);
         
-		setContentView(R.layout.activity_search);
-		
-		Intent intent = getIntent();
-		mAppWidgetId = intent.getIntExtra(
-				AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
-		mPageNum = intent.getIntExtra(
-				Constants.EXTRA_PAGE_NUM, Constants.ERROR_PAGE_NUM);
-		mBoardType = intent.getIntExtra(
-				Constants.EXTRA_BOARD_TYPE, Constants.ERROR_BOARD_TYPE);
-		mRefreshTimetype = intent.getIntExtra(
-				Constants.EXTRA_REFRESH_TIME_TYPE, Constants.ERROR_REFRESH_TIME_TYPE);
-		mIsPermitMobileConnectionType = intent.getBooleanExtra(
-				Constants.EXTRA_PERMIT_MOBILE_CONNECTION_TYPE, Constants.ERROR_PERMIT_MOBILE_CONNECTION_TYPE);
-		if (mAppWidgetId == AppWidgetManager.INVALID_APPWIDGET_ID) {
+        setContentView(R.layout.activity_search);
+        
+        Intent intent = getIntent();
+        mAppWidgetId = intent.getIntExtra(
+                AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
+        mPageNum = intent.getIntExtra(
+                Constants.EXTRA_PAGE_NUM, Constants.ERROR_PAGE_NUM);
+        mBoardType = intent.getIntExtra(
+                Constants.EXTRA_BOARD_TYPE, Constants.ERROR_BOARD_TYPE);
+        mRefreshTimetype = intent.getIntExtra(
+                Constants.EXTRA_REFRESH_TIME_TYPE, Constants.ERROR_REFRESH_TIME_TYPE);
+        mIsPermitMobileConnectionType = intent.getBooleanExtra(
+                Constants.EXTRA_PERMIT_MOBILE_CONNECTION_TYPE, Constants.ERROR_PERMIT_MOBILE_CONNECTION_TYPE);
+        if (mAppWidgetId == AppWidgetManager.INVALID_APPWIDGET_ID) {
             finish();
         }
 
-		mLayoutSearchWord = (LinearLayout)findViewById(R.id.layoutSearchKeyword);
-		mLayoutSearchSubject = (LinearLayout)findViewById(R.id.layoutSearchSubject);
-		
-		toggleSearchTarget(true);
-		initializeSpinners();
-		initializeButtons();
-	}
+        mLayoutSearchWord = (LinearLayout)findViewById(R.id.layoutSearchKeyword);
+        mLayoutSearchSubject = (LinearLayout)findViewById(R.id.layoutSearchSubject);
+        
+        toggleSearchTarget(true);
+        initializeSpinners();
+        initializeButtons();
+    }
 
-	private void toggleSearchTarget(boolean isShowSearchWord) {
-		if (isShowSearchWord) {
-			mLayoutSearchWord.setVisibility(View.VISIBLE);
-			mLayoutSearchSubject.setVisibility(View.GONE);
-		} else {
-			mLayoutSearchWord.setVisibility(View.GONE);
-			mLayoutSearchSubject.setVisibility(View.VISIBLE);
-		}
-	}
-	
-	private void initializeSpinners() {
-		Spinner spinSearchCategory = (Spinner)findViewById(R.id.spinSearchCategory);
-		ArrayAdapter<CharSequence> adapterSearchCategory = ArrayAdapter.createFromResource(this, R.array.searchCategory, android.R.layout.simple_spinner_item);
-		adapterSearchCategory.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+    private void toggleSearchTarget(boolean isShowSearchWord) {
+        if (isShowSearchWord) {
+            mLayoutSearchWord.setVisibility(View.VISIBLE);
+            mLayoutSearchSubject.setVisibility(View.GONE);
+        } else {
+            mLayoutSearchWord.setVisibility(View.GONE);
+            mLayoutSearchSubject.setVisibility(View.VISIBLE);
+        }
+    }
+    
+    private void initializeSpinners() {
+        Spinner spinSearchCategory = (Spinner)findViewById(R.id.spinSearchCategory);
+        ArrayAdapter<CharSequence> adapterSearchCategory = ArrayAdapter.createFromResource(this, R.array.searchCategory, android.R.layout.simple_spinner_item);
+        adapterSearchCategory.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinSearchCategory.setAdapter(adapterSearchCategory);
         spinSearchCategory.setOnItemSelectedListener(mSpinSearchCategorySelectedListener);
         spinSearchCategory.setSelection(Constants.SEARCH_CATEGORY_TYPE_TITLE);
         
         Spinner spinSearchSubject = (Spinner)findViewById(R.id.spinSearchSubject);
-		ArrayAdapter<CharSequence> adapterSearchSubject = ArrayAdapter.createFromResource(this, R.array.searchSubject, android.R.layout.simple_spinner_item);
-		adapterSearchSubject.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		spinSearchSubject.setAdapter(adapterSearchSubject);
-		spinSearchSubject.setOnItemSelectedListener(mSpinSearchSubjectSelectedListener);
-		spinSearchSubject.setSelection(Constants.SEARCH_SUBJECT_TYPE_1);
-	}
+        ArrayAdapter<CharSequence> adapterSearchSubject = ArrayAdapter.createFromResource(this, R.array.searchSubject, android.R.layout.simple_spinner_item);
+        adapterSearchSubject.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinSearchSubject.setAdapter(adapterSearchSubject);
+        spinSearchSubject.setOnItemSelectedListener(mSpinSearchSubjectSelectedListener);
+        spinSearchSubject.setSelection(Constants.SEARCH_SUBJECT_TYPE_1);
+    }
 
-	private void initializeButtons() {
-		findViewById(R.id.btnSearchOk).setOnClickListener(mBtnOkOnClickListener);
-		findViewById(R.id.btnSearchCancel).setOnClickListener(mBtnCancelOnClickListener);
-	}
+    private void initializeButtons() {
+        findViewById(R.id.btnSearchOk).setOnClickListener(mBtnOkOnClickListener);
+        findViewById(R.id.btnSearchCancel).setOnClickListener(mBtnCancelOnClickListener);
+    }
 
     View.OnClickListener mBtnOkOnClickListener = new View.OnClickListener() {
         public void onClick(View v) {
@@ -138,19 +138,19 @@ public class SearchActivity extends Activity {
     
     View.OnClickListener mBtnCancelOnClickListener = new View.OnClickListener() {
         public void onClick(View v) {
-        	if (DEBUG) Log.i(TAG, "Button Cancel clicked");
+            if (DEBUG) Log.i(TAG, "Button Cancel clicked");
             finish();
         }
     };
     
     Spinner.OnItemSelectedListener mSpinSearchCategorySelectedListener = new AdapterView.OnItemSelectedListener() {
         public void onItemSelected(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
-        	mSelectedSearchCategoryType = arg2;
-        	
-        	if (mSelectedSearchCategoryType == Constants.SEARCH_CATEGORY_TYPE_SUBJECT)
-        		toggleSearchTarget(false);
-        	else
-        		toggleSearchTarget(true);
+            mSelectedSearchCategoryType = arg2;
+            
+            if (mSelectedSearchCategoryType == Constants.SEARCH_CATEGORY_TYPE_SUBJECT)
+                toggleSearchTarget(false);
+            else
+                toggleSearchTarget(true);
         }
 
         public void onNothingSelected(AdapterView<?> arg0) {
@@ -158,9 +158,9 @@ public class SearchActivity extends Activity {
         }
     };
     
-	Spinner.OnItemSelectedListener mSpinSearchSubjectSelectedListener = new AdapterView.OnItemSelectedListener() {
+    Spinner.OnItemSelectedListener mSpinSearchSubjectSelectedListener = new AdapterView.OnItemSelectedListener() {
         public void onItemSelected(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
-        	mSelectedSearchSubjectType = arg2;
+            mSelectedSearchSubjectType = arg2;
         }
 
         public void onNothingSelected(AdapterView<?> arg0) {
@@ -168,10 +168,10 @@ public class SearchActivity extends Activity {
         }
     };
     
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.search, menu);
-		return true;
-	}
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.search, menu);
+        return true;
+    }
 }

@@ -70,7 +70,7 @@ public class ContentsFactory implements RemoteViewsService.RemoteViewsFactory {
         mSelectedItemUrl = intent.getStringExtra(Constants.EXTRA_ITEM_URL);
         
         if (DEBUG) Log.i(TAG, "constructor - mAppWidgetId[" + mAppWidgetId +
-        		"], mPageNum[" + mPageNum + "], mSelectedItemUrl[" + mSelectedItemUrl + "]");
+                "], mPageNum[" + mPageNum + "], mSelectedItemUrl[" + mSelectedItemUrl + "]");
         
         setupIntentListener();
     }
@@ -124,7 +124,7 @@ public class ContentsFactory implements RemoteViewsService.RemoteViewsFactory {
                         }
                         String bodyImage = obj.optString(JSON_BODY_IMAGE);
                         if (bodyImage != null && bodyImage.length() > 0) {
-                        	if (DEBUG) Log.i(TAG, "getViewAt - image[" + bodyImage + "]");
+                            if (DEBUG) Log.i(TAG, "getViewAt - image[" + bodyImage + "]");
                             // TODO : manage bitmap
                             RemoteViews rvBodyImage = new RemoteViews(mContext.getPackageName(), R.layout.content_row_image);
                             Bitmap bitmap = null;
@@ -136,15 +136,15 @@ public class ContentsFactory implements RemoteViewsService.RemoteViewsFactory {
                                     rvBodyImage.setImageViewBitmap(R.id.contentRowImage, bitmap);
                                 }
                             } catch (IOException e) {
-                            	if (DEBUG) Log.e(TAG, "getViewAt - getImageBitmap - IOException![" + e.toString() + "]");
+                                if (DEBUG) Log.e(TAG, "getViewAt - getImageBitmap - IOException![" + e.toString() + "]");
                                 e.printStackTrace();
                                 rvBodyImage.setImageViewBitmap(R.id.contentRowImage, null);
                             } catch (RuntimeException e) {
-                            	if (DEBUG) Log.e(TAG, "getViewAt - getImageBitmap - RuntimeException![" + e.toString() + "]");
+                                if (DEBUG) Log.e(TAG, "getViewAt - getImageBitmap - RuntimeException![" + e.toString() + "]");
                                 e.printStackTrace();
                                 rvBodyImage.setImageViewBitmap(R.id.contentRowImage, null);
                             } catch (OutOfMemoryError e) {
-                            	if (DEBUG) Log.e(TAG, "getViewAt - getImageBitmap - OutOfMemoryError![" + e.toString() + "]");
+                                if (DEBUG) Log.e(TAG, "getViewAt - getImageBitmap - OutOfMemoryError![" + e.toString() + "]");
                                 e.printStackTrace();
                                 rvBodyImage.setImageViewBitmap(R.id.contentRowImage, null);
                             }
@@ -209,10 +209,10 @@ public class ContentsFactory implements RemoteViewsService.RemoteViewsFactory {
     
     @Override
     public void onDataSetChanged() {
-    	if (DEBUG) Log.i(TAG, "onDataSetChanged - mSelectedItemUrl[" + mSelectedItemUrl + "]");
+        if (DEBUG) Log.i(TAG, "onDataSetChanged - mSelectedItemUrl[" + mSelectedItemUrl + "]");
 
         if (mSelectedItemUrl == null) {
-        	if (DEBUG) Log.e(TAG, "onDataSetChanged - mSelectedItemUrl is null!");
+            if (DEBUG) Log.e(TAG, "onDataSetChanged - mSelectedItemUrl is null!");
             return;
         }
         
@@ -220,15 +220,15 @@ public class ContentsFactory implements RemoteViewsService.RemoteViewsFactory {
         try {
             mParsingResult = parseMLBParkHtmlDataMobileVer(mSelectedItemUrl);
         } catch (IOException e) {
-        	if (DEBUG) Log.e(TAG, "onDataSetChanged - parseMLBParkHtmlDataMobileVer - IOException![" + e.toString() + "]");
+            if (DEBUG) Log.e(TAG, "onDataSetChanged - parseMLBParkHtmlDataMobileVer - IOException![" + e.toString() + "]");
             e.printStackTrace();
             mParsingResult = PARSING_RESULT.FAILED_IO_EXCEPTION;
         } catch (JSONException e) {
-        	if (DEBUG) Log.e(TAG, "onDataSetChanged - parseMLBParkHtmlDataMobileVer - JSONException![" + e.toString() + "]");
+            if (DEBUG) Log.e(TAG, "onDataSetChanged - parseMLBParkHtmlDataMobileVer - JSONException![" + e.toString() + "]");
             e.printStackTrace();
             mParsingResult = PARSING_RESULT.FAILED_JSON_EXCEPTION;
         } catch (StackOverflowError e) {
-        	if (DEBUG) Log.e(TAG, "onDataSetChanged - parseMLBParkHtmlDataMobileVer - StackOverflowError![" + e.toString() + "]");
+            if (DEBUG) Log.e(TAG, "onDataSetChanged - parseMLBParkHtmlDataMobileVer - StackOverflowError![" + e.toString() + "]");
             e.printStackTrace();
             mParsingResult = PARSING_RESULT.FAILED_STACK_OVERFLOW;
         }
@@ -454,7 +454,7 @@ public class ContentsFactory implements RemoteViewsService.RemoteViewsFactory {
         is.close();
 
         if (bitmap == null) {
-        	if (DEBUG) Log.e(TAG, "getImageBitmap - bitmap is null!");
+            if (DEBUG) Log.e(TAG, "getImageBitmap - bitmap is null!");
             return null;
         } else {
             Bitmap resizeBitmap = null;
@@ -470,7 +470,7 @@ public class ContentsFactory implements RemoteViewsService.RemoteViewsFactory {
                 }
                 
                 if (resizeBitmap == null) {
-                	if (DEBUG) Log.e(TAG, "getImageBitmap - resizeBitmap is null!");
+                    if (DEBUG) Log.e(TAG, "getImageBitmap - resizeBitmap is null!");
                     return null;
                 } else {
                     bitmap.recycle();
@@ -478,7 +478,7 @@ public class ContentsFactory implements RemoteViewsService.RemoteViewsFactory {
                     return resizeBitmap;
                 }
             } else {
-            	if (DEBUG) Log.i(TAG, "getImageBitmap - bitmap[" + bitmapWidth + "," + bitmapHeight + "] is ok!");
+                if (DEBUG) Log.i(TAG, "getImageBitmap - bitmap[" + bitmapWidth + "," + bitmapHeight + "] is ok!");
                 return bitmap;
             }
         }
@@ -495,7 +495,7 @@ public class ContentsFactory implements RemoteViewsService.RemoteViewsFactory {
                     mSelectedItemUrl = intent.getStringExtra(Constants.EXTRA_ITEM_URL);
 
                     if (DEBUG) Log.i(TAG, "onReceive - update mAppWidgetId[" + mAppWidgetId +
-                    		"], mPageNum[" + mPageNum + "], mSelectedItemUrl[" + mSelectedItemUrl + "]");
+                            "], mPageNum[" + mPageNum + "], mSelectedItemUrl[" + mSelectedItemUrl + "]");
                 }
             };
             IntentFilter filter = new IntentFilter();

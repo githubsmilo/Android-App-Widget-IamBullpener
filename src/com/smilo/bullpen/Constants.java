@@ -44,7 +44,7 @@ public final class Constants {
     public static final boolean ERROR_PERMIT_MOBILE_CONNECTION_TYPE = false;
     
     public enum PARSING_RESULT {
-    	SUCCESS_FULL_BOARD,
+        SUCCESS_FULL_BOARD,
         SUCCESS_MOBILE_BOARD,
         SUCCESS_MOBILE_TODAY_BEST,
         FAILED_IO_EXCEPTION,

@@ -109,8 +109,8 @@ public class ConfigurationActivity extends Activity {
             boolean selectedPermitMobileConnectionType = cb.isChecked();
             
             if (DEBUG) Log.i(TAG, "mSelectedBoardType[" + mSelectedBoardType +
-            		"], mSelectedRefreshTimeType[" + mSelectedRefreshTimeType + 
-            		"], selectedPermitMobileConnectionType[" + selectedPermitMobileConnectionType + "]");
+                    "], mSelectedRefreshTimeType[" + mSelectedRefreshTimeType + 
+                    "], selectedPermitMobileConnectionType[" + selectedPermitMobileConnectionType + "]");
             
             final Context context = ConfigurationActivity.this;
             Intent initIntent = new Intent(context, WidgetProvider.class);
@@ -132,7 +132,7 @@ public class ConfigurationActivity extends Activity {
     
     View.OnClickListener mBtnCancelOnClickListener = new View.OnClickListener() {
         public void onClick(View v) {
-        	if (DEBUG) Log.i(TAG, "Button Cancel clicked");
+            if (DEBUG) Log.i(TAG, "Button Cancel clicked");
             final Context context = ConfigurationActivity.this;
 
             if (mIsExecutedBySettingButton == false) {
