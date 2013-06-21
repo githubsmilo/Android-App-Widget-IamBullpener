@@ -10,8 +10,6 @@
         android:layout_height="wrap_content"
         android:background="@color/dark_green"
         android:paddingLeft="10dp"
-        android:paddingTop="3dp"
-        android:paddingBottom="3dp"
         android:orientation="horizontal" >
         
         <TextView
@@ -21,6 +19,15 @@
             android:layout_centerVertical="true"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:text="@string/remoteViewTitle_Default" />
+        
+        <ImageButton
+            android:id="@+id/btnListExport"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:background="@drawable/export_button_selector"
+            android:contentDescription="@string/btn_export" />
     </RelativeLayout>
         
     <ListView

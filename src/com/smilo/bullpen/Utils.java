@@ -48,6 +48,20 @@ public final class Utils {
         return false;
     }
     
+    public static String getMobileBoardUrl(Context context, int pageNum, int boardType,
+            int searchCategoryType, int searchSubjectType, String searchKeyword) throws UnsupportedEncodingException {
+        String result = null;
+        if ((searchCategoryType == Constants.ERROR_SEARCH_CAGETORY_TYPE) ||
+              ((searchCategoryType != Constants.SEARCH_CATEGORY_TYPE_SUBJECT) &&
+                (searchKeyword == null || searchKeyword.equals("")))) {
+            result = getBoardUrl(boardType) + pageNum;
+        } else {
+            result = getBoardUrl(boardType) + pageNum + getSearchUrl(context, searchCategoryType, searchSubjectType, searchKeyword);
+        }
+
+        return result;
+    }
+
     public static boolean isTodayBestBoardType(int boardType) {
         if ((boardType == Constants.BOARD_TYPE_MLB_TOWN_TODAY_BEST) ||
             (boardType == Constants.BOARD_TYPE_KBO_TOWN_TODAY_BEST) ||
@@ -100,59 +114,6 @@ public final class Utils {
                 return res.getString(R.string.remoteViewTitle_News);
             default:
                 return res.getString(R.string.remoteViewTitle_MlbTown);
-        }
-    }
-    
-    public static String getBoardUrl(int boardType) {
-        switch (boardType) {
-            case Constants.BOARD_TYPE_MLB_TOWN :
-                return Constants.URL_MLB_TOWN;
-            case Constants.BOARD_TYPE_KBO_TOWN :
-                return Constants.URL_KBO_TOWN;
-            case Constants.BOARD_TYPE_BULLPEN :
-                return Constants.URL_BULLPEN;
-            case Constants.BOARD_TYPE_MLB_TOWN_TODAY_BEST :
-                return Constants.URL_MLB_TOWN_TODAY_BEST;
-            case Constants.BOARD_TYPE_KBO_TOWN_TODAY_BEST :
-                return Constants.URL_KBO_TOWN_TODAY_BEST;
-            case Constants.BOARD_TYPE_BULLPEN_TODAY_BEST :
-                return Constants.URL_BULLPEN_TODAY_BEST;
-            case Constants.BOARD_TYPE_BULLPEN_1000 :
-                return Constants.URL_BULLPEN_1000;
-            case Constants.BOARD_TYPE_BULLPEN_2000 :
-                return Constants.URL_BULLPEN_2000;
-            case Constants.BOARD_TYPE_NEWS :
-                return Constants.URL_NEWS;
-            default:
-                return Constants.URL_MLB_TOWN;
-        }
-    }
-    
-    public static String getSearchUrl(Context context, 
-            int searchCategoryType, int searchSubjectType, String searchKeyword) throws UnsupportedEncodingException {
-        Resources res = context.getResources();
-        switch (searchCategoryType) {
-            case Constants.SEARCH_CATEGORY_TYPE_TITLE:
-                return (Constants.URL_PARAMETER_SEARCH_CATEGORY + res.getString(R.string.text_category_parameter_title) +
-                        Constants.URL_PARAMETER_SEARCH_KEYWORD + URLEncoder.encode(searchKeyword,"EUC_KR"));
-            case Constants.SEARCH_CATEGORY_TYPE_TITLE_CONTENTS:
-                return (Constants.URL_PARAMETER_SEARCH_CATEGORY + res.getString(R.string.text_category_parameter_title_contents) +
-                        Constants.URL_PARAMETER_SEARCH_KEYWORD + URLEncoder.encode(searchKeyword,"EUC_KR"));
-            case Constants.SEARCH_CATEGORY_TYPE_ID:
-                return (Constants.URL_PARAMETER_SEARCH_CATEGORY + res.getString(R.string.text_category_parameter_id) +
-                        Constants.URL_PARAMETER_SEARCH_KEYWORD + URLEncoder.encode(searchKeyword,"EUC_KR"));
-            case Constants.SEARCH_CATEGORY_TYPE_WRITER:
-                return (Constants.URL_PARAMETER_SEARCH_CATEGORY + res.getString(R.string.text_category_parameter_writer) +
-                        Constants.URL_PARAMETER_SEARCH_KEYWORD + URLEncoder.encode(searchKeyword,"EUC_KR"));
-            case Constants.SEARCH_CATEGORY_TYPE_SUBJECT:
-                return (Constants.URL_PARAMETER_SEARCH_CATEGORY + res.getString(R.string.text_category_parameter_subject) +
-                        Constants.URL_PARAMETER_SEARCH_KEYWORD + getSubjectUrl(context, searchSubjectType));
-            case Constants.SEARCH_CATEGORY_TYPE_HITS:
-                return (Constants.URL_PARAMETER_SEARCH_CATEGORY + res.getString(R.string.text_category_parameter_hits) +
-                        Constants.URL_PARAMETER_SEARCH_KEYWORD + URLEncoder.encode(searchKeyword,"EUC_KR"));
-            default:
-                return (Constants.URL_PARAMETER_SEARCH_CATEGORY + res.getString(R.string.text_category_parameter_title) +
-                        Constants.URL_PARAMETER_SEARCH_KEYWORD + URLEncoder.encode(searchKeyword,"EUC_KR"));
         }
     }
     
@@ -213,6 +174,60 @@ public final class Utils {
                 return res.getString(R.string.text_subject_1);
         }
     }
+    
+    public static String getBoardUrl(int boardType) {
+        switch (boardType) {
+            case Constants.BOARD_TYPE_MLB_TOWN :
+                return Constants.URL_MLB_TOWN;
+            case Constants.BOARD_TYPE_KBO_TOWN :
+                return Constants.URL_KBO_TOWN;
+            case Constants.BOARD_TYPE_BULLPEN :
+                return Constants.URL_BULLPEN;
+            case Constants.BOARD_TYPE_MLB_TOWN_TODAY_BEST :
+                return Constants.URL_MLB_TOWN_TODAY_BEST;
+            case Constants.BOARD_TYPE_KBO_TOWN_TODAY_BEST :
+                return Constants.URL_KBO_TOWN_TODAY_BEST;
+            case Constants.BOARD_TYPE_BULLPEN_TODAY_BEST :
+                return Constants.URL_BULLPEN_TODAY_BEST;
+            case Constants.BOARD_TYPE_BULLPEN_1000 :
+                return Constants.URL_BULLPEN_1000;
+            case Constants.BOARD_TYPE_BULLPEN_2000 :
+                return Constants.URL_BULLPEN_2000;
+            case Constants.BOARD_TYPE_NEWS :
+                return Constants.URL_NEWS;
+            default:
+                return Constants.URL_MLB_TOWN;
+        }
+    }
+    
+    private static String getSearchUrl(Context context, 
+            int searchCategoryType, int searchSubjectType, String searchKeyword) throws UnsupportedEncodingException {
+        Resources res = context.getResources();
+        switch (searchCategoryType) {
+            case Constants.SEARCH_CATEGORY_TYPE_TITLE:
+                return (Constants.URL_PARAMETER_SEARCH_CATEGORY + res.getString(R.string.text_category_parameter_title) +
+                        Constants.URL_PARAMETER_SEARCH_KEYWORD + URLEncoder.encode(searchKeyword,"EUC_KR"));
+            case Constants.SEARCH_CATEGORY_TYPE_TITLE_CONTENTS:
+                return (Constants.URL_PARAMETER_SEARCH_CATEGORY + res.getString(R.string.text_category_parameter_title_contents) +
+                        Constants.URL_PARAMETER_SEARCH_KEYWORD + URLEncoder.encode(searchKeyword,"EUC_KR"));
+            case Constants.SEARCH_CATEGORY_TYPE_ID:
+                return (Constants.URL_PARAMETER_SEARCH_CATEGORY + res.getString(R.string.text_category_parameter_id) +
+                        Constants.URL_PARAMETER_SEARCH_KEYWORD + URLEncoder.encode(searchKeyword,"EUC_KR"));
+            case Constants.SEARCH_CATEGORY_TYPE_WRITER:
+                return (Constants.URL_PARAMETER_SEARCH_CATEGORY + res.getString(R.string.text_category_parameter_writer) +
+                        Constants.URL_PARAMETER_SEARCH_KEYWORD + URLEncoder.encode(searchKeyword,"EUC_KR"));
+            case Constants.SEARCH_CATEGORY_TYPE_SUBJECT:
+                return (Constants.URL_PARAMETER_SEARCH_CATEGORY + res.getString(R.string.text_category_parameter_subject) +
+                        Constants.URL_PARAMETER_SEARCH_KEYWORD + getSubjectUrl(context, searchSubjectType));
+            case Constants.SEARCH_CATEGORY_TYPE_HITS:
+                return (Constants.URL_PARAMETER_SEARCH_CATEGORY + res.getString(R.string.text_category_parameter_hits) +
+                        Constants.URL_PARAMETER_SEARCH_KEYWORD + URLEncoder.encode(searchKeyword,"EUC_KR"));
+            default:
+                return (Constants.URL_PARAMETER_SEARCH_CATEGORY + res.getString(R.string.text_category_parameter_title) +
+                        Constants.URL_PARAMETER_SEARCH_KEYWORD + URLEncoder.encode(searchKeyword,"EUC_KR"));
+        }
+    }
+    
     
     private static String getSubjectUrl(Context context, int searchSubjectType) {
         Resources res = context.getResources();

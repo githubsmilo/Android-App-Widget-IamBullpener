@@ -24,6 +24,7 @@ import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -139,14 +140,8 @@ public class ListViewFactory implements RemoteViewsService.RemoteViewsFactory {
             if (Utils.isTodayBestBoardType(mBoardType)) {
                 mParsingResult = parseMLBParkTodayBest(Utils.getBoardUrl(mBoardType));
             } else {
-                if ((mSelectedSearchCategoryType == Constants.ERROR_SEARCH_CAGETORY_TYPE) ||
-                      ((mSelectedSearchCategoryType != Constants.SEARCH_CATEGORY_TYPE_SUBJECT) && 
-                       (mSelectedSearchKeyword == null || mSelectedSearchKeyword.equals("")))) {
-                    mParsingResult = parseMLBParkMobileBoard(Utils.getBoardUrl(mBoardType) + mPageNum);
-                } else {
-                    mParsingResult = parseMLBParkMobileBoard(Utils.getBoardUrl(mBoardType) + mPageNum +
-                            Utils.getSearchUrl(mContext, mSelectedSearchCategoryType, mSelectedSearchSubjectType, mSelectedSearchKeyword));
-                }
+                mParsingResult = parseMLBParkMobileBoard(Utils.getMobileBoardUrl(mContext, mPageNum, mBoardType,
+                        mSelectedSearchCategoryType, mSelectedSearchSubjectType, mSelectedSearchKeyword));
             }
         } catch (IOException e) {
             if (DEBUG) Log.e(TAG, "onDataSetChanged - IOException![" + e.toString() + "]");

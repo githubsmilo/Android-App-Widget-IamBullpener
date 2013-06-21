@@ -11,9 +11,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.net.Uri;
 import android.util.Log;
 import android.view.View;
 import android.widget.RemoteViews;
+
+import java.io.UnsupportedEncodingException;
 
 public class WidgetProvider extends AppWidgetProvider {
 
@@ -44,6 +47,7 @@ public class WidgetProvider extends AppWidgetProvider {
         REQUEST_SEARCH,
         REQUEST_REFRESH,
         REQUEST_SETTING,
+        REQUEST_EXPORT,
         REQUEST_UNKNOWN,
     };
     
@@ -253,6 +257,11 @@ public class WidgetProvider extends AppWidgetProvider {
             rv.setOnClickPendingIntent(R.id.btnListSearch, pi);
         }
         
+        // Set export button of the remoteViews.
+        pi = PendingIntent.getActivity(context, PENDING_INTENT_REQUEST_CODE.REQUEST_EXPORT.ordinal(),
+                buildExportIntent(context, item), PendingIntent.FLAG_UPDATE_CURRENT);
+        rv.setOnClickPendingIntent(R.id.btnListExport, pi);
+        
         // Set refresh button of the remoteViews.
         pi = PendingIntent.getBroadcast(context, PENDING_INTENT_REQUEST_CODE.REQUEST_REFRESH.ordinal(),
                 buildRefreshListIntent(context, item), PendingIntent.FLAG_UPDATE_CURRENT);
@@ -458,6 +467,27 @@ public class WidgetProvider extends AppWidgetProvider {
         Intent intent = buildBaseIntent(item);
         intent.setClass(context, WidgetProvider.class);
         intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
+        
+        return intent;
+    }
+    
+    private Intent buildExportIntent(Context context, intentItem item) {
+        String url = null;
+        
+        try {
+            if (Utils.isTodayBestBoardType(item.getBoardType())) {
+                url = Constants.URL_BASE;
+            } else {
+                url = Utils.getMobileBoardUrl(context, item.getPageNum(), item.getBoardType(), 
+                        item.getSearchCategoryType(), item.getSearchSubjectType(), item.getSearchKeyword());
+            }
+        } catch (UnsupportedEncodingException e) {
+            if (DEBUG) Log.e(TAG, "buildExportIntent - UnsupportedEncodingException![" + e.toString() + "]");
+            e.printStackTrace();
+        }
+
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         
         return intent;
     }
