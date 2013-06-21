@@ -10,8 +10,6 @@
         android:layout_height="wrap_content"
         android:background="@color/dark_green"
         android:paddingLeft="10dp"
-        android:paddingTop="3dp"
-        android:paddingBottom="3dp"
         android:orientation="horizontal" >
         
         <TextView
