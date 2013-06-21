@@ -13,6 +13,7 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 public class SearchActivity extends Activity {
 
@@ -100,14 +101,21 @@ public class SearchActivity extends Activity {
         public void onClick(View v) {
             if (DEBUG) Log.i(TAG, "Button OK clicked");
 
+            final Context context = SearchActivity.this;
             EditText etSearchKeyword = (EditText)findViewById(R.id.editTextSearchKeyword);
             String searchKeyword = etSearchKeyword.getText().toString();
+            
+            // Check that keyword is empty.
+            if ((mSelectedSearchCategoryType != Constants.SEARCH_CATEGORY_TYPE_SUBJECT) &&
+                  (searchKeyword.equals(""))) {
+                Toast.makeText(context, R.string.text_need_to_enter_keyword, Toast.LENGTH_SHORT).show();
+                return;
+            }
             
             if (DEBUG) Log.i(TAG, "mSelectedSearchCategoryType[" + mSelectedSearchCategoryType +
                     "], mSelectedSearchSubjectType[" + mSelectedSearchSubjectType + 
                     "], searchKeyword[" + searchKeyword + "]");
             
-            final Context context = SearchActivity.this;
             Intent initIntent = new Intent(context, WidgetProvider.class);
             initIntent.setAction(Constants.ACTION_SEARCH);
             initIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, mAppWidgetId);
