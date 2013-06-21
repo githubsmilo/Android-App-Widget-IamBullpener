@@ -51,6 +51,9 @@ public class ContentsFactory implements RemoteViewsService.RemoteViewsFactory {
     //private static int mBoardType = Constants.ERROR_BOARD_TYPE;
     //private static int mRefreshTimetype = Constants.ERROR_REFRESH_TIME_TYPE;
     //private static boolean mIsPermitMobileConnectionType = Constants.ERROR_PERMIT_MOBILE_CONNECTION_TYPE;
+    //private static int mSelectedSearchCategoryType = Constants.ERROR_SEARCH_CAGETORY_TYPE;
+    //private static int mSelectedSearchSubjectType = Constants.ERROR_SEARCH_SUBJECT_TYPE;
+    //private static String mSelectedSearchKeyword = null;
     
     private static String mSelectedItemUrl = null;
     

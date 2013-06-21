@@ -46,8 +46,6 @@ public class ListViewFactory implements RemoteViewsService.RemoteViewsFactory {
     private static int mBoardType = Constants.ERROR_BOARD_TYPE;
     //private static int mRefreshTimetype = Constants.ERROR_REFRESH_TIME_TYPE;
     //private static boolean mIsPermitMobileConnectionType = Constants.ERROR_PERMIT_MOBILE_CONNECTION_TYPE;
-    
-    // Search
     private static int mSelectedSearchCategoryType = Constants.ERROR_SEARCH_CAGETORY_TYPE;
     private static int mSelectedSearchSubjectType = Constants.ERROR_SEARCH_SUBJECT_TYPE;
     private static String mSelectedSearchKeyword = null;
@@ -64,12 +62,24 @@ public class ListViewFactory implements RemoteViewsService.RemoteViewsFactory {
 
     public ListViewFactory(Context context, Intent intent) {
         mContext = context;
-        mAppWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
-        mPageNum = intent.getIntExtra(Constants.EXTRA_PAGE_NUM, Constants.DEFAULT_PAGE_NUM);
-        mBoardType = intent.getIntExtra(Constants.EXTRA_BOARD_TYPE, Constants.DEFAULT_BOARD_TYPE);
+        mAppWidgetId = intent.getIntExtra(
+                AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
+        mPageNum = intent.getIntExtra(
+                Constants.EXTRA_PAGE_NUM, Constants.DEFAULT_PAGE_NUM);
+        mBoardType = intent.getIntExtra(
+                Constants.EXTRA_BOARD_TYPE, Constants.DEFAULT_BOARD_TYPE);
+        mSelectedSearchCategoryType = intent.getIntExtra(
+                Constants.EXTRA_SEARCH_CATEGORY_TYPE, Constants.ERROR_SEARCH_CAGETORY_TYPE);
+        mSelectedSearchSubjectType = intent.getIntExtra(
+                Constants.EXTRA_SEARCH_SUBJECT_TYPE, Constants.ERROR_SEARCH_SUBJECT_TYPE);
+        mSelectedSearchKeyword = intent.getStringExtra(
+                Constants.EXTRA_SEARCH_KEYWORD);
 
         if (DEBUG) Log.i(TAG, "constructor - mAppWidgetId[" + mAppWidgetId + 
-                "], mPageNum[" + mPageNum + "], mBoardType[" + mBoardType + "]");
+                "], mPageNum[" + mPageNum + "], mBoardType[" + mBoardType +
+                "], mSelectedSearchCategoryType[" + mSelectedSearchCategoryType + 
+                "], mSelectedSearchSubjectType[" + mSelectedSearchSubjectType + 
+                "], mSelectedSearchKeyword[" + mSelectedSearchKeyword + "]");
         
         setupIntentListener();
     }
@@ -460,11 +470,12 @@ public class ListViewFactory implements RemoteViewsService.RemoteViewsFactory {
                 @Override
                 public void onReceive(Context context, Intent intent) {
                     // Update itent items through Broadcast Intent.
-                    mAppWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
-                    mBoardType = intent.getIntExtra(Constants.EXTRA_BOARD_TYPE, Constants.DEFAULT_BOARD_TYPE);
-                    mPageNum = intent.getIntExtra(Constants.EXTRA_PAGE_NUM, Constants.DEFAULT_PAGE_NUM);
-                    
-                    // Update search variables through Broadcast Intent.
+                    mAppWidgetId = intent.getIntExtra(
+                            AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
+                    mBoardType = intent.getIntExtra(
+                            Constants.EXTRA_BOARD_TYPE, Constants.ERROR_BOARD_TYPE);
+                    mPageNum = intent.getIntExtra(
+                            Constants.EXTRA_PAGE_NUM, Constants.ERROR_PAGE_NUM);
                     mSelectedSearchCategoryType = intent.getIntExtra(
                             Constants.EXTRA_SEARCH_CATEGORY_TYPE, Constants.ERROR_SEARCH_CAGETORY_TYPE);
                     mSelectedSearchSubjectType = intent.getIntExtra(
