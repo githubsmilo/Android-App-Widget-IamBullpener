@@ -259,7 +259,7 @@ public class WidgetProvider extends AppWidgetProvider {
         
         // Set export button of the remoteViews.
         pi = PendingIntent.getActivity(context, PENDING_INTENT_REQUEST_CODE.REQUEST_EXPORT.ordinal(),
-                buildExportIntent(context, item), PendingIntent.FLAG_UPDATE_CURRENT);
+                buildExportIntent(context, item, null), PendingIntent.FLAG_UPDATE_CURRENT);
         rv.setOnClickPendingIntent(R.id.btnListExport, pi);
         
         // Set refresh button of the remoteViews.
@@ -316,6 +316,11 @@ public class WidgetProvider extends AppWidgetProvider {
         pi = PendingIntent.getBroadcast(context, PENDING_INTENT_REQUEST_CODE.REQUEST_REFRESH.ordinal(), 
                                         buildShowItemIntent(context, item, selectedItemUrl), PendingIntent.FLAG_UPDATE_CURRENT);
         rv.setOnClickPendingIntent(R.id.btnContentRefresh, pi);
+        
+        // Set export button of the remoteViews.
+        pi = PendingIntent.getActivity(context, PENDING_INTENT_REQUEST_CODE.REQUEST_EXPORT.ordinal(),
+                buildExportIntent(context, item, selectedItemUrl), PendingIntent.FLAG_UPDATE_CURRENT);
+        rv.setOnClickPendingIntent(R.id.btnContentExport, pi);
         
         // Set setting button of the remoteViews.
         pi = PendingIntent.getActivity(context, PENDING_INTENT_REQUEST_CODE.REQUEST_SETTING.ordinal(), 
@@ -471,19 +476,23 @@ public class WidgetProvider extends AppWidgetProvider {
         return intent;
     }
     
-    private Intent buildExportIntent(Context context, intentItem item) {
+    private Intent buildExportIntent(Context context, intentItem item, String selectedItemUrl) {
         String url = null;
         
-        try {
-            if (Utils.isTodayBestBoardType(item.getBoardType())) {
-                url = Constants.URL_BASE;
-            } else {
-                url = Utils.getMobileBoardUrl(context, item.getPageNum(), item.getBoardType(), 
-                        item.getSearchCategoryType(), item.getSearchSubjectType(), item.getSearchKeyword());
-            }
-        } catch (UnsupportedEncodingException e) {
-            if (DEBUG) Log.e(TAG, "buildExportIntent - UnsupportedEncodingException![" + e.toString() + "]");
-            e.printStackTrace();
+        if (selectedItemUrl == null) {
+	        try {
+	            if (Utils.isTodayBestBoardType(item.getBoardType())) {
+	                url = Constants.URL_BASE;
+	            } else {
+	                url = Utils.getMobileBoardUrl(context, item.getPageNum(), item.getBoardType(), 
+	                        item.getSearchCategoryType(), item.getSearchSubjectType(), item.getSearchKeyword());
+	            }
+	        } catch (UnsupportedEncodingException e) {
+	            if (DEBUG) Log.e(TAG, "buildExportIntent - UnsupportedEncodingException![" + e.toString() + "]");
+	            e.printStackTrace();
+	        }
+        } else {
+        	url = selectedItemUrl;
         }
 
         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));

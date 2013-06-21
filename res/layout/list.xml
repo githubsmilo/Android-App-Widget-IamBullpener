@@ -48,8 +48,8 @@
             android:id="@+id/btnListNavTop"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
+            android:layout_toLeftOf="@+id/btnListNavPrev"
             android:background="@drawable/up_button_selector"
             android:contentDescription="@string/btn_top" />
 
@@ -58,7 +58,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_toRightOf="@+id/btnListNavTop"
+            android:layout_toLeftOf="@+id/btnListNavNext"
             android:background="@drawable/prev_button_selector"
             android:contentDescription="@string/btn_prev" />
 
@@ -67,27 +67,27 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_toRightOf="@+id/btnListNavPrev"
+            android:layout_toLeftOf="@+id/btnListRefresh"
             android:background="@drawable/next_button_selector"
             android:contentDescription="@string/btn_next" />
-
-        <ImageButton
-            android:id="@+id/btnListSearch"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_toLeftOf="@+id/btnListRefresh"
-            android:background="@drawable/search_button_selector"
-            android:contentDescription="@string/btn_search" />
         
         <ImageButton
             android:id="@+id/btnListRefresh"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_toLeftOf="@+id/btnListSetting"
+            android:layout_toLeftOf="@+id/btnListSearch"
             android:background="@drawable/reload_button_selector"
             android:contentDescription="@string/btn_refresh" />
+        
+        <ImageButton
+            android:id="@+id/btnListSearch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toLeftOf="@+id/btnListSetting"
+            android:background="@drawable/search_button_selector"
+            android:contentDescription="@string/btn_search" />
         
         <ImageButton
             android:id="@+id/btnListSetting"
