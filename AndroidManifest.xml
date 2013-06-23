@@ -8,6 +8,7 @@
         android:minSdkVersion="14"
         android:targetSdkVersion="17" />
 
+    <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
 
@@ -31,7 +32,6 @@
         <service
             android:name="com.smilo.bullpen.ListViewService"
             android:permission="android.permission.BIND_REMOTEVIEWS" />
-        
         <service
             android:name="com.smilo.bullpen.ContentsService"
             android:permission="android.permission.BIND_REMOTEVIEWS" />
@@ -47,13 +47,20 @@
                 <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
             </intent-filter>
         </activity>
-        
         <activity
             android:name="com.smilo.bullpen.SearchActivity"
             android:allowTaskReparenting="false"
             android:label="@string/title_activity_search"
             android:taskAffinity=""
             android:theme="@android:style/Theme.Dialog" >
+        </activity>
+        <activity
+            android:name="com.smilo.bullpen.WebViewActivity"
+            android:allowTaskReparenting="false"
+            android:launchMode="singleTop"
+            android:label="@string/title_activity_web_view"
+            android:taskAffinity=""
+            android:theme="@android:style/Theme.NoTitleBar" >
         </activity>
     </application>
 

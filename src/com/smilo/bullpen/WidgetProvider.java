@@ -274,7 +274,7 @@ public class WidgetProvider extends AppWidgetProvider {
         
         // Set a pending intent for click event to the remoteViews.
         PendingIntent clickPi = PendingIntent.getBroadcast(context, 0, 
-                                       buildShowItemIntent(context, item, null), PendingIntent.FLAG_UPDATE_CURRENT);
+        		buildShowItemIntent(context, item, null), PendingIntent.FLAG_UPDATE_CURRENT);
         rv.setPendingIntentTemplate(R.id.listView, clickPi);
     
         // Update widget.
@@ -495,9 +495,12 @@ public class WidgetProvider extends AppWidgetProvider {
         	url = selectedItemUrl;
         }
 
-        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+        Intent intent = new Intent();
+        intent.setClass(context, WebViewActivity.class);
+        intent.putExtra(Constants.EXTRA_EXPORT_URL, url);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        
+        intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+
         return intent;
     }
 
