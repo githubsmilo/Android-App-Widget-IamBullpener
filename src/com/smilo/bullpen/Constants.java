@@ -28,6 +28,7 @@ public final class Constants {
     public static final String EXTRA_SEARCH_SUBJECT_TYPE = PACKAGE_NAME + ".SEARCH_SUBJECT_TYPE";
     public static final String EXTRA_SEARCH_KEYWORD = PACKAGE_NAME + ".SEARCH_KEYWORD";
     public static final String EXTRA_EXPORT_URL = PACKAGE_NAME + ".EXPORT_URL";
+    public static final String EXTRA_INTERNET_CONNECTED_RESULT = PACKAGE_NAME + ".INTERNET_CONNECTED_RESULT";
     
     public static final int LISTVIEW_MAX_ITEM_COUNT = 20;
     public static final int BITMAP_MAX_SIZE = 800;
@@ -70,6 +71,13 @@ public final class Constants {
         FAILED_JSON_EXCEPTION,
         FAILED_STACK_OVERFLOW,
         FAILED_UNKNOWN,
+    };
+    
+    public enum INTERNET_CONNECTED_RESULT {
+    	SUCCESS_WIFI,
+    	SUCCESS_BLUETOOTH,
+    	SUCCESS_MOBILE,
+    	FAILED,
     };
     
     public static final int BOARD_TYPE_MLB_TOWN = 0;

@@ -10,31 +10,34 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.widget.Toast;
 
+import com.smilo.bullpen.Constants.INTERNET_CONNECTED_RESULT;
+import com.smilo.bullpen.Constants.PARSING_RESULT;
+
 public final class Utils {
 
     private static final String TAG = "Utils";
     private static final boolean DEBUG = Constants.DEBUG_MODE;
 
-    public static boolean isInternetConnected(Context context, boolean isPermitMobileConnection) {
+    public static INTERNET_CONNECTED_RESULT isInternetConnected(Context context, boolean isPermitMobileConnection) {
         ConnectivityManager cm =  (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         
         // Check wifi.
         NetworkInfo niWifi = cm.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
         if ((niWifi != null) && (niWifi.isConnected() == true)) {
-                return true;
+                return INTERNET_CONNECTED_RESULT.SUCCESS_WIFI;
         }
 
         // Check bluetooth
         NetworkInfo niBluetooth = cm.getNetworkInfo(ConnectivityManager.TYPE_BLUETOOTH);
         if ((niBluetooth != null) && (niBluetooth.isConnected() == true)) {
-                return true;
+                return INTERNET_CONNECTED_RESULT.SUCCESS_BLUETOOTH;
         }
 
         // Check mobile.
         if (isPermitMobileConnection) {
             NetworkInfo mobileWifi = cm.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
             if ((mobileWifi != null) && (mobileWifi.isConnected() == true)) {
-                return true;
+                return INTERNET_CONNECTED_RESULT.SUCCESS_MOBILE;
             }
         }
 /*
@@ -45,7 +48,7 @@ public final class Utils {
         }
 */    
         Toast.makeText(context, R.string.internet_not_connected_msg, Toast.LENGTH_SHORT).show();
-        return false;
+        return INTERNET_CONNECTED_RESULT.FAILED;
     }
     
     public static String getMobileBoardUrl(Context context, int pageNum, int boardType,
@@ -285,5 +288,39 @@ public final class Utils {
             default:
                 return res.getString(R.string.text_subject_parameter_1);
         }
+    }
+    
+    public static String getParsingResultString(PARSING_RESULT result) {
+    	if (result == PARSING_RESULT.SUCCESS_FULL_BOARD) {
+    		return "SUCCESS_FULL_BOARD";
+    	} else if (result == PARSING_RESULT.SUCCESS_MOBILE_BOARD) {
+    		return "SUCCESS_MOBILE_BOARD";
+    	} else if (result == PARSING_RESULT.SUCCESS_MOBILE_TODAY_BEST) {
+    		return "SUCCESS_MOBILE_TODAY_BEST";
+    	} else if (result == PARSING_RESULT.FAILED_IO_EXCEPTION) {
+    		return "FAILED_IO_EXCEPTION";
+    	} else if (result == PARSING_RESULT.FAILED_JSON_EXCEPTION) {
+    		return "FAILED_JSON_EXCEPTION";
+    	} else if (result == PARSING_RESULT.FAILED_STACK_OVERFLOW) {
+    		return "FAILED_STACK_OVERFLOW";
+    	} else if (result == PARSING_RESULT.FAILED_UNKNOWN) {
+    		return "FAILED_UNKNOWN";
+    	} else {
+    		return null;
+    	}
+    }
+    
+    public static String getInternetConnectedResult(INTERNET_CONNECTED_RESULT result) {
+    	if (result == INTERNET_CONNECTED_RESULT.SUCCESS_WIFI) {
+    		return "SUCCESS_WIFI";
+    	} else if (result == INTERNET_CONNECTED_RESULT.SUCCESS_BLUETOOTH) {
+    		return "SUCCESS_BLUETOOTH";
+    	} else if (result == INTERNET_CONNECTED_RESULT.SUCCESS_MOBILE) {
+    		return "SUCCESS_MOBILE";
+    	} else if (result == INTERNET_CONNECTED_RESULT.FAILED) {
+    		return "FAILED";
+    	} else {
+    		return null;
+    	}
     }
 }

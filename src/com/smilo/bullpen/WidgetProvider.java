@@ -1,6 +1,8 @@
 
 package com.smilo.bullpen;
 
+import java.io.UnsupportedEncodingException;
+
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetHost;
@@ -11,12 +13,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
-import android.net.Uri;
 import android.util.Log;
 import android.view.View;
 import android.widget.RemoteViews;
 
-import java.io.UnsupportedEncodingException;
+import com.smilo.bullpen.Constants.INTERNET_CONNECTED_RESULT;
 
 public class WidgetProvider extends AppWidgetProvider {
 
@@ -82,11 +83,11 @@ public class WidgetProvider extends AppWidgetProvider {
         AppWidgetManager awm = AppWidgetManager.getInstance(context);
         int[] appWidgetIds = awm.getAppWidgetIds(new ComponentName(context, getClass()));
         
-        if (DEBUG) Log.i(TAG, "onReceive - action[" + action + "], appWidgetsNum[" + appWidgetIds.length +
+        if (DEBUG) Log.d(TAG, "onReceive - action[" + action + "], appWidgetsNum[" + appWidgetIds.length +
                 "], intentItem[" + item.toString() + "]");
         
         for (int i = 0 ; i < appWidgetIds.length ; i++) {
-            if (DEBUG) Log.i(TAG, "onReceive - current appWidgetId[" + appWidgetIds[i] + "]");
+            if (DEBUG) Log.d(TAG, "onReceive - current appWidgetId[" + appWidgetIds[i] + "]");
             
             if (appWidgetId == appWidgetIds[i]) {
 
@@ -106,27 +107,12 @@ public class WidgetProvider extends AppWidgetProvider {
                     // Send broadcast intent to update some variables on the ListViewFactory.
                     context.sendBroadcast(buildUpdateListInfoIntent(item));
                     
-                    if (Utils.isInternetConnected(context, permitMobileConnectionType) == false) {
-                        setRemoteViewToShowLostInternetConnection(context, awm, item);
-                        return;
-                    } else {
-                        // Broadcast ACTION_SHOW_LIST intent.
-                        context.sendBroadcast(buildShowListIntent(context, item));
-                    }
-
-                // This intent(ACTION_APPWIDGET_UPDATE) will be called periodically.
-                // This intent(ACTION_SHOW_LIST) will be called when current item pressed.
-                } else if ((action.equals(Constants.ACTION_APPWIDGET_UPDATE)) ||
-                                    (action.equals(Constants.ACTION_SHOW_LIST))) {
-                    if (Utils.isInternetConnected(context, permitMobileConnectionType) == false) {
-                        if (DEBUG) Log.e(TAG, "onReceive - Internet is not connected!");
-                        return;
-                    } else {
-                        refreshAlarmSetting(context, item);
-                        setRemoteViewToShowList(context, awm, item);
-                    }
-
-                } else if (action.equals(Constants.ACTION_REFRESH_LIST)){    
+                	// Broadcast ACTION_SHOW_LIST intent.
+                    context.sendBroadcast(buildShowListIntent(context, item));
+                    
+                // After setting search activity, this intent will be called.
+                } else if ((action.equals(Constants.ACTION_REFRESH_LIST)) ||
+                        (action.equals(Constants.ACTION_SEARCH))) {    
                     removePreviousAlarm();
                     
                     // Send broadcast intent to update some variables on the ListViewFactory.
@@ -134,7 +120,21 @@ public class WidgetProvider extends AppWidgetProvider {
                     
                     // Broadcast ACTION_SHOW_LIST intent.
                     context.sendBroadcast(buildShowListIntent(context, item));
-                    
+ 
+                // This intent(ACTION_APPWIDGET_UPDATE) will be called periodically.
+                // This intent(ACTION_SHOW_LIST) will be called when current item pressed.
+                } else if ((action.equals(Constants.ACTION_APPWIDGET_UPDATE)) ||
+                                    (action.equals(Constants.ACTION_SHOW_LIST))) {
+                	// Check which the internet is connected or not.
+                    INTERNET_CONNECTED_RESULT result = Utils.isInternetConnected(context, permitMobileConnectionType);
+
+                    // Set proper remote view according to the result.
+                    refreshAlarmSetting(context, item, result);
+                    if (result == INTERNET_CONNECTED_RESULT.FAILED)
+                    	setRemoteViewToShowLostInternetConnection(context, awm, item);
+                    else
+                        setRemoteViewToShowList(context, awm, item);
+
                 // This intent will be called when some item selected.
                 // EXTRA_ITEM_URL was already filled in the ListViewFactory - getViewAt().
                 } else if (action.equals(Constants.ACTION_SHOW_ITEM)) {
@@ -145,64 +145,58 @@ public class WidgetProvider extends AppWidgetProvider {
                     // Send broadcast intent to update some variables on the ContentsFactory.
                     context.sendBroadcast(buildUpdateItemInfoIntent(item, selectedItemUrl));
                     
-                    if (Utils.isInternetConnected(context, permitMobileConnectionType) == false) {
-                        if (DEBUG) Log.e(TAG, "onReceive - Internet is not connected!");
-                        return;
-                    } else {
+                    // Check which internet is connected or net.
+                    INTERNET_CONNECTED_RESULT result = Utils.isInternetConnected(context, permitMobileConnectionType);
+                    
+                    // Set proper remote view according to the result.
+                    if (result == INTERNET_CONNECTED_RESULT.FAILED)
+                    	setRemoteViewToShowLostInternetConnection(context, awm, item);
+                    else
                         setRemoteViewToShowItem(context, awm, item, selectedItemUrl);
-                    }
-                
-                // After setting search activity, this intent will be called.
-                } else if (action.equals(Constants.ACTION_SEARCH)) {
-                    removePreviousAlarm();
-                    
-                    // Send broadcast intent to update some variables on the ListViewFactory.
-                    context.sendBroadcast(buildUpdateListInfoIntent(item));
-                    
-                    // Broadcast ACTION_SHOW_LIST intent.
-                    context.sendBroadcast(buildShowListIntent(context, item));
                 }
             }
         }
     }
 
     private void setRemoteViewToShowLostInternetConnection(Context context, AppWidgetManager awm, intentItem item) {
-        if (DEBUG) Log.i(TAG, "setRemoteViewToShowLostInternetConnection - intentItem[" + item.toString() + "]");
-        
-        // Create new remoteViews
-        RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.lost_internet_connection);
+    	if (DEBUG) Log.d(TAG, "setRemoteViewToShowLostInternetConnection - intentItem[" + item.toString() + "]");
+    	
+    	PendingIntent pi = null;
 
-        PendingIntent pi = null;
-        
+        // Create new remoteViews.
+        RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.lost_internet_connection);
+    	
+    	rv.setTextViewText(R.id.textLostInternetTitle, context.getResources().getText(R.string.text_lost_internet_connection));
+
         // Set refresh button of the remoteViews.
         pi = PendingIntent.getBroadcast(context, PENDING_INTENT_REQUEST_CODE.REQUEST_REFRESH.ordinal(),
-                                        buildRefreshListIntent(context, item), PendingIntent.FLAG_UPDATE_CURRENT);
+                buildRefreshListIntent(context, item), PendingIntent.FLAG_UPDATE_CURRENT);
         rv.setOnClickPendingIntent(R.id.btnLostInternetRefresh, pi);
         
         // Set setting button of the remoteViews.
-        pi = PendingIntent.getActivity(context, PENDING_INTENT_REQUEST_CODE.REQUEST_SETTING.ordinal(), 
-                                       buildConfigurationActivityIntent(context, item), PendingIntent.FLAG_UPDATE_CURRENT);
+        pi = PendingIntent.getActivity(context, PENDING_INTENT_REQUEST_CODE.REQUEST_SETTING.ordinal(),
+                buildConfigurationActivityIntent(context, item), PendingIntent.FLAG_UPDATE_CURRENT);
         rv.setOnClickPendingIntent(R.id.btnLostInternetSetting, pi);
         
         // Update widget.
-        if (DEBUG) Log.i(TAG, "setRemoteViewToShowLostInternetConnection - updateAppWidget [LostInternetConnection]");
+        if (DEBUG) Log.d(TAG, "setRemoteViewToShowLostInternetConnection - updateAppWidget [LostInternetConnection]");
         awm.updateAppWidget(item.getAppWidgetId(), rv);
     }
     
     private void setRemoteViewToShowList(Context context, AppWidgetManager awm, intentItem item) {
-        if (DEBUG) Log.i(TAG, "setRemoteViewToShowList - intentItem[" + item.toString() + "]");
+        if (DEBUG) Log.d(TAG, "setRemoteViewToShowList - intentItem[" + item.toString() + "]");
         
-        // Create new remoteViews.
+        PendingIntent pi = null;
+
+    	// Create new remoteViews.
         RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.list);
-        
+    	
         // Set a remoteAdapter to the remoteViews.
         Intent serviceIntent = buildListViewServiceIntent(context, item);
         rv.setRemoteAdapter(R.id.listView, serviceIntent); // For API14+
         //rv.setRemoteAdapter(item.getAppWidgetId(), R.id.listView, serviceIntent); // For API13-
         rv.setScrollPosition(R.id.listView, 0); // Scroll to top
 
-        PendingIntent pi = null;
-        
         if (Utils.isTodayBestBoardType(item.getBoardType())) {
             // Set title of the remoteViews.
             rv.setTextViewText(R.id.textListTitle, Utils.getBoardTitle(context, item.getBoardType()));
@@ -258,6 +252,7 @@ public class WidgetProvider extends AppWidgetProvider {
         }
         
         // Set export button of the remoteViews.
+        rv.setViewVisibility(R.id.btnListExport, View.VISIBLE);
         pi = PendingIntent.getActivity(context, PENDING_INTENT_REQUEST_CODE.REQUEST_EXPORT.ordinal(),
                 buildExportIntent(context, item, null), PendingIntent.FLAG_UPDATE_CURRENT);
         rv.setOnClickPendingIntent(R.id.btnListExport, pi);
@@ -276,9 +271,9 @@ public class WidgetProvider extends AppWidgetProvider {
         PendingIntent clickPi = PendingIntent.getBroadcast(context, 0, 
         		buildShowItemIntent(context, item, null), PendingIntent.FLAG_UPDATE_CURRENT);
         rv.setPendingIntentTemplate(R.id.listView, clickPi);
-    
+        
         // Update widget.
-        if (DEBUG) Log.i(TAG, "updateAppWidget [BaseballListViewService]");
+        if (DEBUG) Log.d(TAG, "setRemoteViewToShowList - updateAppWidget [BaseballListViewService]");
         awm.updateAppWidget(item.getAppWidgetId(), rv);
         
         // On first call, we need not execute notifyAppWidgetViewDataChanged()
@@ -286,13 +281,15 @@ public class WidgetProvider extends AppWidgetProvider {
         if (mIsSkipFirstCallListViewService) {
             mIsSkipFirstCallListViewService = false;
         } else {
-            if (DEBUG) Log.i(TAG, "notifyAppWidgetViewDataChanged [BaseballListViewService]");
+            if (DEBUG) Log.d(TAG, "setRemoteViewToShowList - notifyAppWidgetViewDataChanged [BaseballListViewService]");
             awm.notifyAppWidgetViewDataChanged(item.getAppWidgetId(), R.id.listView);
         }
     }
     
     private void setRemoteViewToShowItem(Context context, AppWidgetManager awm, intentItem item, String selectedItemUrl) {
-        if (DEBUG) Log.i(TAG, "setRemoteViewToShowItem - intentItem[" + item.toString() + "], selectedItemUrl[" + selectedItemUrl + "]");
+        if (DEBUG) Log.d(TAG, "setRemoteViewToShowItem - intentItem[" + item.toString() + "], selectedItemUrl[" + selectedItemUrl + "]");
+        
+        PendingIntent pi = null;
         
         // Create new remoteViews.
         RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.content);
@@ -302,25 +299,25 @@ public class WidgetProvider extends AppWidgetProvider {
         rv.setRemoteAdapter(R.id.contentView, serviceIntent); // For API14+
         //rv.setRemoteAdapter(item.getAppWidgetId(), R.id.contentView, serviceIntent); // For API13-
 
-        PendingIntent pi = null;
-        
         // Set title of the remoteViews.
         rv.setTextViewText(R.id.textContentTitle, Utils.getBoardTitle(context, item.getBoardType()));
 
         // Set top button of the remoteViews.
+        rv.setViewVisibility(R.id.btnContentNavTop, View.VISIBLE);
         pi = PendingIntent.getBroadcast(context, PENDING_INTENT_REQUEST_CODE.REQUEST_TOP.ordinal(),
                                         buildRefreshListIntent(context, item), PendingIntent.FLAG_UPDATE_CURRENT);
         rv.setOnClickPendingIntent(R.id.btnContentNavTop, pi);
+        
+        // Set export button of the remoteViews.
+        rv.setViewVisibility(R.id.btnContentExport, View.VISIBLE);
+        pi = PendingIntent.getActivity(context, PENDING_INTENT_REQUEST_CODE.REQUEST_EXPORT.ordinal(),
+                buildExportIntent(context, item, selectedItemUrl), PendingIntent.FLAG_UPDATE_CURRENT);
+        rv.setOnClickPendingIntent(R.id.btnContentExport, pi);
         
         // Set refresh button of the remoteViews.
         pi = PendingIntent.getBroadcast(context, PENDING_INTENT_REQUEST_CODE.REQUEST_REFRESH.ordinal(), 
                                         buildShowItemIntent(context, item, selectedItemUrl), PendingIntent.FLAG_UPDATE_CURRENT);
         rv.setOnClickPendingIntent(R.id.btnContentRefresh, pi);
-        
-        // Set export button of the remoteViews.
-        pi = PendingIntent.getActivity(context, PENDING_INTENT_REQUEST_CODE.REQUEST_EXPORT.ordinal(),
-                buildExportIntent(context, item, selectedItemUrl), PendingIntent.FLAG_UPDATE_CURRENT);
-        rv.setOnClickPendingIntent(R.id.btnContentExport, pi);
         
         // Set setting button of the remoteViews.
         pi = PendingIntent.getActivity(context, PENDING_INTENT_REQUEST_CODE.REQUEST_SETTING.ordinal(), 
@@ -333,7 +330,7 @@ public class WidgetProvider extends AppWidgetProvider {
         rv.setPendingIntentTemplate(R.id.contentView, clickPi);
     
         // Update widget.
-        if (DEBUG) Log.i(TAG, "setRemoteViewToShowItem - updateAppWidget [BaseballContentService]");
+        if (DEBUG) Log.d(TAG, "setRemoteViewToShowItem - updateAppWidget [BaseballContentService]");
         awm.updateAppWidget(item.getAppWidgetId(), rv);
 
         // On first call, we need not execute notifyAppWidgetViewDataChanged()
@@ -341,13 +338,14 @@ public class WidgetProvider extends AppWidgetProvider {
         if (mIsSkipFirstCallContentService) {
             mIsSkipFirstCallContentService = false;
         } else {
-            if (DEBUG) Log.i(TAG, "setRemoteViewToShowItem - notifyAppWidgetViewDataChanged [BaseballContentService]");
+            if (DEBUG) Log.d(TAG, "setRemoteViewToShowItem - notifyAppWidgetViewDataChanged [BaseballContentService]");
             awm.notifyAppWidgetViewDataChanged(item.getAppWidgetId(), R.id.contentView);
         }
     }
     
-    private void refreshAlarmSetting(Context context, intentItem item) {
+    private void refreshAlarmSetting(Context context, intentItem item, INTERNET_CONNECTED_RESULT result) {
         // If user does not want to refresh, just remove alarm setting.
+    	// TODO : Consider INTERNET_CONNECTED_RESULT case here?
         if (item.getRefreshTimeType() == Constants.REFRESH_TIME_TYPE_STOP) {
             removePreviousAlarm();
             
@@ -359,7 +357,7 @@ public class WidgetProvider extends AppWidgetProvider {
     }
     
     private void setNewAlarm(Context context, intentItem item, boolean isUrgentMode) {
-        if (DEBUG) Log.i(TAG, "setNewAlarm - intentItem[" + item.toString() + "], isUrgentMode[" + isUrgentMode + "]");
+        if (DEBUG) Log.d(TAG, "setNewAlarm - intentItem[" + item.toString() + "], isUrgentMode[" + isUrgentMode + "]");
 
         Resources res = context.getResources();
         int selectedRefreshTime = Utils.getRefreshTime(context, item.getRefreshTimeType());
@@ -371,7 +369,7 @@ public class WidgetProvider extends AppWidgetProvider {
     }
 
     private void removePreviousAlarm() {
-        if (DEBUG) Log.i(TAG, "removePreviousAlarm");
+        if (DEBUG) Log.d(TAG, "removePreviousAlarm");
 
         if (mManager != null && mSender != null) {
             mSender.cancel();
@@ -423,7 +421,7 @@ public class WidgetProvider extends AppWidgetProvider {
         Intent intent = buildBaseIntent(intentItem);
         intent.setClass(context, WidgetProvider.class);
         intent.setAction(Constants.ACTION_SHOW_LIST);
-        
+
         return intent;
     }
     
@@ -511,19 +509,19 @@ public class WidgetProvider extends AppWidgetProvider {
 
     @Override
     public void onUpdate(Context context, AppWidgetManager awm, int[] appWidgetIds) {
-        if (DEBUG) Log.i(TAG, "onUpdate");
+        if (DEBUG) Log.d(TAG, "onUpdate");
         super.onUpdate(context, awm, appWidgetIds);
     }
 
     @Override
     public void onDeleted(Context context, int[] appWidgetIds) {
-        if (DEBUG) Log.i(TAG, "onDeleted");
+        if (DEBUG) Log.d(TAG, "onDeleted");
         super.onDeleted(context, appWidgetIds);
     }
 
     @Override
     public void onDisabled(Context context) {
-        if (DEBUG) Log.i(TAG, "onDisabled");
+        if (DEBUG) Log.d(TAG, "onDisabled");
         removePreviousAlarm();
         
         // Delete all saved data.
@@ -537,7 +535,7 @@ public class WidgetProvider extends AppWidgetProvider {
 
     @Override
     public void onEnabled(Context context) {
-        if (DEBUG) Log.i(TAG, "onEnabled");
+        if (DEBUG) Log.d(TAG, "onEnabled");
         removePreviousAlarm();
 
         // Initialize global variables.
