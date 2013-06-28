@@ -74,6 +74,14 @@ public final class Utils {
             return false;
     }
     
+    public static boolean isPredefinedBoardType(int boardType) {
+    	if ((boardType == Constants.BOARD_TYPE_BULLPEN_1000) ||
+    		(boardType == Constants.BOARD_TYPE_BULLPEN_2000))
+    		return true;
+    	else
+    		return false;
+    }
+    
     public static int getRefreshTime(Context context, int refreshTimeType) {
         Resources res = context.getResources();
         switch (refreshTimeType) {
