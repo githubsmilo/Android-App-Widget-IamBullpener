@@ -1,7 +1,13 @@
 
 package com.smilo.bullpen;
 
-import com.smilo.bullpen.Constants.PARSING_RESULT;
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.net.URLConnection;
+import java.util.Iterator;
+import java.util.List;
 
 import net.htmlparser.jericho.CharacterReference;
 import net.htmlparser.jericho.Element;
@@ -27,13 +33,7 @@ import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.net.URLConnection;
-import java.util.Iterator;
-import java.util.List;
+import com.smilo.bullpen.Constants.PARSING_RESULT;
 
 public class ContentsFactory implements RemoteViewsService.RemoteViewsFactory {
 
@@ -128,6 +128,17 @@ public class ContentsFactory implements RemoteViewsService.RemoteViewsFactory {
                         String bodyImage = obj.optString(JSON_BODY_IMAGE);
                         if (bodyImage != null && bodyImage.length() > 0) {
                             if (DEBUG) Log.i(TAG, "getViewAt - image[" + bodyImage + "]");
+                            
+                            // NOTE :
+                            // I don't use AsyncTask method to load given image file,
+                            // because the job to update specific remoteViews MUST update widget entirely to refresh.
+                            // This is very expensive job! :(
+                            /*
+                            RemoteViews rvBodyImage = new RemoteViews(mContext.getPackageName(), R.layout.content_row_image);
+                            BitmapWorkerTask task = new BitmapWorkerTask(rvBodyImage, mContext, mAppWidgetId, R.id.contentRowImage);
+                            task.execute(bodyImage);
+                            */
+                            
                             // TODO : manage bitmap
                             RemoteViews rvBodyImage = new RemoteViews(mContext.getPackageName(), R.layout.content_row_image);
                             Bitmap bitmap = null;
@@ -513,4 +524,52 @@ public class ContentsFactory implements RemoteViewsService.RemoteViewsFactory {
             mIntentListener = null;
         }
     }
+    
+    /*
+    static class BitmapWorkerTask extends AsyncTask<String, Void, Bitmap> {
+    	private final RemoteViews rv;
+    	private final Context context;
+    	private final int appWidgetId;
+    	private final int resourceId;
+
+    	public BitmapWorkerTask(RemoteViews rv, Context context, int appWidgetId, int resourceId) {
+    		this.rv = rv;
+    		this.context = context;
+    		this.appWidgetId = appWidgetId;
+    		this.resourceId = resourceId;
+    	}
+    	
+    	// Decode image in background.
+		@Override
+		protected Bitmap doInBackground(String... params) {
+			Bitmap bitmap = null;
+			try {
+				bitmap = getImageBitmap(params[0]);
+			} catch (OutOfMemoryError e) {
+				Log.e(TAG, "BitmapWorkerTask - getImageBitmap - OutOfMemoryError![" + e.toString() + "]");
+				e.printStackTrace();
+			} catch (IOException e) {
+				Log.e(TAG, "BitmapWorkerTask - getImageBitmap - IOException![" + e.toString() + "]");
+				e.printStackTrace();
+			} catch (RuntimeException e) {
+				Log.e(TAG, "BitmapWorkerTask - getImageBitmap - RuntimeException![" + e.toString() + "]");
+				e.printStackTrace();
+			}
+			
+			return bitmap;
+		}
+		
+		// Once complete, see if ImageView is still around and set bitmap.
+	    @Override
+	    protected void onPostExecute(Bitmap bitmap) {
+	    	AppWidgetManager awm = AppWidgetManager.getInstance(context);
+	    	
+	    	rv.setImageViewBitmap(resourceId, bitmap);
+	    	awm.partiallyUpdateAppWidget(appWidgetId, rv);
+	    	
+	    	// TODO : How can I update this widget entirely?
+	    	//awm.updateAppWidget(appWidgetId, ????);
+		}
+    }
+    */
 }
