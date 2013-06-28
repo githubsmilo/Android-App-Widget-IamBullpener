@@ -4,9 +4,9 @@
   android:minHeight="294dp"
   android:updatePeriodMillis="0"
   android:initialLayout="@layout/list"
-  android:previewImage="@drawable/main_image"
   android:configure="com.smilo.bullpen.ConfigurationActivity"
   android:autoAdvanceViewId="@+id/listView"
   android:resizeMode="horizontal|vertical" >
+  <!--  TODO : android:previewImage="@drawable/main_image" -->
   <!-- android:widgetCategory="home_screen|keyguard" for Android 4.2-->
 </appwidget-provider>
