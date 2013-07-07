@@ -495,13 +495,11 @@ public class ContentsFactory implements RemoteViewsService.RemoteViewsFactory {
                     resizeBitmap = Bitmap.createScaledBitmap(
                             bitmap, (bitmapWidth * mDisplayWidth)/bitmapHeight, mDisplayWidth, true);
                 }
-                
+                bitmap.recycle();
                 if (resizeBitmap == null) {
-                	bitmap.recycle();
                     if (DEBUG) Log.e(TAG, "getImageBitmap - resizeBitmap is null!");
                     return null;
                 } else {
-                    bitmap.recycle();
                     if (DEBUG) Log.i(TAG, "getImageBitmap - resizeBitmap[" + resizeBitmap.getWidth() + "," + resizeBitmap.getHeight() + "] is ok!");
                     return resizeBitmap;
                 }
