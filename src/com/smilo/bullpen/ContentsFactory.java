@@ -369,6 +369,12 @@ public class ContentsFactory implements RemoteViewsService.RemoteViewsFactory {
                                 itemBodyText = "";
                             }
                             String itemImgUrl = ((StartTag) nodeSeg).getAttributeValue("src");
+                            if (itemImgUrl.startsWith("/")) {
+                            	StringBuffer strBuf = new StringBuffer();
+                                strBuf.append(Constants.URL_BASE);
+                                strBuf.append(itemImgUrl);
+                                itemImgUrl = strBuf.toString();
+                            }
                             
                             // Put itemImgUrl to the 'body' JSONArray.
                             JSONObject newImgUrl = new JSONObject();
