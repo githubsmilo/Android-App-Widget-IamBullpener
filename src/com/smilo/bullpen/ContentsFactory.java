@@ -223,7 +223,6 @@ public class ContentsFactory implements RemoteViewsService.RemoteViewsFactory {
         }
 
         Intent fillInIntent = new Intent();
-        fillInIntent.putExtra(Constants.EXTRA_PAGE_NUM, mPageNum);
         rv.setOnClickFillInIntent(R.id.contentRowLayout, fillInIntent);
         return rv;
     }
