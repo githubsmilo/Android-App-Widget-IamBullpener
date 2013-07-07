@@ -306,17 +306,15 @@ public class WidgetProvider extends AppWidgetProvider {
         // Set title of the remoteViews.
         rv.setTextViewText(R.id.textContentTitle, Utils.getBoardTitle(context, item.getBoardType()));
 
-        // Set top button of the remoteViews.
-        rv.setViewVisibility(R.id.btnContentNavTop, View.VISIBLE);
-        pi = PendingIntent.getBroadcast(context, PENDING_INTENT_REQUEST_CODE.REQUEST_TOP.ordinal(),
-                                        buildRefreshListIntent(context, item), PendingIntent.FLAG_UPDATE_CURRENT);
-        rv.setOnClickPendingIntent(R.id.btnContentNavTop, pi);
-        
         // Set export button of the remoteViews.
-        rv.setViewVisibility(R.id.btnContentExport, View.VISIBLE);
         pi = PendingIntent.getActivity(context, PENDING_INTENT_REQUEST_CODE.REQUEST_EXPORT.ordinal(),
                 buildExportIntent(context, item, selectedItemUrl), PendingIntent.FLAG_UPDATE_CURRENT);
         rv.setOnClickPendingIntent(R.id.btnContentExport, pi);
+        
+        // Set top button of the remoteViews.
+        pi = PendingIntent.getBroadcast(context, PENDING_INTENT_REQUEST_CODE.REQUEST_TOP.ordinal(),
+                                        buildRefreshListIntent(context, item), PendingIntent.FLAG_UPDATE_CURRENT);
+        rv.setOnClickPendingIntent(R.id.btnContentNavTop, pi);
         
         // Set refresh button of the remoteViews.
         pi = PendingIntent.getBroadcast(context, PENDING_INTENT_REQUEST_CODE.REQUEST_REFRESH.ordinal(), 
