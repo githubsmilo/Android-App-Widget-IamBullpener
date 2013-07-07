@@ -31,7 +31,6 @@ public final class Constants {
     public static final String EXTRA_INTERNET_CONNECTED_RESULT = PACKAGE_NAME + ".INTERNET_CONNECTED_RESULT";
     
     public static final int LISTVIEW_MAX_ITEM_COUNT = 20;
-    public static final int BITMAP_MAX_SIZE = 800;
     
     // Intentitem default values
     public static final int DEFAULT_PAGE_NUM = 1;

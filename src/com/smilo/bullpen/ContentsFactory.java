@@ -30,6 +30,8 @@ import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Log;
+import android.view.Display;
+import android.view.WindowManager;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
@@ -65,6 +67,8 @@ public class ContentsFactory implements RemoteViewsService.RemoteViewsFactory {
     private static final String JSON_COMMENT = "comment";
     private static final String JSON_COMMENT_WRITER = "commentWriter";
     private static final String JSON_COMMENT_TEXT = "commentText";
+    
+    private static int mDisplayWidth;
 
     public ContentsFactory(Context context, Intent intent) {
         mContext = context;
@@ -72,9 +76,12 @@ public class ContentsFactory implements RemoteViewsService.RemoteViewsFactory {
         mPageNum = intent.getIntExtra(Constants.EXTRA_PAGE_NUM, Constants.DEFAULT_PAGE_NUM);
         mSelectedItemUrl = intent.getStringExtra(Constants.EXTRA_ITEM_URL);
         
-        if (DEBUG) Log.i(TAG, "constructor - mAppWidgetId[" + mAppWidgetId +
-                "], mPageNum[" + mPageNum + "], mSelectedItemUrl[" + mSelectedItemUrl + "]");
+        Display display = ((WindowManager)mContext.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+        mDisplayWidth = display.getWidth();
         
+        if (DEBUG) Log.i(TAG, "constructor - mAppWidgetId[" + mAppWidgetId +
+                "], mPageNum[" + mPageNum + "], mSelectedItemUrl[" + mSelectedItemUrl + "], mDisplayWidth[" + mDisplayWidth + "]");
+
         setupIntentListener();
     }
 
@@ -480,16 +487,17 @@ public class ContentsFactory implements RemoteViewsService.RemoteViewsFactory {
             Bitmap resizeBitmap = null;
             int bitmapWidth = bitmap.getWidth();
             int bitmapHeight = bitmap.getHeight();
-            if (bitmapWidth > Constants.BITMAP_MAX_SIZE || bitmapHeight > Constants.BITMAP_MAX_SIZE) {
+            if (bitmapWidth > mDisplayWidth || bitmapHeight > mDisplayWidth) {
                 if (bitmapWidth > bitmapHeight) {
                     resizeBitmap = Bitmap.createScaledBitmap(
-                            bitmap, Constants.BITMAP_MAX_SIZE, (bitmapHeight * Constants.BITMAP_MAX_SIZE)/bitmapWidth, true);
+                            bitmap, mDisplayWidth, (bitmapHeight * mDisplayWidth)/bitmapWidth, true);
                 } else {
                     resizeBitmap = Bitmap.createScaledBitmap(
-                            bitmap, (bitmapWidth * Constants.BITMAP_MAX_SIZE)/bitmapHeight, Constants.BITMAP_MAX_SIZE, true);
+                            bitmap, (bitmapWidth * mDisplayWidth)/bitmapHeight, mDisplayWidth, true);
                 }
                 
                 if (resizeBitmap == null) {
+                	bitmap.recycle();
                     if (DEBUG) Log.e(TAG, "getImageBitmap - resizeBitmap is null!");
                     return null;
                 } else {
