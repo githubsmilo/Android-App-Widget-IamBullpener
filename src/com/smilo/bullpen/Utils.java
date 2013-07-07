@@ -47,7 +47,7 @@ public final class Utils {
                 return true;
         }
 */    
-        Toast.makeText(context, R.string.internet_not_connected_msg, Toast.LENGTH_SHORT).show();
+        //Toast.makeText(context, R.string.internet_not_connected_msg, Toast.LENGTH_SHORT).show();
         return INTERNET_CONNECTED_RESULT.FAILED;
     }
     
