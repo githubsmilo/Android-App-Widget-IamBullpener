@@ -35,7 +35,7 @@ public class WidgetProvider extends AppWidgetProvider {
     private static boolean mIsSkipFirstCallContentService = true;
     
     // For SharedPreferences.
-    private static final String mSharedPreferenceName = Constants.PACKAGE_NAME;
+    private static final String mSharedPreferenceName = Constants.Specific.PACKAGE_NAME;
     private static final String mKeyCompleteToSetup = "key_complete_to_setup";
     private static final String mKeyPermitMobileConnectionType = "key_permit_mobile_connection_type";
     private static final String mKeyRefreshTimeType = "key_refresh_time_type";
@@ -212,7 +212,7 @@ public class WidgetProvider extends AppWidgetProvider {
             // Set title of the remoteViews.
             if (item.getSearchCategoryType() == Constants.ERROR_SEARCH_CAGETORY_TYPE)
                 rv.setTextViewText(R.id.textListTitle, (Utils.getBoardTitle(context, item.getBoardType()) + " - " + currentPageNum));
-            else if (item.getSearchCategoryType() == Constants.SEARCH_CATEGORY_TYPE_SUBJECT)
+            else if (item.getSearchCategoryType() == Constants.Specific.SEARCH_CATEGORY_TYPE_SUBJECT)
                 rv.setTextViewText(R.id.textListTitle, (Utils.getBoardTitle(context, item.getBoardType()) + " - " + currentPageNum +
                         " [" + Utils.getSubjectTitle(context, item.getSearchSubjectType()) + "]"));
             else
@@ -348,7 +348,7 @@ public class WidgetProvider extends AppWidgetProvider {
     private void refreshAlarmSetting(Context context, intentItem item, INTERNET_CONNECTED_RESULT result) {
         // If user does not want to refresh, just remove alarm setting.
     	// TODO : Consider INTERNET_CONNECTED_RESULT case here?
-        if (item.getRefreshTimeType() == Constants.REFRESH_TIME_TYPE_STOP) {
+        if (item.getRefreshTimeType() == Constants.Specific.REFRESH_TIME_TYPE_STOP) {
             removePreviousAlarm();
             
         // If user wants to refresh, set new alarm.
@@ -482,7 +482,7 @@ public class WidgetProvider extends AppWidgetProvider {
         if (selectedItemUrl == null) {
 	        try {
 	            if (Utils.isTodayBestBoardType(item.getBoardType())) {
-	                url = Constants.URL_BASE;
+	                url = Constants.Specific.URL_BASE;
 	            } else {
 	                url = Utils.getMobileBoardUrl(context, item.getPageNum(), item.getBoardType(), 
 	                        item.getSearchCategoryType(), item.getSearchSubjectType(), item.getSearchKeyword());

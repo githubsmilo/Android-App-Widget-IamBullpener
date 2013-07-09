@@ -82,14 +82,14 @@ public class SearchActivity extends Activity {
         adapterSearchCategory.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinSearchCategory.setAdapter(adapterSearchCategory);
         spinSearchCategory.setOnItemSelectedListener(mSpinSearchCategorySelectedListener);
-        spinSearchCategory.setSelection(Constants.SEARCH_CATEGORY_TYPE_TITLE);
+        spinSearchCategory.setSelection(Constants.Specific.SEARCH_CATEGORY_TYPE_TITLE);
         
         Spinner spinSearchSubject = (Spinner)findViewById(R.id.spinSearchSubject);
         ArrayAdapter<CharSequence> adapterSearchSubject = ArrayAdapter.createFromResource(this, R.array.searchSubject, android.R.layout.simple_spinner_item);
         adapterSearchSubject.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinSearchSubject.setAdapter(adapterSearchSubject);
         spinSearchSubject.setOnItemSelectedListener(mSpinSearchSubjectSelectedListener);
-        spinSearchSubject.setSelection(Constants.SEARCH_SUBJECT_TYPE_1);
+        spinSearchSubject.setSelection(Constants.Specific.SEARCH_SUBJECT_TYPE_1);
     }
 
     private void initializeButtons() {
@@ -106,7 +106,7 @@ public class SearchActivity extends Activity {
             String searchKeyword = etSearchKeyword.getText().toString();
             
             // Check that keyword is empty.
-            if ((mSelectedSearchCategoryType != Constants.SEARCH_CATEGORY_TYPE_SUBJECT) &&
+            if ((mSelectedSearchCategoryType != Constants.Specific.SEARCH_CATEGORY_TYPE_SUBJECT) &&
                   (searchKeyword.equals(""))) {
                 Toast.makeText(context, R.string.text_need_to_enter_keyword, Toast.LENGTH_SHORT).show();
                 return;
@@ -147,7 +147,7 @@ public class SearchActivity extends Activity {
         public void onItemSelected(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
             mSelectedSearchCategoryType = arg2;
             
-            if (mSelectedSearchCategoryType == Constants.SEARCH_CATEGORY_TYPE_SUBJECT)
+            if (mSelectedSearchCategoryType == Constants.Specific.SEARCH_CATEGORY_TYPE_SUBJECT)
                 toggleSearchTarget(false);
             else
                 toggleSearchTarget(true);

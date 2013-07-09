@@ -207,7 +207,7 @@ public class ListViewFactory implements RemoteViewsService.RemoteViewsFactory {
         // Initialize widget item array list here.
         mListItems.clear();
 
-        Source source = new Source(new URL(Constants.URL_BASE));
+        Source source = new Source(new URL(Constants.Specific.URL_BASE));
         source.fullSequentialParse();
         
         // Find the same pattern with <div class='today_best'>. This means the 'today best' and we can find three items.
@@ -222,9 +222,9 @@ public class ListViewFactory implements RemoteViewsService.RemoteViewsFactory {
             String classAttr = div.getAttributeValue("class");
             if (classAttr != null && classAttr.equals("today_best")) {
                 foundTodayBest++;
-                if ((urlAddress.equals(Constants.URL_MLB_TOWN_TODAY_BEST) && foundTodayBest == 1) ||
-                    (urlAddress.equals(Constants.URL_KBO_TOWN_TODAY_BEST) && foundTodayBest == 2) ||
-                    (urlAddress.equals(Constants.URL_BULLPEN_TODAY_BEST) && foundTodayBest == 3)) {
+                if ((urlAddress.equals(Constants.Specific.URL_MLB_TOWN_TODAY_BEST) && foundTodayBest == 1) ||
+                    (urlAddress.equals(Constants.Specific.URL_KBO_TOWN_TODAY_BEST) && foundTodayBest == 2) ||
+                    (urlAddress.equals(Constants.Specific.URL_BULLPEN_TODAY_BEST) && foundTodayBest == 3)) {
                     targetDiv = div;
                     break;
                 }
@@ -254,7 +254,7 @@ public class ListViewFactory implements RemoteViewsService.RemoteViewsFactory {
                             url = ((StartTag)nodeSeg).getAttributeValue("href");
                             if (url.startsWith("/")) {
                                 StringBuffer strBuf = new StringBuffer();
-                                strBuf.append(Constants.URL_BASE);
+                                strBuf.append(Constants.Specific.URL_BASE);
                                 strBuf.append(url);
                                 url = strBuf.toString();
                             }
@@ -345,7 +345,7 @@ public class ListViewFactory implements RemoteViewsService.RemoteViewsFactory {
                            url = ((StartTag)nodeSeg).getAttributeValue("href");
                            if (url.startsWith("/")) {
                                StringBuffer strBuf = new StringBuffer();
-                               strBuf.append(Constants.URL_BASE);
+                               strBuf.append(Constants.Specific.URL_BASE);
                                strBuf.append(url);
                                url = strBuf.toString();
                            }
@@ -387,7 +387,7 @@ public class ListViewFactory implements RemoteViewsService.RemoteViewsFactory {
                 mListItems.add(item);
                 mAddedItemCount++;
 
-                if (mAddedItemCount == Constants.LISTVIEW_MAX_ITEM_COUNT)
+                if (mAddedItemCount == Constants.Specific.LISTVIEW_MAX_ITEM_COUNT)
                     break;
             }
             
@@ -438,7 +438,7 @@ public class ListViewFactory implements RemoteViewsService.RemoteViewsFactory {
                 String url = content.getURIAttributes().get(0).getValue();
                 if (url.startsWith("/")) {
                     StringBuffer strBuf = new StringBuffer();
-                    strBuf.append(Constants.URL_BASE);
+                    strBuf.append(Constants.Specific.URL_BASE);
                     strBuf.append(url);
                     url = strBuf.toString();
                 }
@@ -449,7 +449,7 @@ public class ListViewFactory implements RemoteViewsService.RemoteViewsFactory {
                 mListItems.add(item);
                 addedItemCount++;
                 
-                if (addedItemCount == Constants.LISTVIEW_MAX_ITEM_COUNT) {
+                if (addedItemCount == Constants.Specific.LISTVIEW_MAX_ITEM_COUNT) {
                     if (DEBUG) Log.i(TAG, "parseMLBParkFullBoard - done!");
                     return PARSING_RESULT.SUCCESS_FULL_BOARD;
                 }
