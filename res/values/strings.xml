@@ -34,6 +34,7 @@
     <string name="text_failed_io_exception">서버 접속 실패. 잠시 후 다시 시도해보세요.</string>
     <string name="text_failed_json_exception">서버로부터 가져온 정보 오류 발생1</string>
     <string name="text_failed_stack_overflow">서버로부터 가져온 정보 오류 발생2</string>
+    <string name="text_failed_out_of_memory">서버로부터 가져온 정보 오류 발생3</string>
     <string name="text_failed_unknown">알 수 없는 에러 발생</string>
 
     <!-- Configuration activity -->

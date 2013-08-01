@@ -51,6 +51,7 @@ public final class Constants {
         FAILED_IO_EXCEPTION,
         FAILED_JSON_EXCEPTION,
         FAILED_STACK_OVERFLOW,
+        FAILED_OUT_OF_MEMORY,
         FAILED_UNKNOWN,
     };
     

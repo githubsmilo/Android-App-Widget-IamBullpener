@@ -215,7 +215,11 @@ public class ContentsFactory implements RemoteViewsService.RemoteViewsFactory {
             case FAILED_STACK_OVERFLOW :
                 rv.setTextViewText(R.id.contentRowTitleText, mContext.getResources().getString(R.string.text_failed_stack_overflow));
                 break;
-                
+            
+            case FAILED_OUT_OF_MEMORY :
+                rv.setTextViewText(R.id.contentRowTitleText, mContext.getResources().getString(R.string.text_failed_out_of_memory));
+                break;
+               
             case FAILED_UNKNOWN :
             default:
                 rv.setTextViewText(R.id.contentRowTitleText, mContext.getResources().getString(R.string.text_failed_unknown));
@@ -251,6 +255,10 @@ public class ContentsFactory implements RemoteViewsService.RemoteViewsFactory {
             if (DEBUG) Log.e(TAG, "onDataSetChanged - parseMLBParkHtmlDataMobileVer - StackOverflowError![" + e.toString() + "]");
             e.printStackTrace();
             mParsingResult = PARSING_RESULT.FAILED_STACK_OVERFLOW;
+        } catch (OutOfMemoryError e) {
+            if (DEBUG) Log.e(TAG, "onDataSetChanged - parseMLBParkHtmlDataMobileVer - OutOfMemoryError![" + e.toString() + "]");
+            e.printStackTrace();
+            mParsingResult = PARSING_RESULT.FAILED_OUT_OF_MEMORY;
         }
     }
     
@@ -292,7 +300,8 @@ public class ContentsFactory implements RemoteViewsService.RemoteViewsFactory {
         teardownIntentListener();
     }
 
-    private PARSING_RESULT parseMLBParkHtmlDataMobileVer(String urlAddress) throws IOException, JSONException, StackOverflowError {
+    private PARSING_RESULT parseMLBParkHtmlDataMobileVer(String urlAddress)
+            throws IOException, JSONException, StackOverflowError, OutOfMemoryError {
 
         // Load HTML data from given urlAddress.
         Source source = new Source(new URL(urlAddress));
