@@ -18,6 +18,9 @@ import android.view.View;
 import android.widget.RemoteViews;
 
 import com.smilo.bullpen.Constants.INTERNET_CONNECTED_RESULT;
+import com.smilo.bullpen.activities.ConfigurationActivity;
+import com.smilo.bullpen.activities.SearchActivity;
+import com.smilo.bullpen.activities.WebViewActivity;
 
 public class WidgetProvider extends AppWidgetProvider {
 
@@ -314,7 +317,7 @@ public class WidgetProvider extends AppWidgetProvider {
         pi = PendingIntent.getActivity(context, PENDING_INTENT_REQUEST_CODE.REQUEST_EXPORT.ordinal(),
                 buildExportIntent(context, item, selectedItemUrl), PendingIntent.FLAG_UPDATE_CURRENT);
         rv.setOnClickPendingIntent(R.id.btnContentExport, pi);
-        
+
         // Set top button of the remoteViews.
         pi = PendingIntent.getBroadcast(context, PENDING_INTENT_REQUEST_CODE.REQUEST_TOP.ordinal(),
                                         buildRefreshListIntent(context, item), PendingIntent.FLAG_UPDATE_CURRENT);
