@@ -9,6 +9,7 @@ import android.app.Activity;
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -25,6 +26,7 @@ public class ConfigurationActivity extends Activity {
     private static final boolean DEBUG = Constants.DEBUG_MODE;
     
     private int mAppWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID;
+    //private static int mPageNum = Constants.DEFAULT_PAGE_NUM; // We use default page num.
     private int mSelectedBoardType = Constants.DEFAULT_BOARD_TYPE;
     private int mSelectedRefreshTimeType = Constants.DEFAULT_REFRESH_TIME_TYPE;
     
@@ -57,27 +59,35 @@ public class ConfigurationActivity extends Activity {
             mIsExecutedBySettingButton = true;
         }
         
-        boolean isPermitMobileConnection = extras.getBoolean(
-                Constants.EXTRA_PERMIT_MOBILE_CONNECTION_TYPE, Constants.DEFAULT_PERMIT_MOBILE_CONNECTION_TYPE);
-        int refreshTimeType = extras.getInt(
-                Constants.EXTRA_REFRESH_TIME_TYPE, Constants.DEFAULT_REFRESH_TIME_TYPE);
-        int boardType = extras.getInt(
-                Constants.EXTRA_BOARD_TYPE, Constants.DEFAULT_BOARD_TYPE);
+        int boardType;
+        int refreshTimeType;
+        boolean isPermitMobileConnection;
+        String blackList;
         
+        if (mIsExecutedBySettingButton) {
+            boardType = extras.getInt(
+                    Constants.EXTRA_BOARD_TYPE, Constants.DEFAULT_BOARD_TYPE);
+            refreshTimeType = extras.getInt(
+                    Constants.EXTRA_REFRESH_TIME_TYPE, Constants.DEFAULT_REFRESH_TIME_TYPE);
+            isPermitMobileConnection = extras.getBoolean(
+                    Constants.EXTRA_PERMIT_MOBILE_CONNECTION_TYPE, Constants.DEFAULT_PERMIT_MOBILE_CONNECTION_TYPE);
+            blackList = extras.getString(Constants.EXTRA_BLACK_LIST);
+            
+        } else {
+        	// Load configuration info.
+            SharedPreferences pref = getApplicationContext().getSharedPreferences(Constants.SHARED_PREFERENCE_NAME, Context.MODE_PRIVATE);
+            
+            boardType = pref.getInt(Constants.KEY_BOARD_TYPE, Constants.DEFAULT_BOARD_TYPE);
+            refreshTimeType = pref.getInt(Constants.KEY_REFRESH_TIME_TYPE, Constants.DEFAULT_REFRESH_TIME_TYPE);
+            isPermitMobileConnection = pref.getBoolean(Constants.KEY_PERMIT_MOBILE_CONNECTION_TYPE, Constants.DEFAULT_PERMIT_MOBILE_CONNECTION_TYPE);
+            blackList = pref.getString(Constants.KEY_BLACK_LIST, Constants.DEFAULT_BLACK_LIST);
+        }
+
         initializeRadioButton(isPermitMobileConnection);
         initializeSpinners(refreshTimeType, boardType);
-        //initializeEditText();
+        initializeEditText(blackList);
         initializeButtons();
     }
-
-    /*
-    private void initializeEditText() {
-        EditText et = (EditText)findViewById(R.id.editBlackList);
-        
-        // TODO
-        et.setFocusable(false);
-    }
-    */
 
     private void initializeRadioButton(boolean isPermitMobileConnection) {
         CheckBox cb = (CheckBox)findViewById(R.id.cbMobileConnection);
@@ -100,21 +110,38 @@ public class ConfigurationActivity extends Activity {
         spinBoard.setSelection(boardType);
     }
 
+    private void initializeEditText(String blackList) {
+        EditText et = (EditText)findViewById(R.id.editBlackList);
+        
+        if (blackList == null)
+        	et.setText(R.string.text_blackList_empty);
+        else
+        	et.setText(blackList);
+    }
+
     private void initializeButtons() {
         findViewById(R.id.btnConfigurationOk).setOnClickListener(mBtnOkOnClickListener);
         findViewById(R.id.btnConfigurationCancel).setOnClickListener(mBtnCancelOnClickListener);
     }
-    
+
     View.OnClickListener mBtnOkOnClickListener = new View.OnClickListener() {
         public void onClick(View v) {
             if (DEBUG) Log.i(TAG, "Button OK clicked");
 
+            // Get mobileConnection checkbox's value.
             CheckBox cb = (CheckBox)findViewById(R.id.cbMobileConnection);
             boolean selectedPermitMobileConnectionType = cb.isChecked();
             
+            // Get black list's value. If empty, set null.
+            EditText et = (EditText)findViewById(R.id.editBlackList);
+            String blackList = et.getText().toString();
+            if (blackList != null && blackList.length() == 0)
+            	blackList = null;
+            
             if (DEBUG) Log.i(TAG, "mSelectedBoardType[" + mSelectedBoardType +
                     "], mSelectedRefreshTimeType[" + mSelectedRefreshTimeType + 
-                    "], selectedPermitMobileConnectionType[" + selectedPermitMobileConnectionType + "]");
+                    "], selectedPermitMobileConnectionType[" + selectedPermitMobileConnectionType +
+                    "], blackList[" + blackList + "]");
             
             final Context context = ConfigurationActivity.this;
             Intent initIntent = new Intent(context, WidgetProvider.class);
@@ -124,6 +151,7 @@ public class ConfigurationActivity extends Activity {
             initIntent.putExtra(Constants.EXTRA_BOARD_TYPE, mSelectedBoardType);
             initIntent.putExtra(Constants.EXTRA_REFRESH_TIME_TYPE, mSelectedRefreshTimeType);
             initIntent.putExtra(Constants.EXTRA_PERMIT_MOBILE_CONNECTION_TYPE, selectedPermitMobileConnectionType);
+            initIntent.putExtra(Constants.EXTRA_BLACK_LIST, blackList);
  
             context.sendBroadcast(initIntent);
             

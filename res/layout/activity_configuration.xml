@@ -77,13 +77,14 @@
 	        android:layout_weight="0.5"
 	        android:prompt="@string/prompt_board" />
     </LinearLayout>
-<!-- 
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="10dp"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
+        android:gravity="center_vertical"
         android:orientation="horizontal" >
         
         <TextView
@@ -99,14 +100,13 @@
             android:layout_height="wrap_content"
             android:drawSelectorOnTop="true"
             android:layout_weight="0.5"
-            android:hint="@string/text_blackList_not_implemented"
+            android:inputType="text"
             android:ems="10" >
-
             <requestFocus />
         </EditText>
 
     </LinearLayout>
- -->
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

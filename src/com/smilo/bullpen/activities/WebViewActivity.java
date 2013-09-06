@@ -32,6 +32,9 @@ public class WebViewActivity extends Activity {
         // out of the widget placement if they press the back button.
         setResult(RESULT_CANCELED);
         
+        // Set title
+        setTitle(R.string.title_activity_web_view);
+        
 		setContentView(R.layout.activity_web_view);
 
 		Log.i(TAG, "onCreate");

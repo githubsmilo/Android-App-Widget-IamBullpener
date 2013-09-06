@@ -19,6 +19,7 @@
     <string name="remoteViewTitle_Bullpen2000">BULLPEN 조회수 2000</string>
     <string name="remoteViewTitle_News">뉴스</string>
     <string name="btn_search">Search</string>
+    <string name="btn_addtoblacklist">BlackList</string>
     <string name="btn_top">Top</string>
     <string name="btn_prev">Prev</string>
     <string name="btn_next">Next</string>
@@ -47,6 +48,7 @@
     <string name="text_appInfo">만든이</string>
     <string name="btn_ok">OK</string>
     <string name="btn_cancel">Cancel</string>
+    <string name="text_blackList_empty">없음</string>
     <string name="text_blackList_not_implemented">구현 예정</string>
     <string name="appInfo">smilolistener@gmail.com</string>
 
@@ -55,7 +57,7 @@
     <string name="btn_close">Close</string>
     <string name="text_progressbar_title">Loading</string>
     <string name="text_progressbar_message">잠시만 기다려 주세요.</string>
-    
+
     <!-- Search activity -->
     <string name="title_activity_search">검색</string>
     <string name="prompt_searchCategory">카테고리</string>
@@ -64,6 +66,11 @@
     <string name="text_searchKeyword">검색어</string>
     <string name="text_searchSubject">말머리</string>
     <string name="text_need_to_enter_keyword">검색어를 입력해주세요.</string>
+    
+    <!-- AddToBlacklist activity -->
+    <string name="title_activity_add_to_black_list">차단 목록에 추가?</string>
+    <string name="text_add_to_black_list_notice">아래 사용자를 차단 목록에\n추가하시겠습니까?</string>
+    <string name="text_add_to_black_list_msg">님이 차단 목록에 추가되었습니다.</string>
 
     <!-- Search category parameter -->
     <string name="text_category_parameter_title">stt</string>

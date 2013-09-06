@@ -53,10 +53,12 @@ public class ListViewFactory implements RemoteViewsService.RemoteViewsFactory {
 
     private class listItem {
         public String itemTitle;
+        public String itemWriter;
         public String itemUrl;
 
-        listItem(String title, String url) {
+        listItem(String title, String writer, String url) {
             itemTitle = title;
+            itemWriter = writer;
             itemUrl = url;
         }
     }
@@ -100,7 +102,12 @@ public class ListViewFactory implements RemoteViewsService.RemoteViewsFactory {
             case SUCCESS_MOBILE_TODAY_BEST :
                 rv.setTextViewText(R.id.listRowText, mListItems.get(position).itemTitle);
                 Intent fillInIntent = new Intent();
-                fillInIntent.putExtra(Constants.EXTRA_ITEM_URL, mListItems.get(position).itemUrl);
+                String itemUrl = mListItems.get(position).itemUrl;
+                String itemWriter = mListItems.get(position).itemWriter;
+                if (itemUrl != null && itemUrl.length() > 0)
+                    fillInIntent.putExtra(Constants.EXTRA_ITEM_URL, itemUrl);
+                if (itemWriter != null && itemWriter.length() > 0)
+                    fillInIntent.putExtra(Constants.EXTRA_ITEM_WRITER, itemWriter);
                 rv.setOnClickFillInIntent(R.id.listRowText, fillInIntent);
                 break;
                 
@@ -261,7 +268,7 @@ public class ListViewFactory implements RemoteViewsService.RemoteViewsFactory {
                             // Add widget item array list
                             //Log.i(TAG, "parseMLBParkTodayBest - title[" + title + "],url[" + url + "]");
                             
-                            listItem item = new listItem(title, url);
+                            listItem item = new listItem(title, null, url);
                             mListItems.add(item);
                             title = null;
                             url = null;
@@ -301,6 +308,12 @@ public class ListViewFactory implements RemoteViewsService.RemoteViewsFactory {
     private PARSING_RESULT parseMLBParkMobileBoard(String urlAddress) throws IOException, JSONException, StackOverflowError {
         // Initialize widget item array list here.
         mListItems.clear();
+
+        // Parse black list
+        String[] blackList = null;
+        if (mBlackList != null) {
+            blackList = mBlackList.split(Constants.DELIMITER_BLACK_LIST);
+        }
         
         Source source = new Source(new URL(urlAddress));
         source.fullSequentialParse();
@@ -323,11 +336,11 @@ public class ListViewFactory implements RemoteViewsService.RemoteViewsFactory {
             
             for (int i = 0 ; i < lis.size() ; i++) {
                 Segment seg = lis.get(i).getContent();
-                String title = "", url = null;
-                boolean isAddTitle = false, isAddCommentNum = false;
+                String title = "", writer = null, url = null;
+                boolean isAddTitle = false, isAddWriter = false, isAddCommentNum = false, isSkipToAdd = false;
                 //Log.i(TAG, "seg[" + seg.toString() + "]");
 
-                // Parse title and url
+                // Parse title, writer and url
                 for (Iterator<Segment> nodeIterator = seg.getNodeIterator() ; nodeIterator.hasNext();) {
                     Segment nodeSeg = nodeIterator.next();
                     
@@ -346,6 +359,8 @@ public class ListViewFactory implements RemoteViewsService.RemoteViewsFactory {
                            }
                         } else if (tagName.equals("strong")) {
                             isAddTitle = true;
+                        } else if (tagName.equals("em")) {
+                            isAddWriter = true;
                         } else if (tagName.equals("span")) {
                             String spanClass = ((StartTag) nodeSeg).getAttributeValue("class");
                             if (spanClass != null && spanClass.equals("r")) {
@@ -358,6 +373,8 @@ public class ListViewFactory implements RemoteViewsService.RemoteViewsFactory {
                         String tagName = ((Tag)nodeSeg).getName();
                         if (tagName.equals("strong")) {
                             isAddTitle = false;
+                        } else if (tagName.equals("em")) {
+                            isAddWriter = false;
                         }
                         continue;
                         
@@ -369,18 +386,32 @@ public class ListViewFactory implements RemoteViewsService.RemoteViewsFactory {
                     } else {
                         if (isAddTitle) {
                             title += (nodeSeg.getTextExtractor().toString() + " ");
+                        } else if (isAddWriter) {
+                            writer = nodeSeg.getTextExtractor().toString();
+                            isAddWriter = false;
+                            if (blackList != null) {
+                                for(String s : blackList) {
+                                    if (writer.equals(s)) {
+                                        if (DEBUG) Log.d(TAG, "parseMLBParkMobileBoard - Skip writer[" + writer + "]");
+                                        isSkipToAdd = true;
+                                        break;
+                                    }
+                                }
+                            }
                         } else if (isAddCommentNum) {
                             title += (" [" + nodeSeg.getTextExtractor().toString() + "]");
                             isAddCommentNum = false;
                         }
                     }
                 }
-                //Log.i(TAG, "parseMLBParkMobileBoard - title[" + title + "],url[" + url + "]");
-                
+
                 // Add widget item array list
-                listItem item = new listItem(title, url);
-                mListItems.add(item);
-                mAddedItemCount++;
+                if (isSkipToAdd == false) {
+                	Log.i(TAG, "parseMLBParkMobileBoard - title[" + title + "], writer[" + writer + "], url[" + url + "]");
+                    listItem item = new listItem(title, writer, url);
+                    mListItems.add(item);
+                    mAddedItemCount++;
+                }
 
                 if (mAddedItemCount == Constants.Specific.LISTVIEW_MAX_ITEM_COUNT)
                     break;
@@ -440,7 +471,7 @@ public class ListViewFactory implements RemoteViewsService.RemoteViewsFactory {
                 //Log.i(TAG, "parseMLBParkFullBoard - title[" + title + "], url[" + url + "]");
                 
                 // Add widget item to array list
-                listItem item = new listItem(title, url);
+                listItem item = new listItem(title, null, url);
                 mListItems.add(item);
                 addedItemCount++;
                 

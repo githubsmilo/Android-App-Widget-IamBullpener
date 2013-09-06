@@ -31,9 +31,9 @@ public class SearchActivity extends Activity {
     private static int mBoardType = Constants.DEFAULT_BOARD_TYPE;
     private static int mRefreshTimetype = Constants.DEFAULT_REFRESH_TIME_TYPE;
     private static boolean mIsPermitMobileConnectionType = Constants.DEFAULT_PERMIT_MOBILE_CONNECTION_TYPE;
-    
-    private int mSelectedSearchCategoryType = Constants.DEFAULT_SEARCH_CATEGORY_TYPE;
-    private int mSelectedSearchSubjectType = Constants.DEFAULT_SEARCH_SUBJECT_TYPE;
+    private static String mBlackList = Constants.DEFAULT_BLACK_LIST;
+    private static int mSelectedSearchCategoryType = Constants.DEFAULT_SEARCH_CATEGORY_TYPE;
+    private static int mSelectedSearchSubjectType = Constants.DEFAULT_SEARCH_SUBJECT_TYPE;
     
     private LinearLayout mLayoutSearchWord;
     private LinearLayout mLayoutSearchSubject;
@@ -45,6 +45,9 @@ public class SearchActivity extends Activity {
         // Set the result to CANCELED.  This will cause the widget host to cancel
         // out of the widget placement if they press the back button.
         setResult(RESULT_CANCELED);
+        
+        // Set title
+        setTitle(R.string.title_activity_search);
         
         setContentView(R.layout.activity_search);
         
@@ -59,6 +62,7 @@ public class SearchActivity extends Activity {
                 Constants.EXTRA_REFRESH_TIME_TYPE, Constants.DEFAULT_REFRESH_TIME_TYPE);
         mIsPermitMobileConnectionType = intent.getBooleanExtra(
                 Constants.EXTRA_PERMIT_MOBILE_CONNECTION_TYPE, Constants.DEFAULT_PERMIT_MOBILE_CONNECTION_TYPE);
+        mBlackList = intent.getStringExtra(Constants.EXTRA_BLACK_LIST);
         if (mAppWidgetId == AppWidgetManager.INVALID_APPWIDGET_ID) {
             finish();
         }
@@ -128,6 +132,7 @@ public class SearchActivity extends Activity {
             initIntent.putExtra(Constants.EXTRA_BOARD_TYPE, mBoardType);
             initIntent.putExtra(Constants.EXTRA_REFRESH_TIME_TYPE, mRefreshTimetype);
             initIntent.putExtra(Constants.EXTRA_PERMIT_MOBILE_CONNECTION_TYPE, mIsPermitMobileConnectionType);
+            initIntent.putExtra(Constants.EXTRA_BLACK_LIST, mBlackList);
             initIntent.putExtra(Constants.EXTRA_SEARCH_CATEGORY_TYPE, mSelectedSearchCategoryType);
             initIntent.putExtra(Constants.EXTRA_SEARCH_SUBJECT_TYPE, mSelectedSearchSubjectType);
             initIntent.putExtra(Constants.EXTRA_SEARCH_KEYWORD, searchKeyword);

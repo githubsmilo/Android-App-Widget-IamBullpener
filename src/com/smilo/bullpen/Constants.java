@@ -23,11 +23,20 @@ public final class Constants {
     public static final String EXTRA_PERMIT_MOBILE_CONNECTION_TYPE = Specific.PACKAGE_NAME + ".PERMIT_MOBILE_CONNECTION";
     public static final String EXTRA_BLACK_LIST = Specific.PACKAGE_NAME + ".BLACK_LIST";
     public static final String EXTRA_ITEM_URL = Specific.PACKAGE_NAME + ".EXTRA_ITEM_URL";
+    public static final String EXTRA_ITEM_WRITER = Specific.PACKAGE_NAME + ".EXTRA_ITEM_WRITER";
     public static final String EXTRA_SEARCH_CATEGORY_TYPE = Specific.PACKAGE_NAME + ".SEARCH_CATEGORY_TYPE";
     public static final String EXTRA_SEARCH_SUBJECT_TYPE = Specific.PACKAGE_NAME + ".SEARCH_SUBJECT_TYPE";
     public static final String EXTRA_SEARCH_KEYWORD = Specific.PACKAGE_NAME + ".SEARCH_KEYWORD";
     public static final String EXTRA_EXPORT_URL = Specific.PACKAGE_NAME + ".EXPORT_URL";
     public static final String EXTRA_INTERNET_CONNECTED_RESULT = Specific.PACKAGE_NAME + ".INTERNET_CONNECTED_RESULT";
+    
+    // Keys for SharedPreferences.
+    public static final String SHARED_PREFERENCE_NAME = Constants.Specific.PACKAGE_NAME;
+    public static final String KEY_COMPLETE_TO_SETUP = "key_complete_to_setup";
+    public static final String KEY_PERMIT_MOBILE_CONNECTION_TYPE = "key_permit_mobile_connection_type";
+    public static final String KEY_REFRESH_TIME_TYPE = "key_refresh_time_type";
+    public static final String KEY_BOARD_TYPE = "key_board_type";
+    public static final String KEY_BLACK_LIST = "key_black_list";
     
     // Intentitem default values
     public static final int DEFAULT_PAGE_NUM = 1;
@@ -37,6 +46,8 @@ public final class Constants {
     public static final String DEFAULT_BLACK_LIST = null;
     public static final int DEFAULT_SEARCH_CATEGORY_TYPE = Specific.SEARCH_CATEGORY_TYPE_DEFAULT;
     public static final int DEFAULT_SEARCH_SUBJECT_TYPE = Specific.SEARCH_SUBJECT_TYPE_DEFAULT;
+    
+    public static final String DELIMITER_BLACK_LIST = ",";
     
     public enum PARSING_RESULT {
         SUCCESS_FULL_BOARD,

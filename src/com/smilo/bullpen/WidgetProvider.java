@@ -18,6 +18,7 @@ import android.view.View;
 import android.widget.RemoteViews;
 
 import com.smilo.bullpen.Constants.INTERNET_CONNECTED_RESULT;
+import com.smilo.bullpen.activities.AddToBlacklistActivity;
 import com.smilo.bullpen.activities.ConfigurationActivity;
 import com.smilo.bullpen.activities.SearchActivity;
 import com.smilo.bullpen.activities.WebViewActivity;
@@ -37,14 +38,6 @@ public class WidgetProvider extends AppWidgetProvider {
     private static boolean mIsSkipFirstCallListViewService = true;
     private static boolean mIsSkipFirstCallContentService = true;
     
-    // Keys for SharedPreferences.
-    private static final String mSharedPreferenceName = Constants.Specific.PACKAGE_NAME;
-    private static final String mKeyCompleteToSetup = "key_complete_to_setup";
-    private static final String mKeyPermitMobileConnectionType = "key_permit_mobile_connection_type";
-    private static final String mKeyRefreshTimeType = "key_refresh_time_type";
-    private static final String mKeyBoardType = "key_board_type";
-    private static final String mKeyBlackList = "key_black_list";
-    
     private static enum PENDING_INTENT_REQUEST_CODE {
         REQUEST_TOP,
         REQUEST_PREV,
@@ -53,6 +46,7 @@ public class WidgetProvider extends AppWidgetProvider {
         REQUEST_REFRESH,
         REQUEST_SETTING,
         REQUEST_EXPORT,
+        REQUEST_ADDTOBLACKLIST,
         REQUEST_UNKNOWN,
     };
     
@@ -91,7 +85,7 @@ public class WidgetProvider extends AppWidgetProvider {
         
         if (DEBUG) Log.d(TAG, "onReceive - action[" + action + "], appWidgetsNum[" + appWidgetIds.length +
                 "], intentItem[" + item.toString() + "]");
-        
+
         for (int i = 0 ; i < appWidgetIds.length ; i++) {
             if (DEBUG) Log.d(TAG, "onReceive - current appWidgetId[" + appWidgetIds[i] + "]");
             
@@ -102,21 +96,14 @@ public class WidgetProvider extends AppWidgetProvider {
                     removePreviousAlarm();
                     
                     // Save configuration info.
-                    SharedPreferences pref = context.getSharedPreferences(mSharedPreferenceName, Context.MODE_PRIVATE);
-                    SharedPreferences.Editor editor = pref.edit();
-                    editor.putBoolean(mKeyCompleteToSetup, true);
-                    editor.putInt(mKeyBoardType, boardType);
-                    editor.putInt(mKeyRefreshTimeType, refreshTimeType);
-                    editor.putBoolean(mKeyPermitMobileConnectionType, permitMobileConnectionType);
-                    editor.putString(mKeyBlackList, blackList);
-                    editor.commit();
+                    saveIntentItem(context, boardType, refreshTimeType, permitMobileConnectionType, blackList);
 
                     // Send broadcast intent to update some variables on the ListViewFactory.
                     context.sendBroadcast(buildUpdateListInfoIntent(item));
                     
                 	// Broadcast ACTION_SHOW_LIST intent.
                     context.sendBroadcast(buildShowListIntent(context, item));
-                    
+
                 // After setting search activity, this intent will be called.
                 } else if ((action.equals(Constants.ACTION_REFRESH_LIST)) ||
                         (action.equals(Constants.ACTION_SEARCH))) {    
@@ -141,6 +128,9 @@ public class WidgetProvider extends AppWidgetProvider {
                     	setRemoteViewToShowLostInternetConnection(context, awm, item);
                     else
                         setRemoteViewToShowList(context, awm, item);
+                    
+                    // Save configuration info.
+        	        saveIntentItem(context, boardType, refreshTimeType, permitMobileConnectionType, blackList);
 
                 // This intent will be called when some item selected.
                 // EXTRA_ITEM_URL was already filled in the ListViewFactory - getViewAt().
@@ -148,9 +138,10 @@ public class WidgetProvider extends AppWidgetProvider {
                     removePreviousAlarm();
                     
                     String selectedItemUrl = intent.getStringExtra(Constants.EXTRA_ITEM_URL);
+                    String selectedItemWriter = intent.getStringExtra(Constants.EXTRA_ITEM_WRITER);
 
                     // Send broadcast intent to update some variables on the ContentsFactory.
-                    context.sendBroadcast(buildUpdateItemInfoIntent(item, selectedItemUrl));
+                    context.sendBroadcast(buildUpdateItemInfoIntent(item, selectedItemUrl, selectedItemWriter));
                     
                     // Check which internet is connected or net.
                     INTERNET_CONNECTED_RESULT result = Utils.isInternetConnected(context, permitMobileConnectionType);
@@ -159,7 +150,7 @@ public class WidgetProvider extends AppWidgetProvider {
                     if (result == INTERNET_CONNECTED_RESULT.FAILED)
                     	setRemoteViewToShowLostInternetConnection(context, awm, item);
                     else
-                        setRemoteViewToShowItem(context, awm, item, selectedItemUrl);
+                        setRemoteViewToShowItem(context, awm, item, selectedItemUrl, selectedItemWriter);
                 }
             }
         }
@@ -297,8 +288,10 @@ public class WidgetProvider extends AppWidgetProvider {
         }
     }
     
-    private void setRemoteViewToShowItem(Context context, AppWidgetManager awm, intentItem item, String selectedItemUrl) {
-        if (DEBUG) Log.d(TAG, "setRemoteViewToShowItem - intentItem[" + item.toString() + "], selectedItemUrl[" + selectedItemUrl + "]");
+    private void setRemoteViewToShowItem(Context context, AppWidgetManager awm, intentItem item,
+            String selectedItemUrl, String selectedItemWriter) {
+        if (DEBUG) Log.d(TAG, "setRemoteViewToShowItem - intentItem[" + item.toString() +
+                "], selectedItemUrl[" + selectedItemUrl + "], selectedItemWriter[" + selectedItemWriter + "]");
         
         PendingIntent pi = null;
         
@@ -306,7 +299,7 @@ public class WidgetProvider extends AppWidgetProvider {
         RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.content);
         
         // Set a remoteAdapter to the remoteViews.
-        Intent serviceIntent = buildContentServiceIntent(context, item, selectedItemUrl);
+        Intent serviceIntent = buildContentServiceIntent(context, item, selectedItemUrl, selectedItemWriter);
         rv.setRemoteAdapter(R.id.contentView, serviceIntent); // For API14+
         //rv.setRemoteAdapter(item.getAppWidgetId(), R.id.contentView, serviceIntent); // For API13-
 
@@ -317,6 +310,11 @@ public class WidgetProvider extends AppWidgetProvider {
         pi = PendingIntent.getActivity(context, PENDING_INTENT_REQUEST_CODE.REQUEST_EXPORT.ordinal(),
                 buildExportIntent(context, item, selectedItemUrl), PendingIntent.FLAG_UPDATE_CURRENT);
         rv.setOnClickPendingIntent(R.id.btnContentExport, pi);
+        
+        // Set addtoblacklist button of the remoteViews.
+        pi = PendingIntent.getActivity(context, PENDING_INTENT_REQUEST_CODE.REQUEST_ADDTOBLACKLIST.ordinal(),
+                buildAddToBlackListIntent(context, item, selectedItemWriter), PendingIntent.FLAG_UPDATE_CURRENT);
+        rv.setOnClickPendingIntent(R.id.btnContentAddToBlacklist, pi);
 
         // Set top button of the remoteViews.
         pi = PendingIntent.getBroadcast(context, PENDING_INTENT_REQUEST_CODE.REQUEST_TOP.ordinal(),
@@ -410,11 +408,14 @@ public class WidgetProvider extends AppWidgetProvider {
         return intent;
     }
     
-    private Intent buildUpdateItemInfoIntent(intentItem item, String selectedItemUrl) {
+    private Intent buildUpdateItemInfoIntent(intentItem item,
+            String selectedItemUrl, String selectedItemWriter) {
         Intent intent = buildBaseIntent(item);
         intent.setAction(Constants.ACTION_UPDATE_ITEM_INFO);
         if (selectedItemUrl != null && selectedItemUrl.length() > 0)
             intent.putExtra(Constants.EXTRA_ITEM_URL, selectedItemUrl);
+        if (selectedItemWriter != null && selectedItemWriter.length() >0)
+            intent.putExtra(Constants.EXTRA_ITEM_WRITER, selectedItemWriter);
         
         return intent;
     }
@@ -435,11 +436,12 @@ public class WidgetProvider extends AppWidgetProvider {
         return intent;
     }
     
-    private Intent buildShowItemIntent(Context context, intentItem item, String selectedItemUrl) {
+    private Intent buildShowItemIntent(Context context, intentItem item,
+            String selectedItemUrl) {
         Intent intent = buildBaseIntent(item);
         intent.setClass(context, WidgetProvider.class);  
         intent.setAction(Constants.ACTION_SHOW_ITEM);
-        if (selectedItemUrl != null)
+        if (selectedItemUrl != null && selectedItemUrl.length() > 0)
             intent.putExtra(Constants.EXTRA_ITEM_URL, selectedItemUrl);
         
         return intent;
@@ -461,6 +463,17 @@ public class WidgetProvider extends AppWidgetProvider {
         return intent;
     }
     
+    private Intent buildAddToBlackListIntent(Context context, intentItem item,
+            String selectedItemWriter) {
+        Intent intent = buildBaseIntent(item);
+        intent.setClass(context, AddToBlacklistActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        if (selectedItemWriter != null && selectedItemWriter.length() > 0)
+            intent.putExtra(Constants.EXTRA_ITEM_WRITER, selectedItemWriter);
+
+        return intent;
+    }
+    
     private Intent buildListViewServiceIntent(Context context, intentItem intentItem) {
         Intent intent = buildBaseIntent(intentItem);
         intent.setClass(context, ListViewService.class);
@@ -468,10 +481,14 @@ public class WidgetProvider extends AppWidgetProvider {
         return intent;
     }
     
-    private Intent buildContentServiceIntent(Context context, intentItem item, String selectedItemUrl) {
+    private Intent buildContentServiceIntent(Context context, intentItem item,
+            String selectedItemUrl, String selectedItemWriter) {
         Intent intent = buildBaseIntent(item);
         intent.setClass(context, ContentsService.class);
-        intent.putExtra(Constants.EXTRA_ITEM_URL, selectedItemUrl);
+        if (selectedItemUrl != null && selectedItemUrl.length() > 0)
+            intent.putExtra(Constants.EXTRA_ITEM_URL, selectedItemUrl);
+        if (selectedItemWriter != null && selectedItemWriter.length() > 0)
+            intent.putExtra(Constants.EXTRA_ITEM_WRITER, selectedItemWriter);
         
         return intent;
     }
@@ -512,6 +529,20 @@ public class WidgetProvider extends AppWidgetProvider {
         return intent;
     }
 
+    private void saveIntentItem(Context context, int boardType, int refreshTimeType, 
+    		boolean permitMobileConnectionType, String blackList) {
+    	if (DEBUG) Log.d(TAG, "saveIntentItem");
+    	
+    	SharedPreferences pref = context.getSharedPreferences(Constants.SHARED_PREFERENCE_NAME, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = pref.edit();
+        editor.putBoolean(Constants.KEY_COMPLETE_TO_SETUP, true);
+        editor.putInt(Constants.KEY_BOARD_TYPE, boardType);
+        editor.putInt(Constants.KEY_REFRESH_TIME_TYPE, refreshTimeType);
+        editor.putBoolean(Constants.KEY_PERMIT_MOBILE_CONNECTION_TYPE, permitMobileConnectionType);
+        editor.putString(Constants.KEY_BLACK_LIST, blackList);
+        editor.commit();
+    }
+    
     public static void removeWidget(Context context, int appWidgetId) {
         AppWidgetHost host = new AppWidgetHost(context, 1);
         host.deleteAppWidgetId(appWidgetId);
@@ -526,20 +557,13 @@ public class WidgetProvider extends AppWidgetProvider {
     @Override
     public void onDeleted(Context context, int[] appWidgetIds) {
         if (DEBUG) Log.d(TAG, "onDeleted");
+        removePreviousAlarm();
         super.onDeleted(context, appWidgetIds);
     }
 
     @Override
     public void onDisabled(Context context) {
         if (DEBUG) Log.d(TAG, "onDisabled");
-        removePreviousAlarm();
-        
-        // Delete all saved data.
-        SharedPreferences pref = context.getSharedPreferences(mSharedPreferenceName, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = pref.edit();
-        editor.clear();
-        editor.commit();
-        
         super.onDisabled(context);
     }
 
@@ -553,15 +577,15 @@ public class WidgetProvider extends AppWidgetProvider {
         mIsSkipFirstCallContentService = true;
         
         // Load configuration info.
-        SharedPreferences pref = context.getSharedPreferences(mSharedPreferenceName, Context.MODE_PRIVATE);
-        boolean isCompleteToSetup = pref.getBoolean(mKeyCompleteToSetup, false);
+        SharedPreferences pref = context.getSharedPreferences(Constants.SHARED_PREFERENCE_NAME, Context.MODE_PRIVATE);
+        boolean isCompleteToSetup = pref.getBoolean(Constants.KEY_COMPLETE_TO_SETUP, false);
         
         // If completed to setup already, update current widget.
         if (isCompleteToSetup) {
-            int boardType = pref.getInt(mKeyBoardType, Constants.DEFAULT_BOARD_TYPE);
-            int refreshTimeType = pref.getInt(mKeyRefreshTimeType, Constants.DEFAULT_REFRESH_TIME_TYPE);
-            boolean permitMobileConnectionType = pref.getBoolean(mKeyPermitMobileConnectionType, Constants.DEFAULT_PERMIT_MOBILE_CONNECTION_TYPE);
-            String blackList = pref.getString(mKeyBlackList, Constants.DEFAULT_BLACK_LIST);
+            int boardType = pref.getInt(Constants.KEY_BOARD_TYPE, Constants.DEFAULT_BOARD_TYPE);
+            int refreshTimeType = pref.getInt(Constants.KEY_REFRESH_TIME_TYPE, Constants.DEFAULT_REFRESH_TIME_TYPE);
+            boolean permitMobileConnectionType = pref.getBoolean(Constants.KEY_PERMIT_MOBILE_CONNECTION_TYPE, Constants.DEFAULT_PERMIT_MOBILE_CONNECTION_TYPE);
+            String blackList = pref.getString(Constants.KEY_BLACK_LIST, Constants.DEFAULT_BLACK_LIST);
 
             // Set urgent alarm to update widget as soon as possible.
             AppWidgetManager awm = AppWidgetManager.getInstance(context);
