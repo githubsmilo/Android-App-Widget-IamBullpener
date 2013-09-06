@@ -54,7 +54,7 @@ public final class Utils {
     public static String getMobileBoardUrl(Context context, int pageNum, int boardType,
             int searchCategoryType, int searchSubjectType, String searchKeyword) throws UnsupportedEncodingException {
         String result = null;
-        if ((searchCategoryType == Constants.ERROR_SEARCH_CAGETORY_TYPE) ||
+        if ((searchCategoryType == Constants.DEFAULT_SEARCH_CATEGORY_TYPE) ||
               ((searchCategoryType != Constants.Specific.SEARCH_CATEGORY_TYPE_SUBJECT) &&
                 (searchKeyword == null || searchKeyword.equals("")))) {
             result = getBoardUrl(boardType) + pageNum;

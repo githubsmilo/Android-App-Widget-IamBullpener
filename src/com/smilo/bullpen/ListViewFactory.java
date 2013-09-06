@@ -24,7 +24,6 @@ import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -43,12 +42,13 @@ public class ListViewFactory implements RemoteViewsService.RemoteViewsFactory {
     
     // intent item list
     private static int mAppWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID;
-    private static int mPageNum = Constants.ERROR_PAGE_NUM;
-    private static int mBoardType = Constants.ERROR_BOARD_TYPE;
-    //private static int mRefreshTimetype = Constants.ERROR_REFRESH_TIME_TYPE;
-    //private static boolean mIsPermitMobileConnectionType = Constants.ERROR_PERMIT_MOBILE_CONNECTION_TYPE;
-    private static int mSelectedSearchCategoryType = Constants.ERROR_SEARCH_CAGETORY_TYPE;
-    private static int mSelectedSearchSubjectType = Constants.ERROR_SEARCH_SUBJECT_TYPE;
+    private static int mPageNum = Constants.DEFAULT_PAGE_NUM;
+    private static int mBoardType = Constants.DEFAULT_BOARD_TYPE;
+    //private static int mRefreshTimetype = Constants.DEFAULT_REFRESH_TIME_TYPE;
+    //private static boolean mIsPermitMobileConnectionType = Constants.DEFAULT_PERMIT_MOBILE_CONNECTION_TYPE;
+    private static String mBlackList = Constants.DEFAULT_BLACK_LIST;
+    private static int mSelectedSearchCategoryType = Constants.DEFAULT_SEARCH_CATEGORY_TYPE;
+    private static int mSelectedSearchSubjectType = Constants.DEFAULT_SEARCH_SUBJECT_TYPE;
     private static String mSelectedSearchKeyword = null;
 
     private class listItem {
@@ -69,15 +69,17 @@ public class ListViewFactory implements RemoteViewsService.RemoteViewsFactory {
                 Constants.EXTRA_PAGE_NUM, Constants.DEFAULT_PAGE_NUM);
         mBoardType = intent.getIntExtra(
                 Constants.EXTRA_BOARD_TYPE, Constants.DEFAULT_BOARD_TYPE);
+        mBlackList = intent.getStringExtra(
+                Constants.EXTRA_BLACK_LIST);
         mSelectedSearchCategoryType = intent.getIntExtra(
-                Constants.EXTRA_SEARCH_CATEGORY_TYPE, Constants.ERROR_SEARCH_CAGETORY_TYPE);
+                Constants.EXTRA_SEARCH_CATEGORY_TYPE, Constants.DEFAULT_SEARCH_CATEGORY_TYPE);
         mSelectedSearchSubjectType = intent.getIntExtra(
-                Constants.EXTRA_SEARCH_SUBJECT_TYPE, Constants.ERROR_SEARCH_SUBJECT_TYPE);
+                Constants.EXTRA_SEARCH_SUBJECT_TYPE, Constants.DEFAULT_SEARCH_SUBJECT_TYPE);
         mSelectedSearchKeyword = intent.getStringExtra(
                 Constants.EXTRA_SEARCH_KEYWORD);
 
         if (DEBUG) Log.i(TAG, "constructor - mAppWidgetId[" + mAppWidgetId + 
-                "], mPageNum[" + mPageNum + "], mBoardType[" + mBoardType +
+                "], mPageNum[" + mPageNum + "], mBoardType[" + mBoardType + "], mBlackList[" + mBlackList +
                 "], mSelectedSearchCategoryType[" + mSelectedSearchCategoryType + 
                 "], mSelectedSearchSubjectType[" + mSelectedSearchSubjectType + 
                 "], mSelectedSearchKeyword[" + mSelectedSearchKeyword + "]");
@@ -125,15 +127,8 @@ public class ListViewFactory implements RemoteViewsService.RemoteViewsFactory {
 
     @Override
     public void onDataSetChanged() {
-        if (DEBUG) Log.i(TAG, "onDataSetChanged - mBoardType[" + mBoardType + "], mPageNum[" + mPageNum + "]");
-
-        if (mBoardType == Constants.ERROR_BOARD_TYPE) {
-            if (DEBUG) Log.e(TAG, "onDataSetChanged - mBoardType is invalid![" + mBoardType + "]");
-            return;
-        } else if (mPageNum == Constants.ERROR_PAGE_NUM) {
-            if (DEBUG) Log.e(TAG, "onDatasetChanged - mPageNum is invalid![" + mPageNum + "]");
-            return;
-        }
+        if (DEBUG) Log.i(TAG, "onDataSetChanged - mBoardType[" + mBoardType +
+                "], mPageNum[" + mPageNum + "], mBlackList[" + mBlackList + "]");
 
         // Parse MLBPark html data and add items to the widget item array list.
         try {
@@ -468,17 +463,19 @@ public class ListViewFactory implements RemoteViewsService.RemoteViewsFactory {
                     mAppWidgetId = intent.getIntExtra(
                             AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
                     mBoardType = intent.getIntExtra(
-                            Constants.EXTRA_BOARD_TYPE, Constants.ERROR_BOARD_TYPE);
+                            Constants.EXTRA_BOARD_TYPE, Constants.DEFAULT_BOARD_TYPE);
                     mPageNum = intent.getIntExtra(
-                            Constants.EXTRA_PAGE_NUM, Constants.ERROR_PAGE_NUM);
+                            Constants.EXTRA_PAGE_NUM, Constants.DEFAULT_PAGE_NUM);
+                    mBlackList = intent.getStringExtra(
+                            Constants.EXTRA_BLACK_LIST);
                     mSelectedSearchCategoryType = intent.getIntExtra(
-                            Constants.EXTRA_SEARCH_CATEGORY_TYPE, Constants.ERROR_SEARCH_CAGETORY_TYPE);
+                            Constants.EXTRA_SEARCH_CATEGORY_TYPE, Constants.DEFAULT_SEARCH_CATEGORY_TYPE);
                     mSelectedSearchSubjectType = intent.getIntExtra(
-                            Constants.EXTRA_SEARCH_SUBJECT_TYPE, Constants.ERROR_SEARCH_SUBJECT_TYPE);
+                            Constants.EXTRA_SEARCH_SUBJECT_TYPE, Constants.DEFAULT_SEARCH_SUBJECT_TYPE);
                     mSelectedSearchKeyword = intent.getStringExtra(Constants.EXTRA_SEARCH_KEYWORD);
                     
                     if (DEBUG) Log.i(TAG, "onReceive - update mAppWidgetId[" + mAppWidgetId + 
-                            "], mPageNum[" + mPageNum + "], mBoardType[" + mBoardType +
+                            "], mPageNum[" + mPageNum + "], mBoardType[" + mBoardType + "], mBlackList[" + mBlackList +
                             "], mSelectedSearchCategoryType[" + mSelectedSearchCategoryType +
                             "], mSelectedSearchSubjectType[" + mSelectedSearchSubjectType +
                             "], mSelectedSearchKeyword[" + mSelectedSearchKeyword + "]");

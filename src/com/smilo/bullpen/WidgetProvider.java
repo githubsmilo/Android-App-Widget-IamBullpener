@@ -34,12 +34,13 @@ public class WidgetProvider extends AppWidgetProvider {
     private static boolean mIsSkipFirstCallListViewService = true;
     private static boolean mIsSkipFirstCallContentService = true;
     
-    // For SharedPreferences.
+    // Keys for SharedPreferences.
     private static final String mSharedPreferenceName = Constants.Specific.PACKAGE_NAME;
     private static final String mKeyCompleteToSetup = "key_complete_to_setup";
     private static final String mKeyPermitMobileConnectionType = "key_permit_mobile_connection_type";
     private static final String mKeyRefreshTimeType = "key_refresh_time_type";
     private static final String mKeyBoardType = "key_board_type";
+    private static final String mKeyBlackList = "key_black_list";
     
     private static enum PENDING_INTENT_REQUEST_CODE {
         REQUEST_TOP,
@@ -62,22 +63,24 @@ public class WidgetProvider extends AppWidgetProvider {
         int appWidgetId = intent.getIntExtra(
                 AppWidgetManager.EXTRA_APPWIDGET_ID,  AppWidgetManager.INVALID_APPWIDGET_ID);
         int pageNum = intent.getIntExtra(
-                Constants.EXTRA_PAGE_NUM, Constants.ERROR_PAGE_NUM);
+                Constants.EXTRA_PAGE_NUM, Constants.DEFAULT_PAGE_NUM);
         int boardType = intent.getIntExtra(
-                Constants.EXTRA_BOARD_TYPE, Constants.ERROR_BOARD_TYPE);
+                Constants.EXTRA_BOARD_TYPE, Constants.DEFAULT_BOARD_TYPE);
         int refreshTimeType = intent.getIntExtra(
-                Constants.EXTRA_REFRESH_TIME_TYPE, Constants.ERROR_REFRESH_TIME_TYPE);
+                Constants.EXTRA_REFRESH_TIME_TYPE, Constants.DEFAULT_REFRESH_TIME_TYPE);
         boolean permitMobileConnectionType = intent.getBooleanExtra(
-                Constants.EXTRA_PERMIT_MOBILE_CONNECTION_TYPE, Constants.ERROR_PERMIT_MOBILE_CONNECTION_TYPE);
+                Constants.EXTRA_PERMIT_MOBILE_CONNECTION_TYPE, Constants.DEFAULT_PERMIT_MOBILE_CONNECTION_TYPE);
+        String blackList = intent.getStringExtra(
+                Constants.EXTRA_BLACK_LIST);
         int searchCategoryType = intent.getIntExtra(
-                Constants.EXTRA_SEARCH_CATEGORY_TYPE, Constants.ERROR_SEARCH_CAGETORY_TYPE);
+                Constants.EXTRA_SEARCH_CATEGORY_TYPE, Constants.DEFAULT_SEARCH_CATEGORY_TYPE);
         int searchSubjectType = intent.getIntExtra(
-                Constants.EXTRA_SEARCH_SUBJECT_TYPE, Constants.ERROR_SEARCH_SUBJECT_TYPE);
+                Constants.EXTRA_SEARCH_SUBJECT_TYPE, Constants.DEFAULT_SEARCH_SUBJECT_TYPE);
         String searchKeyword = intent.getStringExtra(Constants.EXTRA_SEARCH_KEYWORD);
         
         // Create intentItem instance.
         intentItem item = new intentItem(
-                appWidgetId, pageNum, boardType, refreshTimeType, permitMobileConnectionType,
+                appWidgetId, pageNum, boardType, refreshTimeType, permitMobileConnectionType, blackList,
                 searchCategoryType, searchSubjectType, searchKeyword);
         
         AppWidgetManager awm = AppWidgetManager.getInstance(context);
@@ -102,6 +105,7 @@ public class WidgetProvider extends AppWidgetProvider {
                     editor.putInt(mKeyBoardType, boardType);
                     editor.putInt(mKeyRefreshTimeType, refreshTimeType);
                     editor.putBoolean(mKeyPermitMobileConnectionType, permitMobileConnectionType);
+                    editor.putString(mKeyBlackList, blackList);
                     editor.commit();
 
                     // Send broadcast intent to update some variables on the ListViewFactory.
@@ -210,7 +214,7 @@ public class WidgetProvider extends AppWidgetProvider {
             int currentPageNum = item.getPageNum();
             
             // Set title of the remoteViews.
-            if (item.getSearchCategoryType() == Constants.ERROR_SEARCH_CAGETORY_TYPE)
+            if (item.getSearchCategoryType() == Constants.DEFAULT_SEARCH_CATEGORY_TYPE)
                 rv.setTextViewText(R.id.textListTitle, (Utils.getBoardTitle(context, item.getBoardType()) + " - " + currentPageNum));
             else if (item.getSearchCategoryType() == Constants.Specific.SEARCH_CATEGORY_TYPE_SUBJECT)
                 rv.setTextViewText(R.id.textListTitle, (Utils.getBoardTitle(context, item.getBoardType()) + " - " + currentPageNum +
@@ -386,6 +390,7 @@ public class WidgetProvider extends AppWidgetProvider {
         intent.putExtra(Constants.EXTRA_BOARD_TYPE, item.getBoardType());
         intent.putExtra(Constants.EXTRA_REFRESH_TIME_TYPE, item.getRefreshTimeType());
         intent.putExtra(Constants.EXTRA_PERMIT_MOBILE_CONNECTION_TYPE, item.getPermitMobileConnectionType());
+        intent.putExtra(Constants.EXTRA_BLACK_LIST, item.getBlackList());
         intent.putExtra(Constants.EXTRA_SEARCH_CATEGORY_TYPE, item.getSearchCategoryType());
         intent.putExtra(Constants.EXTRA_SEARCH_SUBJECT_TYPE, item.getSearchSubjectType());
         String searchKeyword = item.getSearchKeyword();
@@ -550,9 +555,10 @@ public class WidgetProvider extends AppWidgetProvider {
         
         // If completed to setup already, update current widget.
         if (isCompleteToSetup) {
-            int boardType = pref.getInt(mKeyBoardType, Constants.ERROR_BOARD_TYPE);
-            int refreshTimeType = pref.getInt(mKeyRefreshTimeType, Constants.ERROR_REFRESH_TIME_TYPE);
-            boolean permitMobileConnectionType = pref.getBoolean(mKeyPermitMobileConnectionType, Constants.ERROR_PERMIT_MOBILE_CONNECTION_TYPE);
+            int boardType = pref.getInt(mKeyBoardType, Constants.DEFAULT_BOARD_TYPE);
+            int refreshTimeType = pref.getInt(mKeyRefreshTimeType, Constants.DEFAULT_REFRESH_TIME_TYPE);
+            boolean permitMobileConnectionType = pref.getBoolean(mKeyPermitMobileConnectionType, Constants.DEFAULT_PERMIT_MOBILE_CONNECTION_TYPE);
+            String blackList = pref.getString(mKeyBlackList, Constants.DEFAULT_BLACK_LIST);
 
             // Set urgent alarm to update widget as soon as possible.
             AppWidgetManager awm = AppWidgetManager.getInstance(context);
@@ -560,8 +566,8 @@ public class WidgetProvider extends AppWidgetProvider {
 
             for (int i = 0 ; i < appWidgetIds.length ; i++) {
                 intentItem item = new intentItem(appWidgetIds[i], Constants.DEFAULT_PAGE_NUM,
-                        boardType, refreshTimeType, permitMobileConnectionType,
-                        Constants.ERROR_SEARCH_CAGETORY_TYPE, Constants.ERROR_SEARCH_SUBJECT_TYPE, null);
+                        boardType, refreshTimeType, permitMobileConnectionType, blackList,
+                        Constants.DEFAULT_SEARCH_CATEGORY_TYPE, Constants.DEFAULT_SEARCH_SUBJECT_TYPE, null);
                 
                 setNewAlarm(context, item, true);
             }
@@ -572,21 +578,23 @@ public class WidgetProvider extends AppWidgetProvider {
 
     private static class intentItem {
         int widgetId = AppWidgetManager.INVALID_APPWIDGET_ID;
-        int pageNumber = Constants.ERROR_PAGE_NUM;
-        int boardType = Constants.ERROR_BOARD_TYPE;
-        int refreshType = Constants.ERROR_REFRESH_TIME_TYPE;
-        boolean isPermitMobileConnection = Constants.ERROR_PERMIT_MOBILE_CONNECTION_TYPE;
-        int searchCategoryType = Constants.ERROR_SEARCH_CAGETORY_TYPE;
-        int searchSubjectType = Constants.ERROR_SEARCH_SUBJECT_TYPE;
+        int pageNumber = Constants.DEFAULT_PAGE_NUM;
+        int boardType = Constants.DEFAULT_BOARD_TYPE;
+        int refreshType = Constants.DEFAULT_REFRESH_TIME_TYPE;
+        boolean isPermitMobileConnection = Constants.DEFAULT_PERMIT_MOBILE_CONNECTION_TYPE;
+        String blackList = Constants.DEFAULT_BLACK_LIST;
+        int searchCategoryType = Constants.DEFAULT_SEARCH_CATEGORY_TYPE;
+        int searchSubjectType = Constants.DEFAULT_SEARCH_SUBJECT_TYPE;
         String searchKeyword = null;
         
         intentItem(int widgetId, int pageNumber, int boardType, int refreshType, boolean isPermitMobileConnection,
-                int searchCategoryType, int searchSubjectType, String searchKeyword) {
+                String blackList, int searchCategoryType, int searchSubjectType, String searchKeyword) {
             this.widgetId = widgetId;
             this.pageNumber = pageNumber;
             this.boardType = boardType;
             this.refreshType = refreshType;
             this.isPermitMobileConnection = isPermitMobileConnection;
+            this.blackList = blackList;
             this.searchCategoryType = searchCategoryType;
             this.searchSubjectType = searchSubjectType;
             this.searchKeyword = searchKeyword;
@@ -612,6 +620,10 @@ public class WidgetProvider extends AppWidgetProvider {
             return isPermitMobileConnection;
         }
         
+        String getBlackList() {
+            return blackList;
+        }
+        
         int getSearchCategoryType() {
             return searchCategoryType;
         }
@@ -631,8 +643,8 @@ public class WidgetProvider extends AppWidgetProvider {
         public String toString() {
             return ("appWidgetId[" + widgetId + "], pageNum[" + pageNumber + "], boardType[" + boardType +
                     "], refreshTimeType[" + refreshType + "], isPermitMobileConnectionType[" + isPermitMobileConnection +
-                    "], searchCategoryType[" + searchCategoryType + "], searchSubjectType[" + searchSubjectType + 
-                    "], searchKeyword[" + searchKeyword + "]");
+                    "], blackList[" + blackList + "], searchCategoryType[" + searchCategoryType +
+                    "], searchSubjectType[" + searchSubjectType + "], searchKeyword[" + searchKeyword + "]");
         }
     }
 }

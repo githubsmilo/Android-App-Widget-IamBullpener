@@ -21,6 +21,7 @@ public final class Constants {
     public static final String EXTRA_BOARD_TYPE = Specific.PACKAGE_NAME + ".BOARD_TYPE";
     public static final String EXTRA_REFRESH_TIME_TYPE = Specific.PACKAGE_NAME + ".REFRESH_TIME_TYPE";
     public static final String EXTRA_PERMIT_MOBILE_CONNECTION_TYPE = Specific.PACKAGE_NAME + ".PERMIT_MOBILE_CONNECTION";
+    public static final String EXTRA_BLACK_LIST = Specific.PACKAGE_NAME + ".BLACK_LIST";
     public static final String EXTRA_ITEM_URL = Specific.PACKAGE_NAME + ".EXTRA_ITEM_URL";
     public static final String EXTRA_SEARCH_CATEGORY_TYPE = Specific.PACKAGE_NAME + ".SEARCH_CATEGORY_TYPE";
     public static final String EXTRA_SEARCH_SUBJECT_TYPE = Specific.PACKAGE_NAME + ".SEARCH_SUBJECT_TYPE";
@@ -30,20 +31,13 @@ public final class Constants {
     
     // Intentitem default values
     public static final int DEFAULT_PAGE_NUM = 1;
-    public static final int DEFAULT_REFRESH_TIME_TYPE = 0;
-    public static final int DEFAULT_BOARD_TYPE = 0;
+    public static final int DEFAULT_BOARD_TYPE = Specific.BOARD_TYPE_MLB_TOWN;
+    public static final int DEFAULT_REFRESH_TIME_TYPE = Specific.REFRESH_TIME_TYPE_1_MIN;
     public static final boolean DEFAULT_PERMIT_MOBILE_CONNECTION_TYPE = false;
-    public static final int DEFAULT_SEARCH_CATEGORY_TYPE = 0;
-    public static final int DEFAULT_SEARCH_SUBJECT_TYPE = 0;
+    public static final String DEFAULT_BLACK_LIST = null;
+    public static final int DEFAULT_SEARCH_CATEGORY_TYPE = Specific.SEARCH_CATEGORY_TYPE_DEFAULT;
+    public static final int DEFAULT_SEARCH_SUBJECT_TYPE = Specific.SEARCH_SUBJECT_TYPE_DEFAULT;
     
-    // Intentitem error values
-    public static final int ERROR_PAGE_NUM = -1;
-    public static final int ERROR_REFRESH_TIME_TYPE = -1;
-    public static final int ERROR_BOARD_TYPE = -1;
-    public static final boolean ERROR_PERMIT_MOBILE_CONNECTION_TYPE = false;
-    public static final int ERROR_SEARCH_CAGETORY_TYPE = -1;
-    public static final int ERROR_SEARCH_SUBJECT_TYPE = -1;
-
     public enum PARSING_RESULT {
         SUCCESS_FULL_BOARD,
         SUCCESS_MOBILE_BOARD,
@@ -98,6 +92,7 @@ public final class Constants {
         public static final int REFRESH_TIME_TYPE_30_MIN = 4;
         public static final int REFRESH_TIME_TYPE_STOP   = 5;
         
+        public static final int SEARCH_CATEGORY_TYPE_DEFAULT = -1;
         public static final int SEARCH_CATEGORY_TYPE_TITLE = 0;
         public static final int SEARCH_CATEGORY_TYPE_TITLE_CONTENTS = 1;
         public static final int SEARCH_CATEGORY_TYPE_ID = 2;
@@ -105,6 +100,7 @@ public final class Constants {
         public static final int SEARCH_CATEGORY_TYPE_SUBJECT = 4;
         public static final int SEARCH_CATEGORY_TYPE_HITS = 5;
         
+        public static final int SEARCH_SUBJECT_TYPE_DEFAULT = -1;
         public static final int SEARCH_SUBJECT_TYPE_1 = 0; // 정치
         public static final int SEARCH_SUBJECT_TYPE_2 = 1; // 19금
         public static final int SEARCH_SUBJECT_TYPE_3 = 2; // 단문

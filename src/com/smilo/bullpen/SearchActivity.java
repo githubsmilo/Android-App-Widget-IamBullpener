@@ -22,10 +22,10 @@ public class SearchActivity extends Activity {
     
     // intent item list
     private static int mAppWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID;
-    //private static int mPageNum = Constants.ERROR_PAGE_NUM; // We use default page num.
-    private static int mBoardType = Constants.ERROR_BOARD_TYPE;
-    private static int mRefreshTimetype = Constants.ERROR_REFRESH_TIME_TYPE;
-    private static boolean mIsPermitMobileConnectionType = Constants.ERROR_PERMIT_MOBILE_CONNECTION_TYPE;
+    //private static int mPageNum = Constants.DEFAULT_PAGE_NUM; // We use default page num.
+    private static int mBoardType = Constants.DEFAULT_BOARD_TYPE;
+    private static int mRefreshTimetype = Constants.DEFAULT_REFRESH_TIME_TYPE;
+    private static boolean mIsPermitMobileConnectionType = Constants.DEFAULT_PERMIT_MOBILE_CONNECTION_TYPE;
     
     private int mSelectedSearchCategoryType = Constants.DEFAULT_SEARCH_CATEGORY_TYPE;
     private int mSelectedSearchSubjectType = Constants.DEFAULT_SEARCH_SUBJECT_TYPE;
@@ -47,13 +47,13 @@ public class SearchActivity extends Activity {
         mAppWidgetId = intent.getIntExtra(
                 AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
         //mPageNum = intent.getIntExtra(
-        //        Constants.EXTRA_PAGE_NUM, Constants.ERROR_PAGE_NUM);
+        //        Constants.EXTRA_PAGE_NUM, Constants.DEFAULT_PAGE_NUM);
         mBoardType = intent.getIntExtra(
-                Constants.EXTRA_BOARD_TYPE, Constants.ERROR_BOARD_TYPE);
+                Constants.EXTRA_BOARD_TYPE, Constants.DEFAULT_BOARD_TYPE);
         mRefreshTimetype = intent.getIntExtra(
-                Constants.EXTRA_REFRESH_TIME_TYPE, Constants.ERROR_REFRESH_TIME_TYPE);
+                Constants.EXTRA_REFRESH_TIME_TYPE, Constants.DEFAULT_REFRESH_TIME_TYPE);
         mIsPermitMobileConnectionType = intent.getBooleanExtra(
-                Constants.EXTRA_PERMIT_MOBILE_CONNECTION_TYPE, Constants.ERROR_PERMIT_MOBILE_CONNECTION_TYPE);
+                Constants.EXTRA_PERMIT_MOBILE_CONNECTION_TYPE, Constants.DEFAULT_PERMIT_MOBILE_CONNECTION_TYPE);
         if (mAppWidgetId == AppWidgetManager.INVALID_APPWIDGET_ID) {
             finish();
         }
