@@ -1,5 +1,5 @@
 
-package com.smilo.bullpen;
+package com.smilo.bullpen.activities;
 
 import android.app.Activity;
 import android.appwidget.AppWidgetManager;
