@@ -1,13 +1,7 @@
 
 package com.smilo.bullpen;
 
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.net.URLConnection;
-import java.util.Iterator;
-import java.util.List;
+import com.smilo.bullpen.Constants.PARSING_RESULT;
 
 import net.htmlparser.jericho.CharacterReference;
 import net.htmlparser.jericho.Element;
@@ -35,7 +29,14 @@ import android.view.WindowManager;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
-import com.smilo.bullpen.Constants.PARSING_RESULT;
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.net.URLConnection;
+import java.util.Iterator;
+import java.util.List;
 
 public class ContentsFactory implements RemoteViewsService.RemoteViewsFactory {
 
@@ -426,8 +427,8 @@ public class ContentsFactory implements RemoteViewsService.RemoteViewsFactory {
             // Find the same pattern with <div class='reply'>. This means the comment of this article.
             } else if (value != null && value.equals("reply")) {
                 Element ul = div.getFirstElement("ul");
-                boolean isSkipSegment = false, isAddNick = false, isAddComment = false;
-                String tmpComment = "";
+                boolean isAddNick = false, isAddComment = false, isFinished = false;
+                String tmpWriter = "", tmpComment = "";
                 for (Iterator<Segment> nodeIterator = ul.getNodeIterator() ; nodeIterator.hasNext();) {
                     Segment nodeSeg = nodeIterator.next();
                     if (nodeSeg instanceof StartTag) {
@@ -446,22 +447,30 @@ public class ContentsFactory implements RemoteViewsService.RemoteViewsFactory {
                         String tagName = ((Tag)nodeSeg).getName();
                         if (tagName.equals("strong")) {
                             isAddComment = false;
-                        }
-                    } else if (nodeSeg instanceof CharacterReference) {
-                        ;
-                    } else {
-                        if (!isSkipSegment && isAddComment) {
-                            tmpComment += nodeSeg.getTextExtractor().toString();
-                        } else if (!isSkipSegment && isAddNick) {
-                            // Put comment info to the 'comment' JSONArray.
-                            String writer = nodeSeg.getTextExtractor().toString();
-                            JSONObject newComment = new JSONObject();
-                            newComment.put(JSON_COMMENT_WRITER, writer);
-                            newComment.put(JSON_COMMENT_TEXT, tmpComment);
-                            comment.put(newComment);
-                            tmpComment = "";
+                        } else if (tagName.equals("span")) {
                             isAddNick = false;
+                        } else if (tagName.equals("li")) {
+                            isFinished = true;
                         }
+                    //} else if (nodeSeg instanceof CharacterReference) {
+                    //    ;
+                    //
+                    } else {
+                        if (isAddComment) {
+                            tmpComment += nodeSeg.getTextExtractor().toString();
+                        } else if (isAddNick) {
+                            tmpWriter += nodeSeg.getTextExtractor().toString();
+                        }
+                    }
+                    
+                    if (isFinished) {
+                        JSONObject newComment = new JSONObject();
+                        newComment.put(JSON_COMMENT_WRITER, tmpWriter);
+                        newComment.put(JSON_COMMENT_TEXT, tmpComment);
+                        comment.put(newComment);
+                        tmpComment = "";
+                        tmpWriter = "";
+                        isFinished = false;
                     }
                 }
 
