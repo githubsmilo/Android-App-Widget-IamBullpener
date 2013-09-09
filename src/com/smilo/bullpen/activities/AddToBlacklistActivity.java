@@ -37,9 +37,6 @@ public class AddToBlacklistActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
-        //Remove title bar
-        this.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        
         // Set title
         this.setTitle(R.string.title_activity_add_to_black_list);
         
