@@ -50,6 +50,7 @@ public class ListViewFactory implements RemoteViewsService.RemoteViewsFactory {
     //private static int mRefreshTimetype = Constants.DEFAULT_REFRESH_TIME_TYPE;
     //private static boolean mIsPermitMobileConnectionType = Constants.DEFAULT_PERMIT_MOBILE_CONNECTION_TYPE;
     private static String mBlackList = Constants.DEFAULT_BLACK_LIST;
+    private static String mBlockedWords = Constants.DEFAULT_BLOCKED_WORDS;
     private static int mSelectedSearchCategoryType = Constants.DEFAULT_SEARCH_CATEGORY_TYPE;
     private static int mSelectedSearchSubjectType = Constants.DEFAULT_SEARCH_SUBJECT_TYPE;
     private static String mSelectedSearchKeyword = null;
@@ -76,6 +77,8 @@ public class ListViewFactory implements RemoteViewsService.RemoteViewsFactory {
                 Constants.EXTRA_BOARD_TYPE, Constants.DEFAULT_BOARD_TYPE);
         mBlackList = intent.getStringExtra(
                 Constants.EXTRA_BLACK_LIST);
+        mBlockedWords = intent.getStringExtra(
+        		Constants.EXTRA_BLOCKED_WORDS);
         mSelectedSearchCategoryType = intent.getIntExtra(
                 Constants.EXTRA_SEARCH_CATEGORY_TYPE, Constants.DEFAULT_SEARCH_CATEGORY_TYPE);
         mSelectedSearchSubjectType = intent.getIntExtra(
@@ -84,7 +87,8 @@ public class ListViewFactory implements RemoteViewsService.RemoteViewsFactory {
                 Constants.EXTRA_SEARCH_KEYWORD);
 
         if (DEBUG) Log.i(TAG, "constructor - mAppWidgetId[" + mAppWidgetId + 
-                "], mPageNum[" + mPageNum + "], mBoardType[" + mBoardType + "], mBlackList[" + mBlackList +
+                "], mPageNum[" + mPageNum + "], mBoardType[" + mBoardType +
+                "], mBlackList[" + mBlackList + "], mBlockedWords[" + mBlockedWords +
                 "], mSelectedSearchCategoryType[" + mSelectedSearchCategoryType + 
                 "], mSelectedSearchSubjectType[" + mSelectedSearchSubjectType + 
                 "], mSelectedSearchKeyword[" + mSelectedSearchKeyword + "]");
@@ -138,7 +142,7 @@ public class ListViewFactory implements RemoteViewsService.RemoteViewsFactory {
     @Override
     public void onDataSetChanged() {
         if (DEBUG) Log.i(TAG, "onDataSetChanged - mBoardType[" + mBoardType +
-                "], mPageNum[" + mPageNum + "], mBlackList[" + mBlackList + "]");
+                "], mPageNum[" + mPageNum + "], mBlackList[" + mBlackList + "], mBlockedWords[" + mBlockedWords + "]");
 
         // Parse MLBPark html data and add items to the widget item array list.
         try {
@@ -318,6 +322,12 @@ public class ListViewFactory implements RemoteViewsService.RemoteViewsFactory {
             blackList = mBlackList.split(Constants.DELIMITER_BLACK_LIST);
         }
         
+        // Parse blocked words
+        String[] blockedWords = null;
+        if (mBlockedWords != null) {
+        	blockedWords = mBlockedWords.split(Constants.DELIMITER_BLOCKED_WORDS);
+        }
+        
         Source source = new Source(new URL(urlAddress));
         source.fullSequentialParse();
         
@@ -387,9 +397,18 @@ public class ListViewFactory implements RemoteViewsService.RemoteViewsFactory {
                         
                     // If plain text, add it to title.
                     } else {
-                        if (isAddTitle) {
+                        if (isAddTitle && !isSkipToAdd) {
                             title += (nodeSeg.getTextExtractor().toString() + " ");
-                        } else if (isAddWriter) {
+                            if (blockedWords != null) {
+                            	for(String s : blockedWords) {
+                            		if (title.contains(s)) {
+                            			if (DEBUG) Log.d(TAG, "parseMLBParkMobileBoard - Skip title[" + title + "]");
+                            			isSkipToAdd = true;
+                                        break;
+                            		}
+                            	}
+                            }
+                        } else if (isAddWriter && !isSkipToAdd) {
                             writer = nodeSeg.getTextExtractor().toString();
                             isAddWriter = false;
                             if (blackList != null) {
@@ -401,7 +420,7 @@ public class ListViewFactory implements RemoteViewsService.RemoteViewsFactory {
                                     }
                                 }
                             }
-                        } else if (isAddCommentNum) {
+                        } else if (isAddCommentNum && !isSkipToAdd) {
                             title += (" [" + nodeSeg.getTextExtractor().toString() + "]");
                             isAddCommentNum = false;
                         }
@@ -502,6 +521,8 @@ public class ListViewFactory implements RemoteViewsService.RemoteViewsFactory {
                             Constants.EXTRA_PAGE_NUM, Constants.DEFAULT_PAGE_NUM);
                     mBlackList = intent.getStringExtra(
                             Constants.EXTRA_BLACK_LIST);
+                    mBlockedWords = intent.getStringExtra(
+                    		Constants.EXTRA_BLOCKED_WORDS);
                     mSelectedSearchCategoryType = intent.getIntExtra(
                             Constants.EXTRA_SEARCH_CATEGORY_TYPE, Constants.DEFAULT_SEARCH_CATEGORY_TYPE);
                     mSelectedSearchSubjectType = intent.getIntExtra(
@@ -509,7 +530,8 @@ public class ListViewFactory implements RemoteViewsService.RemoteViewsFactory {
                     mSelectedSearchKeyword = intent.getStringExtra(Constants.EXTRA_SEARCH_KEYWORD);
                     
                     if (DEBUG) Log.i(TAG, "onReceive - update mAppWidgetId[" + mAppWidgetId + 
-                            "], mPageNum[" + mPageNum + "], mBoardType[" + mBoardType + "], mBlackList[" + mBlackList +
+                            "], mPageNum[" + mPageNum + "], mBoardType[" + mBoardType +
+                            "], mBlackList[" + mBlackList + "], mBlockedWords[" + mBlockedWords +
                             "], mSelectedSearchCategoryType[" + mSelectedSearchCategoryType +
                             "], mSelectedSearchSubjectType[" + mSelectedSearchSubjectType +
                             "], mSelectedSearchKeyword[" + mSelectedSearchKeyword + "]");

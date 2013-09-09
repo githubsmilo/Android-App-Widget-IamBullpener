@@ -29,6 +29,7 @@ public class AddToBlacklistActivity extends Activity {
     private static int mRefreshTimetype = Constants.DEFAULT_REFRESH_TIME_TYPE;
     private static boolean mIsPermitMobileConnectionType = Constants.DEFAULT_PERMIT_MOBILE_CONNECTION_TYPE;
     private static String mBlackList = Constants.DEFAULT_BLACK_LIST;
+    private static String mBlockedWords = Constants.DEFAULT_BLOCKED_WORDS;
     private static int mSelectedSearchCategoryType = Constants.DEFAULT_SEARCH_CATEGORY_TYPE;
     private static int mSelectedSearchSubjectType = Constants.DEFAULT_SEARCH_SUBJECT_TYPE;
     private static String mSelectedSearchKeyword = null;
@@ -54,6 +55,7 @@ public class AddToBlacklistActivity extends Activity {
         mIsPermitMobileConnectionType = intent.getBooleanExtra(
                 Constants.EXTRA_PERMIT_MOBILE_CONNECTION_TYPE, Constants.DEFAULT_PERMIT_MOBILE_CONNECTION_TYPE);
         mBlackList = intent.getStringExtra(Constants.EXTRA_BLACK_LIST);
+        mBlockedWords = intent.getStringExtra(Constants.EXTRA_BLOCKED_WORDS);
         mSelectedSearchCategoryType = intent.getIntExtra(
         		Constants.EXTRA_SEARCH_CATEGORY_TYPE, Constants.DEFAULT_SEARCH_CATEGORY_TYPE);
         mSelectedSearchSubjectType = intent.getIntExtra(
@@ -106,6 +108,7 @@ public class AddToBlacklistActivity extends Activity {
             initIntent.putExtra(Constants.EXTRA_REFRESH_TIME_TYPE, mRefreshTimetype);
             initIntent.putExtra(Constants.EXTRA_PERMIT_MOBILE_CONNECTION_TYPE, mIsPermitMobileConnectionType);
             initIntent.putExtra(Constants.EXTRA_BLACK_LIST, mBlackList);
+            initIntent.putExtra(Constants.EXTRA_BLOCKED_WORDS, mBlockedWords);
             initIntent.putExtra(Constants.EXTRA_SEARCH_CATEGORY_TYPE, mSelectedSearchCategoryType);
             initIntent.putExtra(Constants.EXTRA_SEARCH_SUBJECT_TYPE, mSelectedSearchSubjectType);
             initIntent.putExtra(Constants.EXTRA_SEARCH_KEYWORD, mSelectedSearchKeyword);

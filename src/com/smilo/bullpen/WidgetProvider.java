@@ -71,6 +71,8 @@ public class WidgetProvider extends AppWidgetProvider {
                 Constants.EXTRA_PERMIT_MOBILE_CONNECTION_TYPE, Constants.DEFAULT_PERMIT_MOBILE_CONNECTION_TYPE);
         String blackList = intent.getStringExtra(
                 Constants.EXTRA_BLACK_LIST);
+        String blockedWords = intent.getStringExtra(
+        		Constants.EXTRA_BLOCKED_WORDS);
         int searchCategoryType = intent.getIntExtra(
                 Constants.EXTRA_SEARCH_CATEGORY_TYPE, Constants.DEFAULT_SEARCH_CATEGORY_TYPE);
         int searchSubjectType = intent.getIntExtra(
@@ -79,7 +81,7 @@ public class WidgetProvider extends AppWidgetProvider {
         
         // Create intentItem instance.
         intentItem item = new intentItem(
-                appWidgetId, pageNum, boardType, refreshTimeType, permitMobileConnectionType, blackList,
+                appWidgetId, pageNum, boardType, refreshTimeType, permitMobileConnectionType, blackList, blockedWords,
                 searchCategoryType, searchSubjectType, searchKeyword);
         
         AppWidgetManager awm = AppWidgetManager.getInstance(context);
@@ -98,7 +100,7 @@ public class WidgetProvider extends AppWidgetProvider {
                     removePreviousAlarm();
                     
                     // Save configuration info.
-                    saveIntentItem(context, boardType, refreshTimeType, permitMobileConnectionType, blackList);
+                    saveIntentItem(context, boardType, refreshTimeType, permitMobileConnectionType, blackList, blockedWords);
 
                     // Send broadcast intent to update some variables on the ListViewFactory.
                     context.sendBroadcast(buildUpdateListInfoIntent(item));
@@ -132,7 +134,7 @@ public class WidgetProvider extends AppWidgetProvider {
                         setRemoteViewToShowList(context, awm, item);
                     
                     // Save configuration info.
-        	        saveIntentItem(context, boardType, refreshTimeType, permitMobileConnectionType, blackList);
+        	        saveIntentItem(context, boardType, refreshTimeType, permitMobileConnectionType, blackList, blockedWords);
 
                 // This intent will be called when some item selected.
                 // EXTRA_ITEM_URL was already filled in the ListViewFactory - getViewAt().
@@ -394,6 +396,7 @@ public class WidgetProvider extends AppWidgetProvider {
         intent.putExtra(Constants.EXTRA_REFRESH_TIME_TYPE, item.getRefreshTimeType());
         intent.putExtra(Constants.EXTRA_PERMIT_MOBILE_CONNECTION_TYPE, item.getPermitMobileConnectionType());
         intent.putExtra(Constants.EXTRA_BLACK_LIST, item.getBlackList());
+        intent.putExtra(Constants.EXTRA_BLOCKED_WORDS, item.getBlockedWords());
         intent.putExtra(Constants.EXTRA_SEARCH_CATEGORY_TYPE, item.getSearchCategoryType());
         intent.putExtra(Constants.EXTRA_SEARCH_SUBJECT_TYPE, item.getSearchSubjectType());
         String searchKeyword = item.getSearchKeyword();
@@ -430,8 +433,8 @@ public class WidgetProvider extends AppWidgetProvider {
         return intent;
     }
     
-    private Intent buildShowListIntent(Context context, intentItem intentItem) {
-        Intent intent = buildBaseIntent(intentItem);
+    private Intent buildShowListIntent(Context context, intentItem item) {
+        Intent intent = buildBaseIntent(item);
         intent.setClass(context, WidgetProvider.class);
         intent.setAction(Constants.ACTION_SHOW_LIST);
 
@@ -476,8 +479,8 @@ public class WidgetProvider extends AppWidgetProvider {
         return intent;
     }
     
-    private Intent buildListViewServiceIntent(Context context, intentItem intentItem) {
-        Intent intent = buildBaseIntent(intentItem);
+    private Intent buildListViewServiceIntent(Context context, intentItem item) {
+        Intent intent = buildBaseIntent(item);
         intent.setClass(context, ListViewService.class);
         
         return intent;
@@ -531,7 +534,7 @@ public class WidgetProvider extends AppWidgetProvider {
     }
 
     private void saveIntentItem(Context context, int boardType, int refreshTimeType, 
-    		boolean permitMobileConnectionType, String blackList) {
+    		boolean permitMobileConnectionType, String blackList, String blockedWords) {
     	if (DEBUG) Log.d(TAG, "saveIntentItem");
     	
     	SharedPreferences pref = context.getSharedPreferences(Constants.SHARED_PREFERENCE_NAME, Context.MODE_PRIVATE);
@@ -541,6 +544,7 @@ public class WidgetProvider extends AppWidgetProvider {
         editor.putInt(Constants.KEY_REFRESH_TIME_TYPE, refreshTimeType);
         editor.putBoolean(Constants.KEY_PERMIT_MOBILE_CONNECTION_TYPE, permitMobileConnectionType);
         editor.putString(Constants.KEY_BLACK_LIST, blackList);
+        editor.putString(Constants.KEY_BLOCKED_WORDS, blockedWords);
         editor.commit();
     }
     
@@ -587,6 +591,7 @@ public class WidgetProvider extends AppWidgetProvider {
             int refreshTimeType = pref.getInt(Constants.KEY_REFRESH_TIME_TYPE, Constants.DEFAULT_REFRESH_TIME_TYPE);
             boolean permitMobileConnectionType = pref.getBoolean(Constants.KEY_PERMIT_MOBILE_CONNECTION_TYPE, Constants.DEFAULT_PERMIT_MOBILE_CONNECTION_TYPE);
             String blackList = pref.getString(Constants.KEY_BLACK_LIST, Constants.DEFAULT_BLACK_LIST);
+            String blockedWords = pref.getString(Constants.KEY_BLOCKED_WORDS, Constants.DEFAULT_BLOCKED_WORDS);
 
             // Set urgent alarm to update widget as soon as possible.
             AppWidgetManager awm = AppWidgetManager.getInstance(context);
@@ -594,7 +599,7 @@ public class WidgetProvider extends AppWidgetProvider {
 
             for (int i = 0 ; i < appWidgetIds.length ; i++) {
                 intentItem item = new intentItem(appWidgetIds[i], Constants.DEFAULT_PAGE_NUM,
-                        boardType, refreshTimeType, permitMobileConnectionType, blackList,
+                        boardType, refreshTimeType, permitMobileConnectionType, blackList, blockedWords,
                         Constants.DEFAULT_SEARCH_CATEGORY_TYPE, Constants.DEFAULT_SEARCH_SUBJECT_TYPE, null);
                 
                 setNewAlarm(context, item, true);
@@ -611,18 +616,20 @@ public class WidgetProvider extends AppWidgetProvider {
         int refreshType = Constants.DEFAULT_REFRESH_TIME_TYPE;
         boolean isPermitMobileConnection = Constants.DEFAULT_PERMIT_MOBILE_CONNECTION_TYPE;
         String blackList = Constants.DEFAULT_BLACK_LIST;
+        String blockedWords = Constants.DEFAULT_BLOCKED_WORDS;
         int searchCategoryType = Constants.DEFAULT_SEARCH_CATEGORY_TYPE;
         int searchSubjectType = Constants.DEFAULT_SEARCH_SUBJECT_TYPE;
         String searchKeyword = null;
         
         intentItem(int widgetId, int pageNumber, int boardType, int refreshType, boolean isPermitMobileConnection,
-                String blackList, int searchCategoryType, int searchSubjectType, String searchKeyword) {
+                String blackList, String blockedWords, int searchCategoryType, int searchSubjectType, String searchKeyword) {
             this.widgetId = widgetId;
             this.pageNumber = pageNumber;
             this.boardType = boardType;
             this.refreshType = refreshType;
             this.isPermitMobileConnection = isPermitMobileConnection;
             this.blackList = blackList;
+            this.blockedWords = blockedWords;
             this.searchCategoryType = searchCategoryType;
             this.searchSubjectType = searchSubjectType;
             this.searchKeyword = searchKeyword;
@@ -652,6 +659,10 @@ public class WidgetProvider extends AppWidgetProvider {
             return blackList;
         }
         
+        String getBlockedWords() {
+        	return blockedWords;
+        }
+        
         int getSearchCategoryType() {
             return searchCategoryType;
         }
@@ -671,7 +682,7 @@ public class WidgetProvider extends AppWidgetProvider {
         public String toString() {
             return ("appWidgetId[" + widgetId + "], pageNum[" + pageNumber + "], boardType[" + boardType +
                     "], refreshTimeType[" + refreshType + "], isPermitMobileConnectionType[" + isPermitMobileConnection +
-                    "], blackList[" + blackList + "], searchCategoryType[" + searchCategoryType +
+                    "], blackList[" + blackList + "], blockedWords[" + blockedWords + "], searchCategoryType[" + searchCategoryType +
                     "], searchSubjectType[" + searchSubjectType + "], searchKeyword[" + searchKeyword + "]");
         }
     }

@@ -65,7 +65,7 @@ public class ConfigurationActivity extends Activity {
         int boardType;
         int refreshTimeType;
         boolean isPermitMobileConnection;
-        String blackList;
+        String blackList, blockedWords;;
         
         if (mIsExecutedBySettingButton) {
             boardType = extras.getInt(
@@ -75,6 +75,7 @@ public class ConfigurationActivity extends Activity {
             isPermitMobileConnection = extras.getBoolean(
                     Constants.EXTRA_PERMIT_MOBILE_CONNECTION_TYPE, Constants.DEFAULT_PERMIT_MOBILE_CONNECTION_TYPE);
             blackList = extras.getString(Constants.EXTRA_BLACK_LIST);
+            blockedWords = extras.getString(Constants.EXTRA_BLOCKED_WORDS);
             
         } else {
         	// Load configuration info.
@@ -84,11 +85,12 @@ public class ConfigurationActivity extends Activity {
             refreshTimeType = pref.getInt(Constants.KEY_REFRESH_TIME_TYPE, Constants.DEFAULT_REFRESH_TIME_TYPE);
             isPermitMobileConnection = pref.getBoolean(Constants.KEY_PERMIT_MOBILE_CONNECTION_TYPE, Constants.DEFAULT_PERMIT_MOBILE_CONNECTION_TYPE);
             blackList = pref.getString(Constants.KEY_BLACK_LIST, Constants.DEFAULT_BLACK_LIST);
+            blockedWords = pref.getString(Constants.KEY_BLOCKED_WORDS, Constants.DEFAULT_BLOCKED_WORDS);
         }
 
         initializeRadioButton(isPermitMobileConnection);
         initializeSpinners(refreshTimeType, boardType);
-        initializeEditText(blackList);
+        initializeEditText(blackList, blockedWords);
         initializeButtons();
     }
 
@@ -113,13 +115,18 @@ public class ConfigurationActivity extends Activity {
         spinBoard.setSelection(boardType);
     }
 
-    private void initializeEditText(String blackList) {
-        EditText et = (EditText)findViewById(R.id.editBlackList);
-        
+    private void initializeEditText(String blackList, String blockedWords) {
+        EditText etBlackList = (EditText)findViewById(R.id.editBlackList);
         if (blackList == null)
-        	et.setText("");
+        	etBlackList.setText("");
         else
-        	et.setText(blackList);
+        	etBlackList.setText(blackList);
+        
+        EditText etBlockedWords = (EditText)findViewById(R.id.editBlockedWords);
+        if (blockedWords == null)
+        	etBlockedWords.setText("");
+        else
+        	etBlockedWords.setText(blockedWords);
     }
 
     private void initializeButtons() {
@@ -136,10 +143,16 @@ public class ConfigurationActivity extends Activity {
             boolean selectedPermitMobileConnectionType = cb.isChecked();
             
             // Get black list's value. If empty, set null.
-            EditText et = (EditText)findViewById(R.id.editBlackList);
-            String blackList = et.getText().toString();
+            EditText etBlackList = (EditText)findViewById(R.id.editBlackList);
+            String blackList = etBlackList.getText().toString();
             if (blackList != null && blackList.length() == 0)
             	blackList = null;
+            
+            // Get blocked words's value. If empty, set null.
+            EditText etBlockedWords = (EditText)findViewById(R.id.editBlockedWords);
+            String blockedWords = etBlockedWords.getText().toString();
+            if (blockedWords != null && blockedWords.length() == 0)
+            	blockedWords = null;
             
             if (DEBUG) Log.i(TAG, "mSelectedBoardType[" + mSelectedBoardType +
                     "], mSelectedRefreshTimeType[" + mSelectedRefreshTimeType + 
@@ -155,6 +168,7 @@ public class ConfigurationActivity extends Activity {
             initIntent.putExtra(Constants.EXTRA_REFRESH_TIME_TYPE, mSelectedRefreshTimeType);
             initIntent.putExtra(Constants.EXTRA_PERMIT_MOBILE_CONNECTION_TYPE, selectedPermitMobileConnectionType);
             initIntent.putExtra(Constants.EXTRA_BLACK_LIST, blackList);
+            initIntent.putExtra(Constants.EXTRA_BLOCKED_WORDS, blockedWords);
  
             context.sendBroadcast(initIntent);
             

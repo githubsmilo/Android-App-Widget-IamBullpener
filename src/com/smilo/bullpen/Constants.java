@@ -22,6 +22,7 @@ public final class Constants {
     public static final String EXTRA_REFRESH_TIME_TYPE = Specific.PACKAGE_NAME + ".REFRESH_TIME_TYPE";
     public static final String EXTRA_PERMIT_MOBILE_CONNECTION_TYPE = Specific.PACKAGE_NAME + ".PERMIT_MOBILE_CONNECTION";
     public static final String EXTRA_BLACK_LIST = Specific.PACKAGE_NAME + ".BLACK_LIST";
+    public static final String EXTRA_BLOCKED_WORDS = Specific.PACKAGE_NAME + ".BLOCKED_WORDS";
     public static final String EXTRA_ITEM_URL = Specific.PACKAGE_NAME + ".EXTRA_ITEM_URL";
     public static final String EXTRA_ITEM_WRITER = Specific.PACKAGE_NAME + ".EXTRA_ITEM_WRITER";
     public static final String EXTRA_SEARCH_CATEGORY_TYPE = Specific.PACKAGE_NAME + ".SEARCH_CATEGORY_TYPE";
@@ -37,6 +38,7 @@ public final class Constants {
     public static final String KEY_REFRESH_TIME_TYPE = "key_refresh_time_type";
     public static final String KEY_BOARD_TYPE = "key_board_type";
     public static final String KEY_BLACK_LIST = "key_black_list";
+    public static final String KEY_BLOCKED_WORDS = "key_blocked_words";
     
     // Intentitem default values
     public static final int DEFAULT_PAGE_NUM = 1;
@@ -44,10 +46,12 @@ public final class Constants {
     public static final int DEFAULT_REFRESH_TIME_TYPE = Specific.REFRESH_TIME_TYPE_1_MIN;
     public static final boolean DEFAULT_PERMIT_MOBILE_CONNECTION_TYPE = false;
     public static final String DEFAULT_BLACK_LIST = null;
+    public static final String DEFAULT_BLOCKED_WORDS = null;
     public static final int DEFAULT_SEARCH_CATEGORY_TYPE = Specific.SEARCH_CATEGORY_TYPE_DEFAULT;
     public static final int DEFAULT_SEARCH_SUBJECT_TYPE = Specific.SEARCH_SUBJECT_TYPE_DEFAULT;
     
     public static final String DELIMITER_BLACK_LIST = ",";
+    public static final String DELIMITER_BLOCKED_WORDS = ",";
     
     public enum PARSING_RESULT {
         SUCCESS_FULL_BOARD,

@@ -34,7 +34,6 @@ import android.widget.RemoteViewsService;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Iterator;
@@ -56,7 +55,8 @@ public class ContentsFactory implements RemoteViewsService.RemoteViewsFactory {
     //private static int mBoardType = Constants.DEFAULT_BOARD_TYPE;
     //private static int mRefreshTimetype = Constants.DEFAULT_REFRESH_TIME_TYPE;
     //private static boolean mIsPermitMobileConnectionType = Constants.DEFAULT_PERMIT_MOBILE_CONNECTION_TYPE;
-    //private staticString mBlackList = Constants.DEFAULT_BLACK_LIST;
+    //private static String mBlackList = Constants.DEFAULT_BLACK_LIST;
+    //private static String mBlockedWords = Constants.DEFAULT_BLOCKED_WORDS;
     //private static int mSelectedSearchCategoryType = Constants.DEFAULT_SEARCH_CATEGORY_TYPE;
     //private static int mSelectedSearchSubjectType = Constants.DEFAULT_SEARCH_SUBJECT_TYPE;
     //private static String mSelectedSearchKeyword = null;

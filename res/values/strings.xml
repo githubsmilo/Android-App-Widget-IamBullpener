@@ -45,12 +45,13 @@
     <string name="text_permitMobileConnection">3G/LTE\n접속 허용</string>
     <string name="text_refreshTime">새로 고침</string>
     <string name="text_board">게시판</string>
-    <string name="text_blackList">차단 목록</string>
+    <string name="text_blackList">차단 글쓴이</string>
+    <string name="text_blockedWords">차단 단어</string>
     <string name="text_appInfo">만든이</string>
     <string name="btn_ok">OK</string>
     <string name="btn_cancel">Cancel</string>
-    <string name="text_blackList_empty">없음</string>
-    <string name="text_blackList_not_implemented">구현 예정</string>
+    <string name="text_blackList_empty">콤마로 구분해주세요.</string>
+    <string name="text_blockedWords_empty">콤마로 구분해주세요.</string>
     <string name="appInfo">smilolistener@gmail.com</string>
 
     <!-- WebView activity -->
