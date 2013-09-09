@@ -1,7 +1,10 @@
 
-package com.smilo.bullpen;
+package com.smilo.bullpen.services;
 
+import com.smilo.bullpen.R;
+import com.smilo.bullpen.Constants;
 import com.smilo.bullpen.Constants.PARSING_RESULT;
+import com.smilo.bullpen.Utils;
 
 import net.htmlparser.jericho.CharacterReference;
 import net.htmlparser.jericho.Element;

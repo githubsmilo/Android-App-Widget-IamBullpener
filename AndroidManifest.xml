@@ -29,10 +29,10 @@
         </receiver>
 
         <service
-            android:name="com.smilo.bullpen.ListViewService"
+            android:name="com.smilo.bullpen.services.ListViewService"
             android:permission="android.permission.BIND_REMOTEVIEWS" />
         <service
-            android:name="com.smilo.bullpen.ContentsService"
+            android:name="com.smilo.bullpen.services.ContentsService"
             android:permission="android.permission.BIND_REMOTEVIEWS" />
 
         <activity

@@ -22,6 +22,8 @@ import com.smilo.bullpen.activities.AddToBlacklistActivity;
 import com.smilo.bullpen.activities.ConfigurationActivity;
 import com.smilo.bullpen.activities.SearchActivity;
 import com.smilo.bullpen.activities.WebViewActivity;
+import com.smilo.bullpen.services.ContentsService;
+import com.smilo.bullpen.services.ListViewService;
 
 public class WidgetProvider extends AppWidgetProvider {
 

@@ -1,5 +1,5 @@
 
-package com.smilo.bullpen;
+package com.smilo.bullpen.services;
 
 import android.content.Intent;
 import android.widget.RemoteViewsService;
