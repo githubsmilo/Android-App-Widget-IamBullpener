@@ -40,6 +40,9 @@ public class ConfigurationActivity extends Activity {
         // out of the widget placement if they press the back button.
         setResult(RESULT_CANCELED);
         
+        // Set title
+        this.setTitle(R.string.title_activity_configuration);
+        
         setContentView(R.layout.activity_configuration);
         
         Intent intent = getIntent();
