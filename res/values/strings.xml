@@ -45,8 +45,8 @@
     <string name="text_permitMobileConnection">3G/LTE\n접속 허용</string>
     <string name="text_refreshTime">새로 고침</string>
     <string name="text_board">게시판</string>
-    <string name="text_blackList">차단 글쓴이</string>
-    <string name="text_blockedWords">차단 단어</string>
+    <string name="text_blackList">글쓴이 차단</string>
+    <string name="text_blockedWords">제목 차단</string>
     <string name="text_appInfo">만든이</string>
     <string name="btn_ok">OK</string>
     <string name="btn_cancel">Cancel</string>
