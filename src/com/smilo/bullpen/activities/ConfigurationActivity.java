@@ -114,7 +114,7 @@ public class ConfigurationActivity extends Activity {
         EditText et = (EditText)findViewById(R.id.editBlackList);
         
         if (blackList == null)
-        	et.setText(R.string.text_blackList_empty);
+        	et.setText("");
         else
         	et.setText(blackList);
     }
