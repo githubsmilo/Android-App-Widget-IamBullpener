@@ -524,7 +524,6 @@ public class WidgetProvider extends AppWidgetProvider {
         intent.setClass(context, WebViewActivity.class);
         intent.putExtra(Constants.EXTRA_EXPORT_URL, url);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
         return intent;
     }

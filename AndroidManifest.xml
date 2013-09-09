@@ -48,13 +48,15 @@
             android:theme="@android:style/Theme.Dialog" >
         </activity>
         <activity
-            android:name="com.smilo.bullpen.activities.WebViewActivity"
-            android:launchMode="singleTop"
-            android:theme="@android:style/Theme.NoTitleBar" >
-        </activity>
-        <activity
             android:name="com.smilo.bullpen.activities.AddToBlacklistActivity"
             android:theme="@android:style/Theme.Dialog" >
+        </activity>
+        <activity
+            android:name="com.smilo.bullpen.activities.WebViewActivity"
+            android:launchMode="singleTop"
+            android:taskAffinity=""
+            android:excludeFromRecents="true" 
+            android:theme="@android:style/Theme.NoTitleBar" >
         </activity>
     </application>
 
