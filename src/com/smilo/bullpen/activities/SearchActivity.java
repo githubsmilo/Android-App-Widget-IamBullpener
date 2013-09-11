@@ -2,6 +2,8 @@
 package com.smilo.bullpen.activities;
 
 import com.smilo.bullpen.Constants;
+import com.smilo.bullpen.ExtraItems;
+import com.smilo.bullpen.Utils;
 import com.smilo.bullpen.WidgetProvider;
 import com.smilo.bullpen.R;
 
@@ -11,7 +13,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -24,54 +25,37 @@ public class SearchActivity extends Activity {
 
     private static final String TAG = "SearchActivity";
     private static final boolean DEBUG = Constants.DEBUG_MODE;
-    
-    // intent item list
-    private static int mAppWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID;
-    //private static int mPageNum = Constants.DEFAULT_PAGE_NUM; // We use default page num.
-    private static int mBoardType = Constants.DEFAULT_BOARD_TYPE;
-    private static int mRefreshTimetype = Constants.DEFAULT_REFRESH_TIME_TYPE;
-    private static boolean mIsPermitMobileConnectionType = Constants.DEFAULT_PERMIT_MOBILE_CONNECTION_TYPE;
-    private static String mBlackList = Constants.DEFAULT_BLACK_LIST;
-    private static String mBlockedWords = Constants.DEFAULT_BLOCKED_WORDS;
-    private static int mSelectedSearchCategoryType = Constants.DEFAULT_SEARCH_CATEGORY_TYPE;
-    private static int mSelectedSearchSubjectType = Constants.DEFAULT_SEARCH_SUBJECT_TYPE;
-    
+    public static final String SEARCH_ACTIVITY_CLASS_NAME = Constants.Specific.PACKAGE_NAME + ".activities." + TAG;
+
+    private static ExtraItems mItem = null;
+
     private LinearLayout mLayoutSearchWord;
     private LinearLayout mLayoutSearchSubject;
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_search);
         
         // Set the result to CANCELED.  This will cause the widget host to cancel
         // out of the widget placement if they press the back button.
         setResult(RESULT_CANCELED);
         
-        // Set title
+        // Set title.
         setTitle(R.string.title_activity_search);
         
-        setContentView(R.layout.activity_search);
-        
+        // Get ExtraItems.
         Intent intent = getIntent();
-        mAppWidgetId = intent.getIntExtra(
-                AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
-        //mPageNum = intent.getIntExtra(
-        //        Constants.EXTRA_PAGE_NUM, Constants.DEFAULT_PAGE_NUM);
-        mBoardType = intent.getIntExtra(
-                Constants.EXTRA_BOARD_TYPE, Constants.DEFAULT_BOARD_TYPE);
-        mRefreshTimetype = intent.getIntExtra(
-                Constants.EXTRA_REFRESH_TIME_TYPE, Constants.DEFAULT_REFRESH_TIME_TYPE);
-        mIsPermitMobileConnectionType = intent.getBooleanExtra(
-                Constants.EXTRA_PERMIT_MOBILE_CONNECTION_TYPE, Constants.DEFAULT_PERMIT_MOBILE_CONNECTION_TYPE);
-        mBlackList = intent.getStringExtra(Constants.EXTRA_BLACK_LIST);
-        mBlockedWords = intent.getStringExtra(Constants.EXTRA_BLOCKED_WORDS);
-        if (mAppWidgetId == AppWidgetManager.INVALID_APPWIDGET_ID) {
+        mItem = Utils.createExtraItemsFromIntent(intent);
+        if (mItem.getAppWidgetId() == AppWidgetManager.INVALID_APPWIDGET_ID) {
+            if (DEBUG) Log.e(TAG, "Invalid appWidget Id[" + mItem.getAppWidgetId() + "]");
             finish();
         }
 
         mLayoutSearchWord = (LinearLayout)findViewById(R.id.layoutSearchKeyword);
         mLayoutSearchSubject = (LinearLayout)findViewById(R.id.layoutSearchSubject);
         
+        // Initialize layout components.
         toggleSearchTarget(true);
         initializeSpinners();
         initializeButtons();
@@ -113,37 +97,30 @@ public class SearchActivity extends Activity {
             if (DEBUG) Log.i(TAG, "Button OK clicked");
 
             final Context context = SearchActivity.this;
+            
+            // Get search keyword.
             EditText etSearchKeyword = (EditText)findViewById(R.id.editTextSearchKeyword);
             String searchKeyword = etSearchKeyword.getText().toString();
+            mItem.setSearchKeyword(searchKeyword);
             
             // Check that keyword is empty.
-            if ((mSelectedSearchCategoryType != Constants.Specific.SEARCH_CATEGORY_TYPE_SUBJECT) &&
+            if ((mItem.getSearchCategoryType() != Constants.Specific.SEARCH_CATEGORY_TYPE_SUBJECT) &&
                   (searchKeyword.equals(""))) {
                 Toast.makeText(context, R.string.text_need_to_enter_keyword, Toast.LENGTH_SHORT).show();
                 return;
             }
+
+            // Set mItem to default page number.
+            mItem.setPageNum(Constants.DEFAULT_PAGE_NUM);
             
-            if (DEBUG) Log.i(TAG, "mSelectedSearchCategoryType[" + mSelectedSearchCategoryType +
-                    "], mSelectedSearchSubjectType[" + mSelectedSearchSubjectType + 
-                    "], searchKeyword[" + searchKeyword + "]");
-            
-            Intent initIntent = new Intent(context, WidgetProvider.class);
-            initIntent.setAction(Constants.ACTION_SEARCH);
-            initIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, mAppWidgetId);
-            initIntent.putExtra(Constants.EXTRA_PAGE_NUM, Constants.DEFAULT_PAGE_NUM);
-            initIntent.putExtra(Constants.EXTRA_BOARD_TYPE, mBoardType);
-            initIntent.putExtra(Constants.EXTRA_REFRESH_TIME_TYPE, mRefreshTimetype);
-            initIntent.putExtra(Constants.EXTRA_PERMIT_MOBILE_CONNECTION_TYPE, mIsPermitMobileConnectionType);
-            initIntent.putExtra(Constants.EXTRA_BLACK_LIST, mBlackList);
-            initIntent.putExtra(Constants.EXTRA_BLOCKED_WORDS, mBlockedWords);
-            initIntent.putExtra(Constants.EXTRA_SEARCH_CATEGORY_TYPE, mSelectedSearchCategoryType);
-            initIntent.putExtra(Constants.EXTRA_SEARCH_SUBJECT_TYPE, mSelectedSearchSubjectType);
-            initIntent.putExtra(Constants.EXTRA_SEARCH_KEYWORD, searchKeyword);
-            
-            context.sendBroadcast(initIntent);
-            
+            // Create intent and broadcast it!
+            Intent intent = Utils.createIntentFromExtraItems(
+                    context, WidgetProvider.WIDGET_PROVIDER_CLASS_NAME, Constants.ACTION_SEARCH, mItem, false);
+            context.sendBroadcast(intent);
+
+            // set return intent.
             Intent resultValue = new Intent();
-            resultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, mAppWidgetId);
+            resultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, mItem.getAppWidgetId());
             setResult(RESULT_OK, resultValue);
             finish();
         }
@@ -158,9 +135,9 @@ public class SearchActivity extends Activity {
     
     Spinner.OnItemSelectedListener mSpinSearchCategorySelectedListener = new AdapterView.OnItemSelectedListener() {
         public void onItemSelected(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
-            mSelectedSearchCategoryType = arg2;
+            mItem.setSearchCategoryType(arg2);
             
-            if (mSelectedSearchCategoryType == Constants.Specific.SEARCH_CATEGORY_TYPE_SUBJECT)
+            if (mItem.getSearchCategoryType() == Constants.Specific.SEARCH_CATEGORY_TYPE_SUBJECT)
                 toggleSearchTarget(false);
             else
                 toggleSearchTarget(true);
@@ -173,18 +150,11 @@ public class SearchActivity extends Activity {
     
     Spinner.OnItemSelectedListener mSpinSearchSubjectSelectedListener = new AdapterView.OnItemSelectedListener() {
         public void onItemSelected(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
-            mSelectedSearchSubjectType = arg2;
+            mItem.setSearchSubjectType(arg2);
         }
 
         public void onNothingSelected(AdapterView<?> arg0) {
             // Do nothing
         }
     };
-    
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.search, menu);
-        return true;
-    }
 }

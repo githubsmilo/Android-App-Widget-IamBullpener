@@ -29,6 +29,7 @@ public class WidgetProvider extends AppWidgetProvider {
 
     private static final String TAG = "WidgetProvider";
     private static final boolean DEBUG = Constants.DEBUG_MODE;
+    public static final String WIDGET_PROVIDER_CLASS_NAME = Constants.Specific.PACKAGE_NAME + "." + TAG;
     
     // the pending intent to broadcast alarm.
     private static PendingIntent mSender;
@@ -56,12 +57,14 @@ public class WidgetProvider extends AppWidgetProvider {
     public void onReceive(Context context, Intent intent) {
         super.onReceive(context, intent);
 
+        // Get ExtraItems.
         String action = intent.getAction();
-        intentItem item = createIntentItem(intent);
+        ExtraItems item = Utils.createExtraItemsFromIntent(intent);
+        
         AppWidgetManager awm = AppWidgetManager.getInstance(context);
         int[] appWidgetIds = awm.getAppWidgetIds(new ComponentName(context, getClass()));
         if (DEBUG) Log.d(TAG, "onReceive - action[" + action + "], appWidgetsNum[" + appWidgetIds.length +
-                "], intentItem[" + item.toString() + "]");
+                "], ExtraItems[" + item.toString() + "]");
 
         for (int i = 0 ; i < appWidgetIds.length ; i++) {
             if (DEBUG) Log.d(TAG, "onReceive - current appWidgetId[" + appWidgetIds[i] + "]");
@@ -76,7 +79,7 @@ public class WidgetProvider extends AppWidgetProvider {
                     saveIntentItem(context, item);
 
                     // Send broadcast intent to update some variables on the ListViewFactory.
-                    context.sendBroadcast(buildUpdateListInfoIntent(item));
+                    context.sendBroadcast(buildUpdateListInfoIntent(context, item));
                     
                     // Broadcast ACTION_SHOW_LIST intent.
                     context.sendBroadcast(buildShowListIntent(context, item));
@@ -87,7 +90,7 @@ public class WidgetProvider extends AppWidgetProvider {
                     removePreviousAlarm();
                     
                     // Send broadcast intent to update some variables on the ListViewFactory.
-                    context.sendBroadcast(buildUpdateListInfoIntent(item));
+                    context.sendBroadcast(buildUpdateListInfoIntent(context, item));
                     
                     // Broadcast ACTION_SHOW_LIST intent.
                     context.sendBroadcast(buildShowListIntent(context, item));
@@ -120,14 +123,14 @@ public class WidgetProvider extends AppWidgetProvider {
                     String selectedItemWriter = intent.getStringExtra(Constants.EXTRA_ITEM_WRITER);
 
                     // Send broadcast intent to update some variables on the ContentsFactory.
-                    context.sendBroadcast(buildUpdateItemInfoIntent(item, selectedItemUrl, selectedItemWriter));
+                    context.sendBroadcast(buildUpdateItemInfoIntent(context, item, selectedItemUrl, selectedItemWriter));
                     
                     // Check which internet is connected or net.
                     INTERNET_CONNECTED_RESULT result = Utils.isInternetConnected(context, item.getPermitMobileConnectionType());
                     
                     // Set proper remote view according to the result.
                     if (result == INTERNET_CONNECTED_RESULT.FAILED)
-                           setRemoteViewToShowLostInternetConnection(context, awm, item);
+                        setRemoteViewToShowLostInternetConnection(context, awm, item);
                     else
                         setRemoteViewToShowItem(context, awm, item, selectedItemUrl, selectedItemWriter);
                 }
@@ -135,42 +138,15 @@ public class WidgetProvider extends AppWidgetProvider {
         }
     }
 
-    private intentItem createIntentItem(Intent intent) {
-        int appWidgetId = intent.getIntExtra(
-                AppWidgetManager.EXTRA_APPWIDGET_ID,  AppWidgetManager.INVALID_APPWIDGET_ID);
-        int pageNum = intent.getIntExtra(
-                Constants.EXTRA_PAGE_NUM, Constants.DEFAULT_PAGE_NUM);
-        int boardType = intent.getIntExtra(
-                Constants.EXTRA_BOARD_TYPE, Constants.DEFAULT_BOARD_TYPE);
-        int refreshTimeType = intent.getIntExtra(
-                Constants.EXTRA_REFRESH_TIME_TYPE, Constants.DEFAULT_REFRESH_TIME_TYPE);
-        boolean permitMobileConnectionType = intent.getBooleanExtra(
-                Constants.EXTRA_PERMIT_MOBILE_CONNECTION_TYPE, Constants.DEFAULT_PERMIT_MOBILE_CONNECTION_TYPE);
-        String blackList = intent.getStringExtra(
-                Constants.EXTRA_BLACK_LIST);
-        String blockedWords = intent.getStringExtra(
-                    Constants.EXTRA_BLOCKED_WORDS);
-        int searchCategoryType = intent.getIntExtra(
-                Constants.EXTRA_SEARCH_CATEGORY_TYPE, Constants.DEFAULT_SEARCH_CATEGORY_TYPE);
-        int searchSubjectType = intent.getIntExtra(
-                Constants.EXTRA_SEARCH_SUBJECT_TYPE, Constants.DEFAULT_SEARCH_SUBJECT_TYPE);
-        String searchKeyword = intent.getStringExtra(Constants.EXTRA_SEARCH_KEYWORD);
-        
-        intentItem item = new intentItem(
-                appWidgetId, pageNum, boardType, refreshTimeType, permitMobileConnectionType, blackList, blockedWords,
-                searchCategoryType, searchSubjectType, searchKeyword);
-        
-        return item;
-    }
-    
-    private void setRemoteViewToShowLostInternetConnection(Context context, AppWidgetManager awm, intentItem item) {
-        if (DEBUG) Log.d(TAG, "setRemoteViewToShowLostInternetConnection - intentItem[" + item.toString() + "]");
+    private void setRemoteViewToShowLostInternetConnection(Context context, AppWidgetManager awm, ExtraItems item) {
+        if (DEBUG) Log.d(TAG, "setRemoteViewToShowLostInternetConnection - ExtraItems[" + item.toString() + "]");
         
         PendingIntent pi = null;
 
         // Create new remoteViews.
         RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.lost_internet_connection);
         
+        // Set title of the remoteViews.
         rv.setTextViewText(R.id.textLostInternetTitle, context.getResources().getText(R.string.text_lost_internet_connection));
 
         // Set refresh button of the remoteViews.
@@ -188,8 +164,8 @@ public class WidgetProvider extends AppWidgetProvider {
         awm.updateAppWidget(item.getAppWidgetId(), rv);
     }
     
-    private void setRemoteViewToShowList(Context context, AppWidgetManager awm, intentItem item) {
-        if (DEBUG) Log.d(TAG, "setRemoteViewToShowList - intentItem[" + item.toString() + "]");
+    private void setRemoteViewToShowList(Context context, AppWidgetManager awm, ExtraItems item) {
+        if (DEBUG) Log.d(TAG, "setRemoteViewToShowList - ExtraItems[" + item.toString() + "]");
         
         PendingIntent pi = null;
 
@@ -295,9 +271,9 @@ public class WidgetProvider extends AppWidgetProvider {
         }
     }
     
-    private void setRemoteViewToShowItem(Context context, AppWidgetManager awm, intentItem item,
+    private void setRemoteViewToShowItem(Context context, AppWidgetManager awm, ExtraItems item,
             String selectedItemUrl, String selectedItemWriter) {
-        if (DEBUG) Log.d(TAG, "setRemoteViewToShowItem - intentItem[" + item.toString() +
+        if (DEBUG) Log.d(TAG, "setRemoteViewToShowItem - ExtraItems[" + item.toString() +
                 "], selectedItemUrl[" + selectedItemUrl + "], selectedItemWriter[" + selectedItemWriter + "]");
         
         PendingIntent pi = null;
@@ -357,7 +333,7 @@ public class WidgetProvider extends AppWidgetProvider {
         }
     }
     
-    private void refreshAlarmSetting(Context context, intentItem item, INTERNET_CONNECTED_RESULT result) {
+    private void refreshAlarmSetting(Context context, ExtraItems item, INTERNET_CONNECTED_RESULT result) {
         // If user does not want to refresh, just remove alarm setting.
         // TODO : Consider INTERNET_CONNECTED_RESULT case here?
         if (item.getRefreshTimeType() == Constants.Specific.REFRESH_TIME_TYPE_STOP) {
@@ -370,8 +346,8 @@ public class WidgetProvider extends AppWidgetProvider {
         }
     }
     
-    private void setNewAlarm(Context context, intentItem item, boolean isUrgentMode) {
-        if (DEBUG) Log.d(TAG, "setNewAlarm - intentItem[" + item.toString() + "], isUrgentMode[" + isUrgentMode + "]");
+    private void setNewAlarm(Context context, ExtraItems item, boolean isUrgentMode) {
+        if (DEBUG) Log.d(TAG, "setNewAlarm");
 
         Resources res = context.getResources();
         int selectedRefreshTime = Utils.getRefreshTime(context, item.getRefreshTimeType());
@@ -391,125 +367,82 @@ public class WidgetProvider extends AppWidgetProvider {
         }
     }
 
-    private Intent buildBaseIntent(intentItem item) {
-        Intent intent = new Intent();
-        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, item.getAppWidgetId());
-        intent.putExtra(Constants.EXTRA_PAGE_NUM, item.getPageNum());
-        intent.putExtra(Constants.EXTRA_BOARD_TYPE, item.getBoardType());
-        intent.putExtra(Constants.EXTRA_REFRESH_TIME_TYPE, item.getRefreshTimeType());
-        intent.putExtra(Constants.EXTRA_PERMIT_MOBILE_CONNECTION_TYPE, item.getPermitMobileConnectionType());
-        intent.putExtra(Constants.EXTRA_BLACK_LIST, item.getBlackList());
-        intent.putExtra(Constants.EXTRA_BLOCKED_WORDS, item.getBlockedWords());
-        intent.putExtra(Constants.EXTRA_SEARCH_CATEGORY_TYPE, item.getSearchCategoryType());
-        intent.putExtra(Constants.EXTRA_SEARCH_SUBJECT_TYPE, item.getSearchSubjectType());
-        String searchKeyword = item.getSearchKeyword();
-        if (searchKeyword != null && searchKeyword.length() > 0)
-            intent.putExtra(Constants.EXTRA_SEARCH_KEYWORD, searchKeyword);
-        
-        return intent;
+    private Intent buildUpdateListInfoIntent(Context context, ExtraItems item) {
+        return Utils.createIntentFromExtraItems(
+                context, null, Constants.ACTION_UPDATE_LIST_INFO, item, false);
     }
     
-    private Intent buildUpdateListInfoIntent(intentItem item) {
-        Intent intent = buildBaseIntent(item);
-        intent.setAction(Constants.ACTION_UPDATE_LIST_INFO);
-        
-        return intent;
-    }
-    
-    private Intent buildUpdateItemInfoIntent(intentItem item,
+    private Intent buildUpdateItemInfoIntent(Context context, ExtraItems item,
             String selectedItemUrl, String selectedItemWriter) {
-        Intent intent = buildBaseIntent(item);
-        intent.setAction(Constants.ACTION_UPDATE_ITEM_INFO);
+        Intent intent = Utils.createIntentFromExtraItems(
+                context, null, Constants.ACTION_UPDATE_ITEM_INFO, item, false);
         if (selectedItemUrl != null && selectedItemUrl.length() > 0)
             intent.putExtra(Constants.EXTRA_ITEM_URL, selectedItemUrl);
         if (selectedItemWriter != null && selectedItemWriter.length() >0)
             intent.putExtra(Constants.EXTRA_ITEM_WRITER, selectedItemWriter);
-        
         return intent;
     }
     
-    private Intent buildRefreshListIntent(Context context, intentItem item) {
-        Intent intent = buildBaseIntent(item);
-        intent.setClass(context, WidgetProvider.class);
-        intent.setAction(Constants.ACTION_REFRESH_LIST);
-        
-        return intent;
+    private Intent buildRefreshListIntent(Context context, ExtraItems item) {
+        return Utils.createIntentFromExtraItems(
+                context, WIDGET_PROVIDER_CLASS_NAME, Constants.ACTION_REFRESH_LIST, item, false);
     }
     
-    private Intent buildShowListIntent(Context context, intentItem item) {
-        Intent intent = buildBaseIntent(item);
-        intent.setClass(context, WidgetProvider.class);
-        intent.setAction(Constants.ACTION_SHOW_LIST);
-
-        return intent;
+    private Intent buildShowListIntent(Context context, ExtraItems item) {
+        return Utils.createIntentFromExtraItems(
+                context, WIDGET_PROVIDER_CLASS_NAME, Constants.ACTION_SHOW_LIST, item, false);
     }
     
-    private Intent buildShowItemIntent(Context context, intentItem item,
+    private Intent buildShowItemIntent(Context context, ExtraItems item,
             String selectedItemUrl) {
-        Intent intent = buildBaseIntent(item);
-        intent.setClass(context, WidgetProvider.class);  
-        intent.setAction(Constants.ACTION_SHOW_ITEM);
+        Intent intent = Utils.createIntentFromExtraItems(
+                context, WIDGET_PROVIDER_CLASS_NAME, Constants.ACTION_SHOW_ITEM, item, false);
         if (selectedItemUrl != null && selectedItemUrl.length() > 0)
             intent.putExtra(Constants.EXTRA_ITEM_URL, selectedItemUrl);
-        
         return intent;
     }
     
-    private Intent buildConfigurationActivityIntent(Context context, intentItem item) {
-        Intent intent = buildBaseIntent(item);
-        intent.setClass(context, ConfigurationActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
-        return intent;
+    private Intent buildConfigurationActivityIntent(Context context, ExtraItems item) {
+        return Utils.createIntentFromExtraItems(
+                context, ConfigurationActivity.CONFIGURATION_ACTIVITY_CLASS_NAME, null, item, true);
     }
     
-    private Intent buildSearchActivityIntent(Context context, intentItem item) {
-        Intent intent = buildBaseIntent(item);
-        intent.setClass(context, SearchActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
-        return intent;
+    private Intent buildSearchActivityIntent(Context context, ExtraItems item) {
+        return Utils.createIntentFromExtraItems(
+                context, SearchActivity.SEARCH_ACTIVITY_CLASS_NAME, null, item, true);
     }
     
-    private Intent buildAddToBlackListIntent(Context context, intentItem item,
+    private Intent buildAddToBlackListIntent(Context context, ExtraItems item,
             String selectedItemWriter) {
-        Intent intent = buildBaseIntent(item);
-        intent.setClass(context, AddToBlacklistActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        Intent intent = Utils.createIntentFromExtraItems(
+                context, AddToBlacklistActivity.ADDTOBLACKLIST_ACTIVITY_CLASS_NAME, null, item, true);
         if (selectedItemWriter != null && selectedItemWriter.length() > 0)
             intent.putExtra(Constants.EXTRA_ITEM_WRITER, selectedItemWriter);
-
         return intent;
     }
     
-    private Intent buildListViewServiceIntent(Context context, intentItem item) {
-        Intent intent = buildBaseIntent(item);
-        intent.setClass(context, ListViewService.class);
-        
-        return intent;
+    private Intent buildListViewServiceIntent(Context context, ExtraItems item) {
+        return Utils.createIntentFromExtraItems(
+                context, ListViewService.LISTVIEW_SERVICE_CLASS_NAME, null, item, false);
     }
     
-    private Intent buildContentServiceIntent(Context context, intentItem item,
+    private Intent buildContentServiceIntent(Context context, ExtraItems item,
             String selectedItemUrl, String selectedItemWriter) {
-        Intent intent = buildBaseIntent(item);
-        intent.setClass(context, ContentsService.class);
+        Intent intent = Utils.createIntentFromExtraItems(
+                context, ContentsService.CONTENTS_SERVICE_CLASS_NAME, null, item, false);
         if (selectedItemUrl != null && selectedItemUrl.length() > 0)
             intent.putExtra(Constants.EXTRA_ITEM_URL, selectedItemUrl);
         if (selectedItemWriter != null && selectedItemWriter.length() > 0)
             intent.putExtra(Constants.EXTRA_ITEM_WRITER, selectedItemWriter);
-        
         return intent;
     }
     
-    private Intent buildWidgetUpdateIntent(Context context, intentItem item) {
-        Intent intent = buildBaseIntent(item);
-        intent.setClass(context, WidgetProvider.class);
-        intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
-        
-        return intent;
+    private Intent buildWidgetUpdateIntent(Context context, ExtraItems item) {
+        return Utils.createIntentFromExtraItems(
+                context, WIDGET_PROVIDER_CLASS_NAME, AppWidgetManager.ACTION_APPWIDGET_UPDATE, item, false);
     }
     
-    private Intent buildExportIntent(Context context, intentItem item, String selectedItemUrl) {
+    private Intent buildExportIntent(Context context, ExtraItems item, String selectedItemUrl) {
         String url = null;
         
         if (selectedItemUrl == null) {
@@ -527,16 +460,15 @@ public class WidgetProvider extends AppWidgetProvider {
         } else {
             url = selectedItemUrl;
         }
-
-        Intent intent = new Intent();
-        intent.setClass(context, WebViewActivity.class);
+        
+        Intent intent = Utils.createIntentFromExtraItems(
+                context, WebViewActivity.WEBVIEW_ACTIVITY_CLASS_NAME, null, item, true);
         intent.putExtra(Constants.EXTRA_EXPORT_URL, url);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
         return intent;
     }
 
-    private void saveIntentItem(Context context, intentItem item) {
+    private void saveIntentItem(Context context, ExtraItems item) {
         if (DEBUG) Log.d(TAG, "saveIntentItem");
         
         SharedPreferences pref = context.getSharedPreferences(Constants.SHARED_PREFERENCE_NAME, Context.MODE_PRIVATE);
@@ -547,6 +479,7 @@ public class WidgetProvider extends AppWidgetProvider {
         editor.putBoolean(Constants.KEY_PERMIT_MOBILE_CONNECTION_TYPE, item.getPermitMobileConnectionType());
         editor.putString(Constants.KEY_BLACK_LIST, item.getBlackList());
         editor.putString(Constants.KEY_BLOCKED_WORDS, item.getBlockedWords());
+        editor.putString(Constants.KEY_SCRAP_LIST, item.getScrapList());
         editor.commit();
     }
     
@@ -594,14 +527,15 @@ public class WidgetProvider extends AppWidgetProvider {
             boolean permitMobileConnectionType = pref.getBoolean(Constants.KEY_PERMIT_MOBILE_CONNECTION_TYPE, Constants.DEFAULT_PERMIT_MOBILE_CONNECTION_TYPE);
             String blackList = pref.getString(Constants.KEY_BLACK_LIST, Constants.DEFAULT_BLACK_LIST);
             String blockedWords = pref.getString(Constants.KEY_BLOCKED_WORDS, Constants.DEFAULT_BLOCKED_WORDS);
+            String scrapList = pref.getString(Constants.KEY_SCRAP_LIST, Constants.DEFAULT_SCRAP_LIST);
 
             // Set urgent alarm to update widget as soon as possible.
             AppWidgetManager awm = AppWidgetManager.getInstance(context);
             int[] appWidgetIds = awm.getAppWidgetIds(new ComponentName(context, getClass()));
 
             for (int i = 0 ; i < appWidgetIds.length ; i++) {
-                intentItem item = new intentItem(appWidgetIds[i], Constants.DEFAULT_PAGE_NUM,
-                        boardType, refreshTimeType, permitMobileConnectionType, blackList, blockedWords,
+                ExtraItems item = new ExtraItems(appWidgetIds[i], Constants.DEFAULT_PAGE_NUM,
+                        boardType, refreshTimeType, permitMobileConnectionType, blackList, blockedWords, scrapList,
                         Constants.DEFAULT_SEARCH_CATEGORY_TYPE, Constants.DEFAULT_SEARCH_SUBJECT_TYPE, null);
                 
                 setNewAlarm(context, item, true);
@@ -609,83 +543,5 @@ public class WidgetProvider extends AppWidgetProvider {
         }
         
         super.onEnabled(context);
-    }
-
-    private static class intentItem {
-        int widgetId = AppWidgetManager.INVALID_APPWIDGET_ID;
-        int pageNumber = Constants.DEFAULT_PAGE_NUM;
-        int boardType = Constants.DEFAULT_BOARD_TYPE;
-        int refreshType = Constants.DEFAULT_REFRESH_TIME_TYPE;
-        boolean isPermitMobileConnection = Constants.DEFAULT_PERMIT_MOBILE_CONNECTION_TYPE;
-        String blackList = Constants.DEFAULT_BLACK_LIST;
-        String blockedWords = Constants.DEFAULT_BLOCKED_WORDS;
-        int searchCategoryType = Constants.DEFAULT_SEARCH_CATEGORY_TYPE;
-        int searchSubjectType = Constants.DEFAULT_SEARCH_SUBJECT_TYPE;
-        String searchKeyword = null;
-
-        intentItem(int widgetId, int pageNumber, int boardType, int refreshType, boolean isPermitMobileConnection,
-                String blackList, String blockedWords, int searchCategoryType, int searchSubjectType, String searchKeyword) {
-            this.widgetId = widgetId;
-            this.pageNumber = pageNumber;
-            this.boardType = boardType;
-            this.refreshType = refreshType;
-            this.isPermitMobileConnection = isPermitMobileConnection;
-            this.blackList = blackList;
-            this.blockedWords = blockedWords;
-            this.searchCategoryType = searchCategoryType;
-            this.searchSubjectType = searchSubjectType;
-            this.searchKeyword = searchKeyword;
-        }
-        
-        int getAppWidgetId() {
-            return widgetId;
-        }
-        
-        int getPageNum() {
-            return pageNumber;
-        }
-        
-        int getBoardType() {
-            return boardType;
-        }
-        
-        int getRefreshTimeType() {
-            return refreshType;
-        }
-        
-        boolean getPermitMobileConnectionType() {
-            return isPermitMobileConnection;
-        }
-        
-        String getBlackList() {
-            return blackList;
-        }
-        
-        String getBlockedWords() {
-            return blockedWords;
-        }
-        
-        int getSearchCategoryType() {
-            return searchCategoryType;
-        }
-        
-        int getSearchSubjectType() {
-            return searchSubjectType;
-        }
-        
-        String getSearchKeyword() {
-            return searchKeyword;
-        }
-        
-        void setPageNum(int pageNum) {
-            pageNumber = pageNum;
-        }
-        
-        public String toString() {
-            return ("appWidgetId[" + widgetId + "], pageNum[" + pageNumber + "], boardType[" + boardType +
-                    "], refreshTimeType[" + refreshType + "], isPermitMobileConnectionType[" + isPermitMobileConnection +
-                    "], blackList[" + blackList + "], blockedWords[" + blockedWords + "], searchCategoryType[" + searchCategoryType +
-                    "], searchSubjectType[" + searchSubjectType + "], searchKeyword[" + searchKeyword + "]");
-        }
     }
 }

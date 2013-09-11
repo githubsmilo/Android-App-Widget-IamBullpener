@@ -4,11 +4,12 @@ package com.smilo.bullpen;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
+import android.appwidget.AppWidgetManager;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.widget.Toast;
 
 import com.smilo.bullpen.Constants.INTERNET_CONNECTED_RESULT;
 import com.smilo.bullpen.Constants.PARSING_RESULT;
@@ -47,8 +48,62 @@ public final class Utils {
                 return true;
         }
 */    
-        //Toast.makeText(context, R.string.internet_not_connected_msg, Toast.LENGTH_SHORT).show();
         return INTERNET_CONNECTED_RESULT.FAILED;
+    }
+    
+    public static ExtraItems createExtraItemsFromIntent(Intent intent) {
+        int appWidgetId = intent.getIntExtra(
+                AppWidgetManager.EXTRA_APPWIDGET_ID,  AppWidgetManager.INVALID_APPWIDGET_ID);
+        int pageNum = intent.getIntExtra(
+                Constants.EXTRA_PAGE_NUM, Constants.DEFAULT_PAGE_NUM);
+        int boardType = intent.getIntExtra(
+                Constants.EXTRA_BOARD_TYPE, Constants.DEFAULT_BOARD_TYPE);
+        int refreshTimeType = intent.getIntExtra(
+                Constants.EXTRA_REFRESH_TIME_TYPE, Constants.DEFAULT_REFRESH_TIME_TYPE);
+        boolean permitMobileConnectionType = intent.getBooleanExtra(
+                Constants.EXTRA_PERMIT_MOBILE_CONNECTION_TYPE, Constants.DEFAULT_PERMIT_MOBILE_CONNECTION_TYPE);
+        String blackList = intent.getStringExtra(
+                Constants.EXTRA_BLACK_LIST);
+        String blockedWords = intent.getStringExtra(
+                    Constants.EXTRA_BLOCKED_WORDS);
+        String scrapList = intent.getStringExtra(
+                Constants.EXTRA_SCRAP_LIST);
+        int searchCategoryType = intent.getIntExtra(
+                Constants.EXTRA_SEARCH_CATEGORY_TYPE, Constants.DEFAULT_SEARCH_CATEGORY_TYPE);
+        int searchSubjectType = intent.getIntExtra(
+                Constants.EXTRA_SEARCH_SUBJECT_TYPE, Constants.DEFAULT_SEARCH_SUBJECT_TYPE);
+        String searchKeyword = intent.getStringExtra(
+                Constants.EXTRA_SEARCH_KEYWORD);
+        
+        ExtraItems item = new ExtraItems(
+                appWidgetId, pageNum, boardType, refreshTimeType, permitMobileConnectionType,
+                blackList, blockedWords, scrapList, searchCategoryType, searchSubjectType, searchKeyword);
+        
+        return item;
+    }
+    
+    public static Intent createIntentFromExtraItems(
+            Context context, String className, String actionName, ExtraItems item, boolean isAddNewTask) {
+        Intent intent = new Intent();
+        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, item.getAppWidgetId());
+        intent.putExtra(Constants.EXTRA_PAGE_NUM, item.getPageNum());
+        intent.putExtra(Constants.EXTRA_BOARD_TYPE, item.getBoardType());
+        intent.putExtra(Constants.EXTRA_REFRESH_TIME_TYPE, item.getRefreshTimeType());
+        intent.putExtra(Constants.EXTRA_PERMIT_MOBILE_CONNECTION_TYPE, item.getPermitMobileConnectionType());
+        intent.putExtra(Constants.EXTRA_BLACK_LIST, item.getBlackList());
+        intent.putExtra(Constants.EXTRA_BLOCKED_WORDS, item.getBlockedWords());
+        intent.putExtra(Constants.EXTRA_SCRAP_LIST, item.getScrapList());
+        intent.putExtra(Constants.EXTRA_SEARCH_CATEGORY_TYPE, item.getSearchCategoryType());
+        intent.putExtra(Constants.EXTRA_SEARCH_SUBJECT_TYPE, item.getSearchSubjectType());
+        intent.putExtra(Constants.EXTRA_SEARCH_KEYWORD, item.getSearchKeyword());
+        if (className != null)
+            intent.setClassName(context, className);
+        if (actionName != null)
+            intent.setAction(actionName);
+        if (isAddNewTask)
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        
+        return intent;
     }
     
     public static String getMobileBoardUrl(Context context, int pageNum, int boardType,

@@ -10,7 +10,6 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
@@ -18,46 +17,45 @@ public class WebViewActivity extends Activity {
 
     private static final String TAG = "WebViewActivity";
     private static final boolean DEBUG = Constants.DEBUG_MODE;
-    
-    private static String mExportUrl = null;
-    
+    public static final String WEBVIEW_ACTIVITY_CLASS_NAME = Constants.Specific.PACKAGE_NAME + ".activities." + TAG;
+
     private ProgressDialog mProgress = null;
     private WebView mWebView = null;
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_web_view);
         
         // Set the result to CANCELED.  This will cause the widget host to cancel
         // out of the widget placement if they press the back button.
         setResult(RESULT_CANCELED);
         
-        // Set title
+        // Set title.
         setTitle(R.string.title_activity_web_view);
         
-        setContentView(R.layout.activity_web_view);
-
-        Log.i(TAG, "onCreate");
+        // Get exported url.
         Intent intent = getIntent();
-        String mExportUrl = intent.getStringExtra(Constants.EXTRA_EXPORT_URL);
-        if (mExportUrl == null) {
-            Log.e(TAG, "onCreate - exportUrl is null!");
+        String exportUrl = intent.getStringExtra(Constants.EXTRA_EXPORT_URL);
+        if (exportUrl == null) {
+            if (DEBUG) Log.e(TAG, "onCreate - exportUrl is null!");
             finish();
         }
         
+        // Initialize layout components.
         initializeWebView();
-        mWebView.loadUrl(mExportUrl);
+        mWebView.loadUrl(exportUrl);
     }
 
     @Override
     protected void onNewIntent(Intent intent) {
-        Log.i(TAG, "onNewIntent");
-        String mExportUrl = intent.getStringExtra(Constants.EXTRA_EXPORT_URL);
-        if (mExportUrl == null) {
-            Log.e(TAG, "onCreate - exportUrl is null!");
+        if (DEBUG) Log.i(TAG, "onNewIntent");
+        String exportUrl = intent.getStringExtra(Constants.EXTRA_EXPORT_URL);
+        if (exportUrl == null) {
+            if (DEBUG) Log.e(TAG, "onCreate - exportUrl is null!");
             finish();
         }
-        mWebView.loadUrl(mExportUrl);
+        mWebView.loadUrl(exportUrl);
         
         super.onNewIntent(intent);
     }
@@ -74,7 +72,6 @@ public class WebViewActivity extends Activity {
 
     private void initializeWebView() {
         mWebView = (WebView)findViewById(R.id.webViewExport);
-        mWebView.getSettings().setJavaScriptEnabled(true);
         mWebView.getSettings().setBuiltInZoomControls(true);
         mWebView.setBackgroundColor(0);
         mWebView.setWebViewClient(new WebViewClient() {
@@ -117,12 +114,5 @@ public class WebViewActivity extends Activity {
                 super.onPageFinished(view, url);
             }
         });
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.web_view, menu);
-        return true;
     }
 }

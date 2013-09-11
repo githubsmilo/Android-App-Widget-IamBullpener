@@ -2,6 +2,8 @@
 package com.smilo.bullpen.activities;
 
 import com.smilo.bullpen.Constants;
+import com.smilo.bullpen.ExtraItems;
+import com.smilo.bullpen.Utils;
 import com.smilo.bullpen.WidgetProvider;
 import com.smilo.bullpen.R;
 
@@ -12,7 +14,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -24,58 +25,50 @@ public class ConfigurationActivity extends Activity {
 
     private static final String TAG = "ConfigurationActivity";
     private static final boolean DEBUG = Constants.DEBUG_MODE;
+    public static final String CONFIGURATION_ACTIVITY_CLASS_NAME = Constants.Specific.PACKAGE_NAME + ".activities." + TAG;
     
-    private int mAppWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID;
-    //private static int mPageNum = Constants.DEFAULT_PAGE_NUM; // We use default page num.
-    private int mSelectedBoardType = Constants.DEFAULT_BOARD_TYPE;
-    private int mSelectedRefreshTimeType = Constants.DEFAULT_REFRESH_TIME_TYPE;
+    private static ExtraItems mItem = null;
     
     private boolean mIsExecutedBySettingButton = false;
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_configuration);
         
         // Set the result to CANCELED.  This will cause the widget host to cancel
         // out of the widget placement if they press the back button.
         setResult(RESULT_CANCELED);
         
-        // Set title
+        // Set title.
         this.setTitle(R.string.title_activity_configuration);
-        
-        setContentView(R.layout.activity_configuration);
-        
+
+        // Get ExtraItems.
         Intent intent = getIntent();
-        Bundle extras = intent.getExtras();
-        if (extras != null) {
-            mAppWidgetId = extras.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
-        }
-        
-        // If they gave us an intent without the widget id, just bail.
-        if (mAppWidgetId == AppWidgetManager.INVALID_APPWIDGET_ID) {
+        mItem = Utils.createExtraItemsFromIntent(intent);
+        if (mItem.getAppWidgetId() == AppWidgetManager.INVALID_APPWIDGET_ID) {
+            if (DEBUG) Log.e(TAG, "Invalid appWidget Id[" + mItem.getAppWidgetId() + "]");
             finish();
         }
 
-        if (extras.containsKey(Constants.EXTRA_PERMIT_MOBILE_CONNECTION_TYPE) &&
+        Bundle extras = intent.getExtras();
+        if (extras != null &&
+            extras.containsKey(Constants.EXTRA_PERMIT_MOBILE_CONNECTION_TYPE) &&
             extras.containsKey(Constants.EXTRA_REFRESH_TIME_TYPE) &&
             extras.containsKey(Constants.EXTRA_BOARD_TYPE)) {
             mIsExecutedBySettingButton = true;
         }
         
-        int boardType;
-        int refreshTimeType;
+        int boardType, refreshTimeType;
         boolean isPermitMobileConnection;
-        String blackList, blockedWords;;
+        String blackList, blockedWords;
         
         if (mIsExecutedBySettingButton) {
-            boardType = extras.getInt(
-                    Constants.EXTRA_BOARD_TYPE, Constants.DEFAULT_BOARD_TYPE);
-            refreshTimeType = extras.getInt(
-                    Constants.EXTRA_REFRESH_TIME_TYPE, Constants.DEFAULT_REFRESH_TIME_TYPE);
-            isPermitMobileConnection = extras.getBoolean(
-                    Constants.EXTRA_PERMIT_MOBILE_CONNECTION_TYPE, Constants.DEFAULT_PERMIT_MOBILE_CONNECTION_TYPE);
-            blackList = extras.getString(Constants.EXTRA_BLACK_LIST);
-            blockedWords = extras.getString(Constants.EXTRA_BLOCKED_WORDS);
+            boardType = mItem.getBoardType();
+            refreshTimeType = mItem.getRefreshTimeType();
+            isPermitMobileConnection = mItem.getPermitMobileConnectionType();
+            blackList = mItem.getBlackList();
+            blockedWords = mItem.getBlockedWords();
             
         } else {
             // Load configuration info.
@@ -86,8 +79,10 @@ public class ConfigurationActivity extends Activity {
             isPermitMobileConnection = pref.getBoolean(Constants.KEY_PERMIT_MOBILE_CONNECTION_TYPE, Constants.DEFAULT_PERMIT_MOBILE_CONNECTION_TYPE);
             blackList = pref.getString(Constants.KEY_BLACK_LIST, Constants.DEFAULT_BLACK_LIST);
             blockedWords = pref.getString(Constants.KEY_BLOCKED_WORDS, Constants.DEFAULT_BLOCKED_WORDS);
+            mItem.setScrapList(pref.getString(Constants.KEY_SCRAP_LIST, Constants.DEFAULT_SCRAP_LIST));
         }
 
+        // Initialize layout components.
         initializeRadioButton(isPermitMobileConnection);
         initializeSpinners(refreshTimeType, boardType);
         initializeEditText(blackList, blockedWords);
@@ -138,42 +133,39 @@ public class ConfigurationActivity extends Activity {
         public void onClick(View v) {
             if (DEBUG) Log.i(TAG, "Button OK clicked");
 
+            final Context context = ConfigurationActivity.this;
+            
             // Get mobileConnection checkbox's value.
             CheckBox cb = (CheckBox)findViewById(R.id.cbMobileConnection);
-            boolean selectedPermitMobileConnectionType = cb.isChecked();
+            mItem.setPermitMobileConnectionType(cb.isChecked());
             
             // Get black list's value. If empty, set null.
             EditText etBlackList = (EditText)findViewById(R.id.editBlackList);
             String blackList = etBlackList.getText().toString();
             if (blackList != null && blackList.length() == 0)
-                blackList = null;
+                mItem.setBlackList(null);
+            else
+                mItem.setBlackList(blackList);
             
             // Get blocked words's value. If empty, set null.
             EditText etBlockedWords = (EditText)findViewById(R.id.editBlockedWords);
             String blockedWords = etBlockedWords.getText().toString();
             if (blockedWords != null && blockedWords.length() == 0)
-                blockedWords = null;
+                mItem.setBlockedWords(null);
+            else
+                mItem.setBlockedWords(blockedWords);
+
+            // Set mItem to default page number.
+            mItem.setPageNum(Constants.DEFAULT_PAGE_NUM);
             
-            if (DEBUG) Log.i(TAG, "mSelectedBoardType[" + mSelectedBoardType +
-                    "], mSelectedRefreshTimeType[" + mSelectedRefreshTimeType + 
-                    "], selectedPermitMobileConnectionType[" + selectedPermitMobileConnectionType +
-                    "], blackList[" + blackList + "]");
-            
-            final Context context = ConfigurationActivity.this;
-            Intent initIntent = new Intent(context, WidgetProvider.class);
-            initIntent.setAction(Constants.ACTION_INIT_LIST);
-            initIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, mAppWidgetId);
-            initIntent.putExtra(Constants.EXTRA_PAGE_NUM, Constants.DEFAULT_PAGE_NUM);
-            initIntent.putExtra(Constants.EXTRA_BOARD_TYPE, mSelectedBoardType);
-            initIntent.putExtra(Constants.EXTRA_REFRESH_TIME_TYPE, mSelectedRefreshTimeType);
-            initIntent.putExtra(Constants.EXTRA_PERMIT_MOBILE_CONNECTION_TYPE, selectedPermitMobileConnectionType);
-            initIntent.putExtra(Constants.EXTRA_BLACK_LIST, blackList);
-            initIntent.putExtra(Constants.EXTRA_BLOCKED_WORDS, blockedWords);
- 
-            context.sendBroadcast(initIntent);
-            
+            // Create intent and broadcast it!
+            Intent intent = Utils.createIntentFromExtraItems(
+                    context, WidgetProvider.WIDGET_PROVIDER_CLASS_NAME, Constants.ACTION_INIT_LIST, mItem, false);
+            context.sendBroadcast(intent);
+
+            // set return intent.
             Intent resultValue = new Intent();
-            resultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, mAppWidgetId);
+            resultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, mItem.getAppWidgetId());
             setResult(RESULT_OK, resultValue);
             finish();
         }
@@ -185,7 +177,7 @@ public class ConfigurationActivity extends Activity {
             final Context context = ConfigurationActivity.this;
 
             if (mIsExecutedBySettingButton == false) {
-                WidgetProvider.removeWidget(context, mAppWidgetId);
+                WidgetProvider.removeWidget(context, mItem.getAppWidgetId());
             }
             finish();
         }
@@ -193,7 +185,7 @@ public class ConfigurationActivity extends Activity {
     
     Spinner.OnItemSelectedListener mSpinRefreshTimeSelectedListener = new AdapterView.OnItemSelectedListener() {
         public void onItemSelected(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
-            mSelectedRefreshTimeType = arg2;
+            mItem.setRefreshTimeType(arg2);
         }
 
         public void onNothingSelected(AdapterView<?> arg0) {
@@ -203,18 +195,11 @@ public class ConfigurationActivity extends Activity {
     
     Spinner.OnItemSelectedListener mSpinBoardSelectedListener = new AdapterView.OnItemSelectedListener() {
         public void onItemSelected(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
-            mSelectedBoardType = arg2;
+            mItem.setBoardType(arg2);
         }
 
         public void onNothingSelected(AdapterView<?> arg0) {
             // Do nothing
         }
     };
-    
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_configuration, menu);
-        return true;
-    }
 }

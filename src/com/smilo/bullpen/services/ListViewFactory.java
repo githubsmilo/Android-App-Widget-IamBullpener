@@ -1,6 +1,7 @@
 
 package com.smilo.bullpen.services;
 
+import com.smilo.bullpen.ExtraItems;
 import com.smilo.bullpen.R;
 import com.smilo.bullpen.Constants;
 import com.smilo.bullpen.Constants.PARSING_RESULT;
@@ -17,7 +18,6 @@ import net.htmlparser.jericho.Tag;
 
 import org.json.JSONException;
 
-import android.appwidget.AppWidgetManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -38,22 +38,11 @@ public class ListViewFactory implements RemoteViewsService.RemoteViewsFactory {
     private static final boolean DEBUG = Constants.DEBUG_MODE;
 
     private static Context mContext;
+    private static ExtraItems mItem = null;
     private static List<listItem> mListItems = new ArrayList<listItem>();
     private static BroadcastReceiver mIntentListener;
     private static PARSING_RESULT mParsingResult = PARSING_RESULT.FAILED_UNKNOWN;
     private static int mAddedItemCount = 0;
-    
-    // intent item list
-    private static int mAppWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID;
-    private static int mPageNum = Constants.DEFAULT_PAGE_NUM;
-    private static int mBoardType = Constants.DEFAULT_BOARD_TYPE;
-    //private static int mRefreshTimetype = Constants.DEFAULT_REFRESH_TIME_TYPE;
-    //private static boolean mIsPermitMobileConnectionType = Constants.DEFAULT_PERMIT_MOBILE_CONNECTION_TYPE;
-    private static String mBlackList = Constants.DEFAULT_BLACK_LIST;
-    private static String mBlockedWords = Constants.DEFAULT_BLOCKED_WORDS;
-    private static int mSelectedSearchCategoryType = Constants.DEFAULT_SEARCH_CATEGORY_TYPE;
-    private static int mSelectedSearchSubjectType = Constants.DEFAULT_SEARCH_SUBJECT_TYPE;
-    private static String mSelectedSearchKeyword = null;
 
     private class listItem {
         public String itemTitle;
@@ -69,29 +58,10 @@ public class ListViewFactory implements RemoteViewsService.RemoteViewsFactory {
 
     public ListViewFactory(Context context, Intent intent) {
         mContext = context;
-        mAppWidgetId = intent.getIntExtra(
-                AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
-        mPageNum = intent.getIntExtra(
-                Constants.EXTRA_PAGE_NUM, Constants.DEFAULT_PAGE_NUM);
-        mBoardType = intent.getIntExtra(
-                Constants.EXTRA_BOARD_TYPE, Constants.DEFAULT_BOARD_TYPE);
-        mBlackList = intent.getStringExtra(
-                Constants.EXTRA_BLACK_LIST);
-        mBlockedWords = intent.getStringExtra(
-                Constants.EXTRA_BLOCKED_WORDS);
-        mSelectedSearchCategoryType = intent.getIntExtra(
-                Constants.EXTRA_SEARCH_CATEGORY_TYPE, Constants.DEFAULT_SEARCH_CATEGORY_TYPE);
-        mSelectedSearchSubjectType = intent.getIntExtra(
-                Constants.EXTRA_SEARCH_SUBJECT_TYPE, Constants.DEFAULT_SEARCH_SUBJECT_TYPE);
-        mSelectedSearchKeyword = intent.getStringExtra(
-                Constants.EXTRA_SEARCH_KEYWORD);
-
-        if (DEBUG) Log.i(TAG, "constructor - mAppWidgetId[" + mAppWidgetId + 
-                "], mPageNum[" + mPageNum + "], mBoardType[" + mBoardType +
-                "], mBlackList[" + mBlackList + "], mBlockedWords[" + mBlockedWords +
-                "], mSelectedSearchCategoryType[" + mSelectedSearchCategoryType + 
-                "], mSelectedSearchSubjectType[" + mSelectedSearchSubjectType + 
-                "], mSelectedSearchKeyword[" + mSelectedSearchKeyword + "]");
+        
+        // Get ExtraItems
+        mItem = Utils.createExtraItemsFromIntent(intent);
+        if (DEBUG) Log.i(TAG, "constructor - mItem[" + mItem.toString() + "]");
         
         setupIntentListener();
     }
@@ -141,16 +111,16 @@ public class ListViewFactory implements RemoteViewsService.RemoteViewsFactory {
 
     @Override
     public void onDataSetChanged() {
-        if (DEBUG) Log.i(TAG, "onDataSetChanged - mBoardType[" + mBoardType +
-                "], mPageNum[" + mPageNum + "], mBlackList[" + mBlackList + "], mBlockedWords[" + mBlockedWords + "]");
+        if (DEBUG) Log.i(TAG, "onDataSetChanged - extraItems[" + mItem + "]");
 
         // Parse MLBPark html data and add items to the widget item array list.
         try {
-            if (Utils.isTodayBestBoardType(mBoardType)) {
-                mParsingResult = parseMLBParkTodayBest(Utils.getBoardUrl(mBoardType));
+            if (Utils.isTodayBestBoardType(mItem.getBoardType())) {
+                mParsingResult = parseMLBParkTodayBest(Utils.getBoardUrl(mItem.getBoardType()));
             } else {
-                mParsingResult = parseMLBParkMobileBoard(Utils.getMobileBoardUrl(mContext, mPageNum, mBoardType,
-                        mSelectedSearchCategoryType, mSelectedSearchSubjectType, mSelectedSearchKeyword));
+                mParsingResult = parseMLBParkMobileBoard(Utils.getMobileBoardUrl(
+                        mContext, mItem.getPageNum(), mItem.getBoardType(), mItem.getSearchCategoryType(),
+                        mItem.getSearchSubjectType(), mItem.getSearchKeyword()));
             }
         } catch (IOException e) {
             if (DEBUG) Log.e(TAG, "onDataSetChanged - IOException![" + e.toString() + "]");
@@ -318,14 +288,14 @@ public class ListViewFactory implements RemoteViewsService.RemoteViewsFactory {
 
         // Parse black list
         String[] blackList = null;
-        if (mBlackList != null) {
-            blackList = mBlackList.split(Constants.DELIMITER_BLACK_LIST);
+        if (mItem.getBlackList() != null) {
+            blackList = mItem.getBlackList().split(Constants.DELIMITER_BLACK_LIST);
         }
         
         // Parse blocked words
         String[] blockedWords = null;
-        if (mBlockedWords != null) {
-            blockedWords = mBlockedWords.split(Constants.DELIMITER_BLOCKED_WORDS);
+        if (mItem.getBlockedWords() != null) {
+            blockedWords = mItem.getBlockedWords().split(Constants.DELIMITER_BLOCKED_WORDS);
         }
         
         Source source = new Source(new URL(urlAddress));
@@ -512,29 +482,10 @@ public class ListViewFactory implements RemoteViewsService.RemoteViewsFactory {
             mIntentListener = new BroadcastReceiver() {
                 @Override
                 public void onReceive(Context context, Intent intent) {
-                    // Update itent items through Broadcast Intent.
-                    mAppWidgetId = intent.getIntExtra(
-                            AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
-                    mBoardType = intent.getIntExtra(
-                            Constants.EXTRA_BOARD_TYPE, Constants.DEFAULT_BOARD_TYPE);
-                    mPageNum = intent.getIntExtra(
-                            Constants.EXTRA_PAGE_NUM, Constants.DEFAULT_PAGE_NUM);
-                    mBlackList = intent.getStringExtra(
-                            Constants.EXTRA_BLACK_LIST);
-                    mBlockedWords = intent.getStringExtra(
-                            Constants.EXTRA_BLOCKED_WORDS);
-                    mSelectedSearchCategoryType = intent.getIntExtra(
-                            Constants.EXTRA_SEARCH_CATEGORY_TYPE, Constants.DEFAULT_SEARCH_CATEGORY_TYPE);
-                    mSelectedSearchSubjectType = intent.getIntExtra(
-                            Constants.EXTRA_SEARCH_SUBJECT_TYPE, Constants.DEFAULT_SEARCH_SUBJECT_TYPE);
-                    mSelectedSearchKeyword = intent.getStringExtra(Constants.EXTRA_SEARCH_KEYWORD);
-                    
-                    if (DEBUG) Log.i(TAG, "onReceive - update mAppWidgetId[" + mAppWidgetId + 
-                            "], mPageNum[" + mPageNum + "], mBoardType[" + mBoardType +
-                            "], mBlackList[" + mBlackList + "], mBlockedWords[" + mBlockedWords +
-                            "], mSelectedSearchCategoryType[" + mSelectedSearchCategoryType +
-                            "], mSelectedSearchSubjectType[" + mSelectedSearchSubjectType +
-                            "], mSelectedSearchKeyword[" + mSelectedSearchKeyword + "]");
+                    // Update mItem through Broadcast Intent.
+                    ExtraItems item = Utils.createExtraItemsFromIntent(intent);
+                    mItem.update(item);
+                    if (DEBUG) Log.i(TAG, "onReceive - update mItem[" + mItem.toString() + "]");
                 }
             };
             IntentFilter filter = new IntentFilter();
