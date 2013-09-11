@@ -75,11 +75,11 @@ public final class Utils {
     }
     
     public static boolean isPredefinedBoardType(int boardType) {
-    	if ((boardType == Constants.Specific.BOARD_TYPE_BULLPEN_1000) ||
-    		(boardType == Constants.Specific.BOARD_TYPE_BULLPEN_2000))
-    		return true;
-    	else
-    		return false;
+        if ((boardType == Constants.Specific.BOARD_TYPE_BULLPEN_1000) ||
+            (boardType == Constants.Specific.BOARD_TYPE_BULLPEN_2000))
+            return true;
+        else
+            return false;
     }
     
     public static int getRefreshTime(Context context, int refreshTimeType) {
@@ -299,36 +299,36 @@ public final class Utils {
     }
     
     public static String getParsingResultString(PARSING_RESULT result) {
-    	if (result == PARSING_RESULT.SUCCESS_FULL_BOARD) {
-    		return "SUCCESS_FULL_BOARD";
-    	} else if (result == PARSING_RESULT.SUCCESS_MOBILE_BOARD) {
-    		return "SUCCESS_MOBILE_BOARD";
-    	} else if (result == PARSING_RESULT.SUCCESS_MOBILE_TODAY_BEST) {
-    		return "SUCCESS_MOBILE_TODAY_BEST";
-    	} else if (result == PARSING_RESULT.FAILED_IO_EXCEPTION) {
-    		return "FAILED_IO_EXCEPTION";
-    	} else if (result == PARSING_RESULT.FAILED_JSON_EXCEPTION) {
-    		return "FAILED_JSON_EXCEPTION";
-    	} else if (result == PARSING_RESULT.FAILED_STACK_OVERFLOW) {
-    		return "FAILED_STACK_OVERFLOW";
-    	} else if (result == PARSING_RESULT.FAILED_UNKNOWN) {
-    		return "FAILED_UNKNOWN";
-    	} else {
-    		return null;
-    	}
+        if (result == PARSING_RESULT.SUCCESS_FULL_BOARD) {
+            return "SUCCESS_FULL_BOARD";
+        } else if (result == PARSING_RESULT.SUCCESS_MOBILE_BOARD) {
+            return "SUCCESS_MOBILE_BOARD";
+        } else if (result == PARSING_RESULT.SUCCESS_MOBILE_TODAY_BEST) {
+            return "SUCCESS_MOBILE_TODAY_BEST";
+        } else if (result == PARSING_RESULT.FAILED_IO_EXCEPTION) {
+            return "FAILED_IO_EXCEPTION";
+        } else if (result == PARSING_RESULT.FAILED_JSON_EXCEPTION) {
+            return "FAILED_JSON_EXCEPTION";
+        } else if (result == PARSING_RESULT.FAILED_STACK_OVERFLOW) {
+            return "FAILED_STACK_OVERFLOW";
+        } else if (result == PARSING_RESULT.FAILED_UNKNOWN) {
+            return "FAILED_UNKNOWN";
+        } else {
+            return null;
+        }
     }
     
     public static String getInternetConnectedResult(INTERNET_CONNECTED_RESULT result) {
-    	if (result == INTERNET_CONNECTED_RESULT.SUCCESS_WIFI) {
-    		return "SUCCESS_WIFI";
-    	} else if (result == INTERNET_CONNECTED_RESULT.SUCCESS_BLUETOOTH) {
-    		return "SUCCESS_BLUETOOTH";
-    	} else if (result == INTERNET_CONNECTED_RESULT.SUCCESS_MOBILE) {
-    		return "SUCCESS_MOBILE";
-    	} else if (result == INTERNET_CONNECTED_RESULT.FAILED) {
-    		return "FAILED";
-    	} else {
-    		return null;
-    	}
+        if (result == INTERNET_CONNECTED_RESULT.SUCCESS_WIFI) {
+            return "SUCCESS_WIFI";
+        } else if (result == INTERNET_CONNECTED_RESULT.SUCCESS_BLUETOOTH) {
+            return "SUCCESS_BLUETOOTH";
+        } else if (result == INTERNET_CONNECTED_RESULT.SUCCESS_MOBILE) {
+            return "SUCCESS_MOBILE";
+        } else if (result == INTERNET_CONNECTED_RESULT.FAILED) {
+            return "FAILED";
+        } else {
+            return null;
+        }
     }
 }

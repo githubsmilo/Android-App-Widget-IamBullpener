@@ -78,7 +78,7 @@ public class ListViewFactory implements RemoteViewsService.RemoteViewsFactory {
         mBlackList = intent.getStringExtra(
                 Constants.EXTRA_BLACK_LIST);
         mBlockedWords = intent.getStringExtra(
-        		Constants.EXTRA_BLOCKED_WORDS);
+                Constants.EXTRA_BLOCKED_WORDS);
         mSelectedSearchCategoryType = intent.getIntExtra(
                 Constants.EXTRA_SEARCH_CATEGORY_TYPE, Constants.DEFAULT_SEARCH_CATEGORY_TYPE);
         mSelectedSearchSubjectType = intent.getIntExtra(
@@ -325,7 +325,7 @@ public class ListViewFactory implements RemoteViewsService.RemoteViewsFactory {
         // Parse blocked words
         String[] blockedWords = null;
         if (mBlockedWords != null) {
-        	blockedWords = mBlockedWords.split(Constants.DELIMITER_BLOCKED_WORDS);
+            blockedWords = mBlockedWords.split(Constants.DELIMITER_BLOCKED_WORDS);
         }
         
         Source source = new Source(new URL(urlAddress));
@@ -400,13 +400,13 @@ public class ListViewFactory implements RemoteViewsService.RemoteViewsFactory {
                         if (isAddTitle && !isSkipToAdd) {
                             title += (nodeSeg.getTextExtractor().toString() + " ");
                             if (blockedWords != null) {
-                            	for(String s : blockedWords) {
-                            		if (title.contains(s)) {
-                            			if (DEBUG) Log.d(TAG, "parseMLBParkMobileBoard - Skip title[" + title + "]");
-                            			isSkipToAdd = true;
+                                for(String s : blockedWords) {
+                                    if (title.contains(s)) {
+                                        if (DEBUG) Log.d(TAG, "parseMLBParkMobileBoard - Skip title[" + title + "]");
+                                        isSkipToAdd = true;
                                         break;
-                            		}
-                            	}
+                                    }
+                                }
                             }
                         } else if (isAddWriter && !isSkipToAdd) {
                             writer = nodeSeg.getTextExtractor().toString();
@@ -429,7 +429,7 @@ public class ListViewFactory implements RemoteViewsService.RemoteViewsFactory {
 
                 // Add widget item array list
                 if (isSkipToAdd == false) {
-                	Log.i(TAG, "parseMLBParkMobileBoard - title[" + title + "], writer[" + writer + "], url[" + url + "]");
+                    Log.i(TAG, "parseMLBParkMobileBoard - title[" + title + "], writer[" + writer + "], url[" + url + "]");
                     listItem item = new listItem(title, writer, url);
                     mListItems.add(item);
                     mAddedItemCount++;
@@ -522,7 +522,7 @@ public class ListViewFactory implements RemoteViewsService.RemoteViewsFactory {
                     mBlackList = intent.getStringExtra(
                             Constants.EXTRA_BLACK_LIST);
                     mBlockedWords = intent.getStringExtra(
-                    		Constants.EXTRA_BLOCKED_WORDS);
+                            Constants.EXTRA_BLOCKED_WORDS);
                     mSelectedSearchCategoryType = intent.getIntExtra(
                             Constants.EXTRA_SEARCH_CATEGORY_TYPE, Constants.DEFAULT_SEARCH_CATEGORY_TYPE);
                     mSelectedSearchSubjectType = intent.getIntExtra(

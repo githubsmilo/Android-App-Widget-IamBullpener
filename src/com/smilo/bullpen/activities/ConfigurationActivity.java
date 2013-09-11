@@ -78,7 +78,7 @@ public class ConfigurationActivity extends Activity {
             blockedWords = extras.getString(Constants.EXTRA_BLOCKED_WORDS);
             
         } else {
-        	// Load configuration info.
+            // Load configuration info.
             SharedPreferences pref = getApplicationContext().getSharedPreferences(Constants.SHARED_PREFERENCE_NAME, Context.MODE_PRIVATE);
             
             boardType = pref.getInt(Constants.KEY_BOARD_TYPE, Constants.DEFAULT_BOARD_TYPE);
@@ -118,15 +118,15 @@ public class ConfigurationActivity extends Activity {
     private void initializeEditText(String blackList, String blockedWords) {
         EditText etBlackList = (EditText)findViewById(R.id.editBlackList);
         if (blackList == null)
-        	etBlackList.setText("");
+            etBlackList.setText("");
         else
-        	etBlackList.setText(blackList);
+            etBlackList.setText(blackList);
         
         EditText etBlockedWords = (EditText)findViewById(R.id.editBlockedWords);
         if (blockedWords == null)
-        	etBlockedWords.setText("");
+            etBlockedWords.setText("");
         else
-        	etBlockedWords.setText(blockedWords);
+            etBlockedWords.setText(blockedWords);
     }
 
     private void initializeButtons() {
@@ -146,13 +146,13 @@ public class ConfigurationActivity extends Activity {
             EditText etBlackList = (EditText)findViewById(R.id.editBlackList);
             String blackList = etBlackList.getText().toString();
             if (blackList != null && blackList.length() == 0)
-            	blackList = null;
+                blackList = null;
             
             // Get blocked words's value. If empty, set null.
             EditText etBlockedWords = (EditText)findViewById(R.id.editBlockedWords);
             String blockedWords = etBlockedWords.getText().toString();
             if (blockedWords != null && blockedWords.length() == 0)
-            	blockedWords = null;
+                blockedWords = null;
             
             if (DEBUG) Log.i(TAG, "mSelectedBoardType[" + mSelectedBoardType +
                     "], mSelectedRefreshTimeType[" + mSelectedRefreshTimeType + 

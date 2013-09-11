@@ -41,7 +41,7 @@
     <!-- Configuration activity -->
     <string name="title_activity_configuration">설정</string>
     <string name="prompt_refreshTime">새로고침 시간</string>
-    <string name="prompt_board">게시판 목록</string>
+    <string name="prompt_board">목록</string>
     <string name="text_permitMobileConnection">3G/LTE\n접속 허용</string>
     <string name="text_refreshTime">새로 고침</string>
     <string name="text_board">게시판</string>

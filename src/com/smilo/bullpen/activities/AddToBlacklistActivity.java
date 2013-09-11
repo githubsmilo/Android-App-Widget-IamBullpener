@@ -19,11 +19,11 @@ import com.smilo.bullpen.WidgetProvider;
 
 public class AddToBlacklistActivity extends Activity {
 
-	private static final String TAG = "AddToBlacklistActivity";
-	private static final boolean DEBUG = Constants.DEBUG_MODE;
-	
-	// intent item list
-	private static int mAppWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID;
+    private static final String TAG = "AddToBlacklistActivity";
+    private static final boolean DEBUG = Constants.DEBUG_MODE;
+    
+    // intent item list
+    private static int mAppWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID;
     private static int mPageNum = Constants.DEFAULT_PAGE_NUM;
     private static int mBoardType = Constants.DEFAULT_BOARD_TYPE;
     private static int mRefreshTimetype = Constants.DEFAULT_REFRESH_TIME_TYPE;
@@ -33,7 +33,7 @@ public class AddToBlacklistActivity extends Activity {
     private static int mSelectedSearchCategoryType = Constants.DEFAULT_SEARCH_CATEGORY_TYPE;
     private static int mSelectedSearchSubjectType = Constants.DEFAULT_SEARCH_SUBJECT_TYPE;
     private static String mSelectedSearchKeyword = null;
-	
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,9 +57,9 @@ public class AddToBlacklistActivity extends Activity {
         mBlackList = intent.getStringExtra(Constants.EXTRA_BLACK_LIST);
         mBlockedWords = intent.getStringExtra(Constants.EXTRA_BLOCKED_WORDS);
         mSelectedSearchCategoryType = intent.getIntExtra(
-        		Constants.EXTRA_SEARCH_CATEGORY_TYPE, Constants.DEFAULT_SEARCH_CATEGORY_TYPE);
+                Constants.EXTRA_SEARCH_CATEGORY_TYPE, Constants.DEFAULT_SEARCH_CATEGORY_TYPE);
         mSelectedSearchSubjectType = intent.getIntExtra(
-        		Constants.EXTRA_SEARCH_SUBJECT_TYPE, Constants.DEFAULT_SEARCH_SUBJECT_TYPE);
+                Constants.EXTRA_SEARCH_SUBJECT_TYPE, Constants.DEFAULT_SEARCH_SUBJECT_TYPE);
         mSelectedSearchKeyword = intent.getStringExtra(Constants.EXTRA_SEARCH_KEYWORD);
         
         if (mAppWidgetId == AppWidgetManager.INVALID_APPWIDGET_ID) {
@@ -75,7 +75,7 @@ public class AddToBlacklistActivity extends Activity {
     private void initializeTextView(String selectedItemWriter) {
         TextView tv = (TextView)findViewById(R.id.textAddToBlacklistWriter);
         tv.setText(selectedItemWriter);
-	}
+    }
 
     private void initializeButtons() {
         findViewById(R.id.btnAddToBlacklistOk).setOnClickListener(mBtnOkOnClickListener);
@@ -92,13 +92,13 @@ public class AddToBlacklistActivity extends Activity {
             
             // Update blackList
             if (mBlackList == null)
-            	mBlackList = selectedItemWriter;
+                mBlackList = selectedItemWriter;
             else
-            	mBlackList = mBlackList.concat(Constants.DELIMITER_BLACK_LIST + selectedItemWriter);
+                mBlackList = mBlackList.concat(Constants.DELIMITER_BLACK_LIST + selectedItemWriter);
 
             // Show toast message
             Toast.makeText(context, selectedItemWriter + context.getResources().getString(R.string.text_add_to_black_list_msg),
-            		Toast.LENGTH_SHORT).show();
+                    Toast.LENGTH_SHORT).show();
             
             Intent initIntent = new Intent(context, WidgetProvider.class);
             initIntent.setAction(Constants.ACTION_REFRESH_LIST);

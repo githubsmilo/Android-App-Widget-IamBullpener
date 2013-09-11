@@ -389,7 +389,7 @@ public class ContentsFactory implements RemoteViewsService.RemoteViewsFactory {
                             }
                             String itemImgUrl = ((StartTag) nodeSeg).getAttributeValue("src");
                             if (itemImgUrl.startsWith("/")) {
-                            	StringBuffer strBuf = new StringBuffer();
+                                StringBuffer strBuf = new StringBuffer();
                                 strBuf.append(Constants.Specific.URL_BASE);
                                 strBuf.append(itemImgUrl);
                                 itemImgUrl = strBuf.toString();
@@ -559,49 +559,49 @@ public class ContentsFactory implements RemoteViewsService.RemoteViewsFactory {
     
     /*
     static class BitmapWorkerTask extends AsyncTask<String, Void, Bitmap> {
-    	private final RemoteViews rv;
-    	private final Context context;
-    	private final int appWidgetId;
-    	private final int resourceId;
+        private final RemoteViews rv;
+        private final Context context;
+        private final int appWidgetId;
+        private final int resourceId;
 
-    	public BitmapWorkerTask(RemoteViews rv, Context context, int appWidgetId, int resourceId) {
-    		this.rv = rv;
-    		this.context = context;
-    		this.appWidgetId = appWidgetId;
-    		this.resourceId = resourceId;
-    	}
-    	
-    	// Decode image in background.
-		@Override
-		protected Bitmap doInBackground(String... params) {
-			Bitmap bitmap = null;
-			try {
-				bitmap = getImageBitmap(params[0]);
-			} catch (OutOfMemoryError e) {
-				Log.e(TAG, "BitmapWorkerTask - getImageBitmap - OutOfMemoryError![" + e.toString() + "]");
-				e.printStackTrace();
-			} catch (IOException e) {
-				Log.e(TAG, "BitmapWorkerTask - getImageBitmap - IOException![" + e.toString() + "]");
-				e.printStackTrace();
-			} catch (RuntimeException e) {
-				Log.e(TAG, "BitmapWorkerTask - getImageBitmap - RuntimeException![" + e.toString() + "]");
-				e.printStackTrace();
-			}
-			
-			return bitmap;
-		}
-		
-		// Once complete, see if ImageView is still around and set bitmap.
-	    @Override
-	    protected void onPostExecute(Bitmap bitmap) {
-	    	AppWidgetManager awm = AppWidgetManager.getInstance(context);
-	    	
-	    	rv.setImageViewBitmap(resourceId, bitmap);
-	    	awm.partiallyUpdateAppWidget(appWidgetId, rv);
-	    	
-	    	// TODO : How can I update this widget entirely?
-	    	//awm.updateAppWidget(appWidgetId, ????);
-		}
+        public BitmapWorkerTask(RemoteViews rv, Context context, int appWidgetId, int resourceId) {
+            this.rv = rv;
+            this.context = context;
+            this.appWidgetId = appWidgetId;
+            this.resourceId = resourceId;
+        }
+        
+        // Decode image in background.
+        @Override
+        protected Bitmap doInBackground(String... params) {
+            Bitmap bitmap = null;
+            try {
+                bitmap = getImageBitmap(params[0]);
+            } catch (OutOfMemoryError e) {
+                Log.e(TAG, "BitmapWorkerTask - getImageBitmap - OutOfMemoryError![" + e.toString() + "]");
+                e.printStackTrace();
+            } catch (IOException e) {
+                Log.e(TAG, "BitmapWorkerTask - getImageBitmap - IOException![" + e.toString() + "]");
+                e.printStackTrace();
+            } catch (RuntimeException e) {
+                Log.e(TAG, "BitmapWorkerTask - getImageBitmap - RuntimeException![" + e.toString() + "]");
+                e.printStackTrace();
+            }
+            
+            return bitmap;
+        }
+        
+        // Once complete, see if ImageView is still around and set bitmap.
+        @Override
+        protected void onPostExecute(Bitmap bitmap) {
+            AppWidgetManager awm = AppWidgetManager.getInstance(context);
+            
+            rv.setImageViewBitmap(resourceId, bitmap);
+            awm.partiallyUpdateAppWidget(appWidgetId, rv);
+            
+            // TODO : How can I update this widget entirely?
+            //awm.updateAppWidget(appWidgetId, ????);
+        }
     }
     */
 }

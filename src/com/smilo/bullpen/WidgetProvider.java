@@ -57,55 +57,28 @@ public class WidgetProvider extends AppWidgetProvider {
         super.onReceive(context, intent);
 
         String action = intent.getAction();
-        
-        // get intent items.
-        int appWidgetId = intent.getIntExtra(
-                AppWidgetManager.EXTRA_APPWIDGET_ID,  AppWidgetManager.INVALID_APPWIDGET_ID);
-        int pageNum = intent.getIntExtra(
-                Constants.EXTRA_PAGE_NUM, Constants.DEFAULT_PAGE_NUM);
-        int boardType = intent.getIntExtra(
-                Constants.EXTRA_BOARD_TYPE, Constants.DEFAULT_BOARD_TYPE);
-        int refreshTimeType = intent.getIntExtra(
-                Constants.EXTRA_REFRESH_TIME_TYPE, Constants.DEFAULT_REFRESH_TIME_TYPE);
-        boolean permitMobileConnectionType = intent.getBooleanExtra(
-                Constants.EXTRA_PERMIT_MOBILE_CONNECTION_TYPE, Constants.DEFAULT_PERMIT_MOBILE_CONNECTION_TYPE);
-        String blackList = intent.getStringExtra(
-                Constants.EXTRA_BLACK_LIST);
-        String blockedWords = intent.getStringExtra(
-        		Constants.EXTRA_BLOCKED_WORDS);
-        int searchCategoryType = intent.getIntExtra(
-                Constants.EXTRA_SEARCH_CATEGORY_TYPE, Constants.DEFAULT_SEARCH_CATEGORY_TYPE);
-        int searchSubjectType = intent.getIntExtra(
-                Constants.EXTRA_SEARCH_SUBJECT_TYPE, Constants.DEFAULT_SEARCH_SUBJECT_TYPE);
-        String searchKeyword = intent.getStringExtra(Constants.EXTRA_SEARCH_KEYWORD);
-        
-        // Create intentItem instance.
-        intentItem item = new intentItem(
-                appWidgetId, pageNum, boardType, refreshTimeType, permitMobileConnectionType, blackList, blockedWords,
-                searchCategoryType, searchSubjectType, searchKeyword);
-        
+        intentItem item = createIntentItem(intent);
         AppWidgetManager awm = AppWidgetManager.getInstance(context);
         int[] appWidgetIds = awm.getAppWidgetIds(new ComponentName(context, getClass()));
-        
         if (DEBUG) Log.d(TAG, "onReceive - action[" + action + "], appWidgetsNum[" + appWidgetIds.length +
                 "], intentItem[" + item.toString() + "]");
 
         for (int i = 0 ; i < appWidgetIds.length ; i++) {
             if (DEBUG) Log.d(TAG, "onReceive - current appWidgetId[" + appWidgetIds[i] + "]");
             
-            if (appWidgetId == appWidgetIds[i]) {
+            if (item.getAppWidgetId() == appWidgetIds[i]) {
 
                 // After setting configuration activity, this intent will be called.
                 if (action.equals(Constants.ACTION_INIT_LIST)) {
                     removePreviousAlarm();
                     
                     // Save configuration info.
-                    saveIntentItem(context, boardType, refreshTimeType, permitMobileConnectionType, blackList, blockedWords);
+                    saveIntentItem(context, item);
 
                     // Send broadcast intent to update some variables on the ListViewFactory.
                     context.sendBroadcast(buildUpdateListInfoIntent(item));
                     
-                	// Broadcast ACTION_SHOW_LIST intent.
+                    // Broadcast ACTION_SHOW_LIST intent.
                     context.sendBroadcast(buildShowListIntent(context, item));
 
                 // After setting search activity, this intent will be called.
@@ -123,18 +96,20 @@ public class WidgetProvider extends AppWidgetProvider {
                 // This intent(ACTION_SHOW_LIST) will be called when current item pressed.
                 } else if ((action.equals(Constants.ACTION_APPWIDGET_UPDATE)) ||
                                     (action.equals(Constants.ACTION_SHOW_LIST))) {
-                	// Check which the internet is connected or not.
-                    INTERNET_CONNECTED_RESULT result = Utils.isInternetConnected(context, permitMobileConnectionType);
+                    
+                    // Check which the internet is connected or not.
+                    INTERNET_CONNECTED_RESULT result = Utils.isInternetConnected(context, item.getPermitMobileConnectionType());
 
-                    // Set proper remote view according to the result.
                     refreshAlarmSetting(context, item, result);
+                    
+                    // Set proper remote view according to the result.
                     if (result == INTERNET_CONNECTED_RESULT.FAILED)
-                    	setRemoteViewToShowLostInternetConnection(context, awm, item);
+                        setRemoteViewToShowLostInternetConnection(context, awm, item);
                     else
                         setRemoteViewToShowList(context, awm, item);
                     
                     // Save configuration info.
-        	        saveIntentItem(context, boardType, refreshTimeType, permitMobileConnectionType, blackList, blockedWords);
+                      saveIntentItem(context, item);
 
                 // This intent will be called when some item selected.
                 // EXTRA_ITEM_URL was already filled in the ListViewFactory - getViewAt().
@@ -148,11 +123,11 @@ public class WidgetProvider extends AppWidgetProvider {
                     context.sendBroadcast(buildUpdateItemInfoIntent(item, selectedItemUrl, selectedItemWriter));
                     
                     // Check which internet is connected or net.
-                    INTERNET_CONNECTED_RESULT result = Utils.isInternetConnected(context, permitMobileConnectionType);
+                    INTERNET_CONNECTED_RESULT result = Utils.isInternetConnected(context, item.getPermitMobileConnectionType());
                     
                     // Set proper remote view according to the result.
                     if (result == INTERNET_CONNECTED_RESULT.FAILED)
-                    	setRemoteViewToShowLostInternetConnection(context, awm, item);
+                           setRemoteViewToShowLostInternetConnection(context, awm, item);
                     else
                         setRemoteViewToShowItem(context, awm, item, selectedItemUrl, selectedItemWriter);
                 }
@@ -160,15 +135,43 @@ public class WidgetProvider extends AppWidgetProvider {
         }
     }
 
+    private intentItem createIntentItem(Intent intent) {
+        int appWidgetId = intent.getIntExtra(
+                AppWidgetManager.EXTRA_APPWIDGET_ID,  AppWidgetManager.INVALID_APPWIDGET_ID);
+        int pageNum = intent.getIntExtra(
+                Constants.EXTRA_PAGE_NUM, Constants.DEFAULT_PAGE_NUM);
+        int boardType = intent.getIntExtra(
+                Constants.EXTRA_BOARD_TYPE, Constants.DEFAULT_BOARD_TYPE);
+        int refreshTimeType = intent.getIntExtra(
+                Constants.EXTRA_REFRESH_TIME_TYPE, Constants.DEFAULT_REFRESH_TIME_TYPE);
+        boolean permitMobileConnectionType = intent.getBooleanExtra(
+                Constants.EXTRA_PERMIT_MOBILE_CONNECTION_TYPE, Constants.DEFAULT_PERMIT_MOBILE_CONNECTION_TYPE);
+        String blackList = intent.getStringExtra(
+                Constants.EXTRA_BLACK_LIST);
+        String blockedWords = intent.getStringExtra(
+                    Constants.EXTRA_BLOCKED_WORDS);
+        int searchCategoryType = intent.getIntExtra(
+                Constants.EXTRA_SEARCH_CATEGORY_TYPE, Constants.DEFAULT_SEARCH_CATEGORY_TYPE);
+        int searchSubjectType = intent.getIntExtra(
+                Constants.EXTRA_SEARCH_SUBJECT_TYPE, Constants.DEFAULT_SEARCH_SUBJECT_TYPE);
+        String searchKeyword = intent.getStringExtra(Constants.EXTRA_SEARCH_KEYWORD);
+        
+        intentItem item = new intentItem(
+                appWidgetId, pageNum, boardType, refreshTimeType, permitMobileConnectionType, blackList, blockedWords,
+                searchCategoryType, searchSubjectType, searchKeyword);
+        
+        return item;
+    }
+    
     private void setRemoteViewToShowLostInternetConnection(Context context, AppWidgetManager awm, intentItem item) {
-    	if (DEBUG) Log.d(TAG, "setRemoteViewToShowLostInternetConnection - intentItem[" + item.toString() + "]");
-    	
-    	PendingIntent pi = null;
+        if (DEBUG) Log.d(TAG, "setRemoteViewToShowLostInternetConnection - intentItem[" + item.toString() + "]");
+        
+        PendingIntent pi = null;
 
         // Create new remoteViews.
         RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.lost_internet_connection);
-    	
-    	rv.setTextViewText(R.id.textLostInternetTitle, context.getResources().getText(R.string.text_lost_internet_connection));
+        
+        rv.setTextViewText(R.id.textLostInternetTitle, context.getResources().getText(R.string.text_lost_internet_connection));
 
         // Set refresh button of the remoteViews.
         pi = PendingIntent.getBroadcast(context, PENDING_INTENT_REQUEST_CODE.REQUEST_REFRESH.ordinal(),
@@ -190,9 +193,9 @@ public class WidgetProvider extends AppWidgetProvider {
         
         PendingIntent pi = null;
 
-    	// Create new remoteViews.
+        // Create new remoteViews.
         RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.list);
-    	
+        
         // Set a remoteAdapter to the remoteViews.
         Intent serviceIntent = buildListViewServiceIntent(context, item);
         rv.setRemoteAdapter(R.id.listView, serviceIntent); // For API14+
@@ -248,12 +251,12 @@ public class WidgetProvider extends AppWidgetProvider {
 
             // Set search button of the remoteViews.
             if (Utils.isPredefinedBoardType(item.getBoardType())) {
-            	rv.setViewVisibility(R.id.btnListSearch, View.GONE);
+                rv.setViewVisibility(R.id.btnListSearch, View.GONE);
             } else {
-	            rv.setViewVisibility(R.id.btnListSearch, View.VISIBLE);
-	            pi = PendingIntent.getActivity(context, PENDING_INTENT_REQUEST_CODE.REQUEST_SEARCH.ordinal(), 
-	                    buildSearchActivityIntent(context, item), PendingIntent.FLAG_UPDATE_CURRENT);
-	            rv.setOnClickPendingIntent(R.id.btnListSearch, pi);
+                rv.setViewVisibility(R.id.btnListSearch, View.VISIBLE);
+                pi = PendingIntent.getActivity(context, PENDING_INTENT_REQUEST_CODE.REQUEST_SEARCH.ordinal(), 
+                        buildSearchActivityIntent(context, item), PendingIntent.FLAG_UPDATE_CURRENT);
+                rv.setOnClickPendingIntent(R.id.btnListSearch, pi);
             }
         }
         
@@ -275,7 +278,7 @@ public class WidgetProvider extends AppWidgetProvider {
         
         // Set a pending intent for click event to the remoteViews.
         PendingIntent clickPi = PendingIntent.getBroadcast(context, 0, 
-        		buildShowItemIntent(context, item, null), PendingIntent.FLAG_UPDATE_CURRENT);
+                buildShowItemIntent(context, item, null), PendingIntent.FLAG_UPDATE_CURRENT);
         rv.setPendingIntentTemplate(R.id.listView, clickPi);
         
         // Update widget.
@@ -356,7 +359,7 @@ public class WidgetProvider extends AppWidgetProvider {
     
     private void refreshAlarmSetting(Context context, intentItem item, INTERNET_CONNECTED_RESULT result) {
         // If user does not want to refresh, just remove alarm setting.
-    	// TODO : Consider INTERNET_CONNECTED_RESULT case here?
+        // TODO : Consider INTERNET_CONNECTED_RESULT case here?
         if (item.getRefreshTimeType() == Constants.Specific.REFRESH_TIME_TYPE_STOP) {
             removePreviousAlarm();
             
@@ -510,19 +513,19 @@ public class WidgetProvider extends AppWidgetProvider {
         String url = null;
         
         if (selectedItemUrl == null) {
-	        try {
-	            if (Utils.isTodayBestBoardType(item.getBoardType())) {
-	                url = Constants.Specific.URL_BASE;
-	            } else {
-	                url = Utils.getMobileBoardUrl(context, item.getPageNum(), item.getBoardType(), 
-	                        item.getSearchCategoryType(), item.getSearchSubjectType(), item.getSearchKeyword());
-	            }
-	        } catch (UnsupportedEncodingException e) {
-	            if (DEBUG) Log.e(TAG, "buildExportIntent - UnsupportedEncodingException![" + e.toString() + "]");
-	            e.printStackTrace();
-	        }
+            try {
+                if (Utils.isTodayBestBoardType(item.getBoardType())) {
+                    url = Constants.Specific.URL_BASE;
+                } else {
+                    url = Utils.getMobileBoardUrl(context, item.getPageNum(), item.getBoardType(), 
+                            item.getSearchCategoryType(), item.getSearchSubjectType(), item.getSearchKeyword());
+                }
+            } catch (UnsupportedEncodingException e) {
+                if (DEBUG) Log.e(TAG, "buildExportIntent - UnsupportedEncodingException![" + e.toString() + "]");
+                e.printStackTrace();
+            }
         } else {
-        	url = selectedItemUrl;
+            url = selectedItemUrl;
         }
 
         Intent intent = new Intent();
@@ -533,18 +536,17 @@ public class WidgetProvider extends AppWidgetProvider {
         return intent;
     }
 
-    private void saveIntentItem(Context context, int boardType, int refreshTimeType, 
-    		boolean permitMobileConnectionType, String blackList, String blockedWords) {
-    	if (DEBUG) Log.d(TAG, "saveIntentItem");
-    	
-    	SharedPreferences pref = context.getSharedPreferences(Constants.SHARED_PREFERENCE_NAME, Context.MODE_PRIVATE);
+    private void saveIntentItem(Context context, intentItem item) {
+        if (DEBUG) Log.d(TAG, "saveIntentItem");
+        
+        SharedPreferences pref = context.getSharedPreferences(Constants.SHARED_PREFERENCE_NAME, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = pref.edit();
         editor.putBoolean(Constants.KEY_COMPLETE_TO_SETUP, true);
-        editor.putInt(Constants.KEY_BOARD_TYPE, boardType);
-        editor.putInt(Constants.KEY_REFRESH_TIME_TYPE, refreshTimeType);
-        editor.putBoolean(Constants.KEY_PERMIT_MOBILE_CONNECTION_TYPE, permitMobileConnectionType);
-        editor.putString(Constants.KEY_BLACK_LIST, blackList);
-        editor.putString(Constants.KEY_BLOCKED_WORDS, blockedWords);
+        editor.putInt(Constants.KEY_BOARD_TYPE, item.getBoardType());
+        editor.putInt(Constants.KEY_REFRESH_TIME_TYPE, item.getRefreshTimeType());
+        editor.putBoolean(Constants.KEY_PERMIT_MOBILE_CONNECTION_TYPE, item.getPermitMobileConnectionType());
+        editor.putString(Constants.KEY_BLACK_LIST, item.getBlackList());
+        editor.putString(Constants.KEY_BLOCKED_WORDS, item.getBlockedWords());
         editor.commit();
     }
     
@@ -620,7 +622,7 @@ public class WidgetProvider extends AppWidgetProvider {
         int searchCategoryType = Constants.DEFAULT_SEARCH_CATEGORY_TYPE;
         int searchSubjectType = Constants.DEFAULT_SEARCH_SUBJECT_TYPE;
         String searchKeyword = null;
-        
+
         intentItem(int widgetId, int pageNumber, int boardType, int refreshType, boolean isPermitMobileConnection,
                 String blackList, String blockedWords, int searchCategoryType, int searchSubjectType, String searchKeyword) {
             this.widgetId = widgetId;
@@ -660,7 +662,7 @@ public class WidgetProvider extends AppWidgetProvider {
         }
         
         String getBlockedWords() {
-        	return blockedWords;
+            return blockedWords;
         }
         
         int getSearchCategoryType() {

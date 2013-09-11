@@ -65,10 +65,10 @@ public final class Constants {
     };
     
     public enum INTERNET_CONNECTED_RESULT {
-    	SUCCESS_WIFI,
-    	SUCCESS_BLUETOOTH,
-    	SUCCESS_MOBILE,
-    	FAILED,
+        SUCCESS_WIFI,
+        SUCCESS_BLUETOOTH,
+        SUCCESS_MOBILE,
+        FAILED,
     };
     
     public final class Specific {
