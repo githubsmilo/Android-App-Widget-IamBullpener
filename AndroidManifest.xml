@@ -37,6 +37,9 @@
 
         <activity
             android:name="com.smilo.bullpen.activities.ConfigurationActivity"
+            android:launchMode="singleTop"
+            android:taskAffinity=""
+            android:excludeFromRecents="true"
             android:theme="@android:style/Theme.Dialog"
             android:windowSoftInputMode="stateAlwaysHidden" >
             <intent-filter>
@@ -45,10 +48,16 @@
         </activity>
         <activity
             android:name="com.smilo.bullpen.activities.SearchActivity"
+            android:launchMode="singleTop"
+            android:taskAffinity=""
+            android:excludeFromRecents="true"
             android:theme="@android:style/Theme.Dialog" >
         </activity>
         <activity
             android:name="com.smilo.bullpen.activities.AddToBlacklistActivity"
+            android:launchMode="singleTop"
+            android:taskAffinity=""
+            android:excludeFromRecents="true"
             android:theme="@android:style/Theme.Dialog" >
         </activity>
         <activity
