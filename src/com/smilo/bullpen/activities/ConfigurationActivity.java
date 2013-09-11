@@ -155,8 +155,11 @@ public class ConfigurationActivity extends Activity {
             else
                 mItem.setBlockedWords(blockedWords);
 
-            // Set mItem to default page number.
+            // Set mItem's some fields to default.
             mItem.setPageNum(Constants.DEFAULT_PAGE_NUM);
+            mItem.setSearchCategoryType(Constants.DEFAULT_SEARCH_CATEGORY_TYPE);
+            mItem.setSearchSubjectType(Constants.DEFAULT_SEARCH_SUBJECT_TYPE);
+            mItem.setSearchKeyword(null);
             
             // Create intent and broadcast it!
             Intent intent = Utils.createIntentFromExtraItems(
