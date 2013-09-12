@@ -11,7 +11,6 @@ public final class ExtraItems {
     private boolean isPermitMobileConnection = Constants.DEFAULT_PERMIT_MOBILE_CONNECTION_TYPE;
     private String blackList = Constants.DEFAULT_BLACK_LIST;
     private String blockedWords = Constants.DEFAULT_BLOCKED_WORDS;
-    private String scrapList = Constants.DEFAULT_SCRAP_LIST;
     private int searchCategoryType = Constants.DEFAULT_SEARCH_CATEGORY_TYPE;
     private int searchSubjectType = Constants.DEFAULT_SEARCH_SUBJECT_TYPE;
     private String searchKeyword = null;
@@ -23,7 +22,6 @@ public final class ExtraItems {
                                 boolean isPermitMobileConnection,
                                 String blackList,
                                 String blockedWords,
-                                String scrapList,
                                 int searchCategoryType,
                                 int searchSubjectType,
                                 String searchKeyword) {
@@ -34,7 +32,6 @@ public final class ExtraItems {
         this.isPermitMobileConnection = isPermitMobileConnection;
         this.blackList = blackList;
         this.blockedWords = blockedWords;
-        this.scrapList = scrapList;
         this.searchCategoryType = searchCategoryType;
         this.searchSubjectType = searchSubjectType;
         this.searchKeyword = searchKeyword;
@@ -66,10 +63,6 @@ public final class ExtraItems {
     
     public String getBlockedWords() {
         return blockedWords;
-    }
-    
-    public String getScrapList() {
-        return scrapList;
     }
     
     public int getSearchCategoryType() {
@@ -112,10 +105,6 @@ public final class ExtraItems {
         this.blockedWords = blockedWords;
     }
     
-    public void setScrapList(String scrapList) {
-        this.scrapList = scrapList;
-    }
-    
     public void setSearchCategoryType(int searchCategoryType) {
         this.searchCategoryType = searchCategoryType;
     }
@@ -136,7 +125,6 @@ public final class ExtraItems {
         isPermitMobileConnection = newItem.getPermitMobileConnectionType();
         blackList = newItem.getBlackList();
         blockedWords = newItem.getBlockedWords();
-        scrapList = newItem.getScrapList();
         searchCategoryType = newItem.getSearchCategoryType();
         searchSubjectType = newItem.getSearchSubjectType();
         searchKeyword = newItem.getSearchKeyword();
@@ -145,7 +133,7 @@ public final class ExtraItems {
     public String toString() {
         return ("appWidgetId[" + widgetId + "], pageNum[" + pageNum + "], boardType[" + boardType +
                 "], refreshTimeType[" + refreshType + "], isPermitMobileConnectionType[" + isPermitMobileConnection +
-                "], blackList[" + blackList + "], blockedWords[" + blockedWords + "], scrapList[" + scrapList + 
+                "], blackList[" + blackList + "], blockedWords[" + blockedWords + 
                 "], searchCategoryType[" + searchCategoryType + "], searchSubjectType[" + searchSubjectType +
                 "], searchKeyword[" + searchKeyword + "]");
     }

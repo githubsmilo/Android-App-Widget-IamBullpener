@@ -66,8 +66,6 @@ public final class Utils {
                 Constants.EXTRA_BLACK_LIST);
         String blockedWords = intent.getStringExtra(
                     Constants.EXTRA_BLOCKED_WORDS);
-        String scrapList = intent.getStringExtra(
-                Constants.EXTRA_SCRAP_LIST);
         int searchCategoryType = intent.getIntExtra(
                 Constants.EXTRA_SEARCH_CATEGORY_TYPE, Constants.DEFAULT_SEARCH_CATEGORY_TYPE);
         int searchSubjectType = intent.getIntExtra(
@@ -77,7 +75,7 @@ public final class Utils {
         
         ExtraItems item = new ExtraItems(
                 appWidgetId, pageNum, boardType, refreshTimeType, permitMobileConnectionType,
-                blackList, blockedWords, scrapList, searchCategoryType, searchSubjectType, searchKeyword);
+                blackList, blockedWords, searchCategoryType, searchSubjectType, searchKeyword);
         
         return item;
     }
@@ -92,7 +90,6 @@ public final class Utils {
         intent.putExtra(Constants.EXTRA_PERMIT_MOBILE_CONNECTION_TYPE, item.getPermitMobileConnectionType());
         intent.putExtra(Constants.EXTRA_BLACK_LIST, item.getBlackList());
         intent.putExtra(Constants.EXTRA_BLOCKED_WORDS, item.getBlockedWords());
-        intent.putExtra(Constants.EXTRA_SCRAP_LIST, item.getScrapList());
         intent.putExtra(Constants.EXTRA_SEARCH_CATEGORY_TYPE, item.getSearchCategoryType());
         intent.putExtra(Constants.EXTRA_SEARCH_SUBJECT_TYPE, item.getSearchSubjectType());
         intent.putExtra(Constants.EXTRA_SEARCH_KEYWORD, item.getSearchKeyword());

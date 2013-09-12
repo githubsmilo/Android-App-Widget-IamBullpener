@@ -479,7 +479,6 @@ public class WidgetProvider extends AppWidgetProvider {
         editor.putBoolean(Constants.KEY_PERMIT_MOBILE_CONNECTION_TYPE, item.getPermitMobileConnectionType());
         editor.putString(Constants.KEY_BLACK_LIST, item.getBlackList());
         editor.putString(Constants.KEY_BLOCKED_WORDS, item.getBlockedWords());
-        editor.putString(Constants.KEY_SCRAP_LIST, item.getScrapList());
         editor.commit();
     }
     
@@ -527,7 +526,6 @@ public class WidgetProvider extends AppWidgetProvider {
             boolean permitMobileConnectionType = pref.getBoolean(Constants.KEY_PERMIT_MOBILE_CONNECTION_TYPE, Constants.DEFAULT_PERMIT_MOBILE_CONNECTION_TYPE);
             String blackList = pref.getString(Constants.KEY_BLACK_LIST, Constants.DEFAULT_BLACK_LIST);
             String blockedWords = pref.getString(Constants.KEY_BLOCKED_WORDS, Constants.DEFAULT_BLOCKED_WORDS);
-            String scrapList = pref.getString(Constants.KEY_SCRAP_LIST, Constants.DEFAULT_SCRAP_LIST);
 
             // Set urgent alarm to update widget as soon as possible.
             AppWidgetManager awm = AppWidgetManager.getInstance(context);
@@ -535,7 +533,7 @@ public class WidgetProvider extends AppWidgetProvider {
 
             for (int i = 0 ; i < appWidgetIds.length ; i++) {
                 ExtraItems item = new ExtraItems(appWidgetIds[i], Constants.DEFAULT_PAGE_NUM,
-                        boardType, refreshTimeType, permitMobileConnectionType, blackList, blockedWords, scrapList,
+                        boardType, refreshTimeType, permitMobileConnectionType, blackList, blockedWords,
                         Constants.DEFAULT_SEARCH_CATEGORY_TYPE, Constants.DEFAULT_SEARCH_SUBJECT_TYPE, null);
                 
                 setNewAlarm(context, item, true);

@@ -79,7 +79,6 @@ public class ConfigurationActivity extends Activity {
             isPermitMobileConnection = pref.getBoolean(Constants.KEY_PERMIT_MOBILE_CONNECTION_TYPE, Constants.DEFAULT_PERMIT_MOBILE_CONNECTION_TYPE);
             blackList = pref.getString(Constants.KEY_BLACK_LIST, Constants.DEFAULT_BLACK_LIST);
             blockedWords = pref.getString(Constants.KEY_BLOCKED_WORDS, Constants.DEFAULT_BLOCKED_WORDS);
-            mItem.setScrapList(pref.getString(Constants.KEY_SCRAP_LIST, Constants.DEFAULT_SCRAP_LIST));
         }
 
         // Initialize layout components.
