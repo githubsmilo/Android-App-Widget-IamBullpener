@@ -32,6 +32,7 @@
     <string name="text_comment_not_existed">리플 없음</string>
     <string name="text_lost_internet_connection">인터넷 연결이 끊겼습니다.</string>
     <string name="text_loadingView">Loading..</string>
+    <string name="text_failed_may_be_deleted">글이 삭제 되었습니다.</string>
     <string name="text_failed_io_exception">서버 접속 실패. 잠시 후 다시 시도해보세요.</string>
     <string name="text_failed_json_exception">서버로부터 가져온 정보 오류 발생1</string>
     <string name="text_failed_stack_overflow">서버로부터 가져온 정보 오류 발생2</string>

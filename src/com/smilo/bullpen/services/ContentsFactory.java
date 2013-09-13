@@ -1,11 +1,11 @@
 
 package com.smilo.bullpen.services;
 
+import com.smilo.bullpen.Constants;
+import com.smilo.bullpen.Constants.PARSING_RESULT;
 import com.smilo.bullpen.ExtraItem;
 import com.smilo.bullpen.R;
-import com.smilo.bullpen.Constants;
 import com.smilo.bullpen.Utils;
-import com.smilo.bullpen.Constants.PARSING_RESULT;
 
 import net.htmlparser.jericho.CharacterReference;
 import net.htmlparser.jericho.Element;
@@ -24,6 +24,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Log;
@@ -85,8 +86,11 @@ public class ContentsFactory implements RemoteViewsService.RemoteViewsFactory {
     public RemoteViews getViewAt(int position) {
         //Log.i(TAG, "getViewAt - position[" + position + "]");
 
-        // Create remoteViews
+        // Create remoteViews.
         RemoteViews rv = new RemoteViews(mContext.getPackageName(), R.layout.content_row);
+
+        // Get resources.
+        Resources res = mContext.getResources();
         
         switch (mParsingResult) {
             case SUCCESS_MOBILE_BOARD :
@@ -99,13 +103,14 @@ public class ContentsFactory implements RemoteViewsService.RemoteViewsFactory {
                     if (contentWriter != null && contentWriter.length() > 0) {
                         rv.setTextViewText(R.id.contentRowTitleText, "[" + contentWriter + "]\n" + contentTitle);
                     } else {
-                        rv.setTextViewText(R.id.contentRowTitleText, "[" + mContext.getResources().getString(R.string.text_writer_not_existed) + "]\n" + contentTitle);
+                        rv.setTextViewText(R.id.contentRowTitleText, "[" + res.getString(R.string.text_writer_not_existed) + "]\n" + contentTitle);
                     }
                 } else {
                     if (contentWriter != null && contentWriter.length() > 0) {
-                        rv.setTextViewText(R.id.contentRowTitleText, "[" + contentWriter + "]\n" + mContext.getResources().getString(R.string.text_title_not_existed));
+                        rv.setTextViewText(R.id.contentRowTitleText, "[" + contentWriter + "]\n" + res.getString(R.string.text_title_not_existed));
                     } else {
-                        rv.setTextViewText(R.id.contentRowTitleText, "[" + mContext.getResources().getString(R.string.text_writer_not_existed) + "]\n" + mContext.getResources().getString(R.string.text_title_not_existed));
+                        rv.setTextViewText(R.id.contentRowTitleText, res.getString(R.string.text_failed_may_be_deleted));
+                        break;
                     }
                 }
                 
@@ -185,13 +190,13 @@ public class ContentsFactory implements RemoteViewsService.RemoteViewsFactory {
                             if (commentText != null && commentText.length() >0) {
                                 rvComment.setTextViewText(R.id.contentRowText, "[" + commentWriter + "]\n" + commentText);
                             } else {
-                                rvComment.setTextViewText(R.id.contentRowText, "[" + commentWriter + "]\n" + mContext.getResources().getString(R.string.text_comment_not_existed));
+                                rvComment.setTextViewText(R.id.contentRowText, "[" + commentWriter + "]\n" + res.getString(R.string.text_comment_not_existed));
                             }
                         } else {
                             if (commentText != null && commentText.length() >0) {
-                                rvComment.setTextViewText(R.id.contentRowText, "[" + mContext.getResources().getString(R.string.text_writer_not_existed) + "]\n" + commentText);
+                                rvComment.setTextViewText(R.id.contentRowText, "[" + res.getString(R.string.text_writer_not_existed) + "]\n" + commentText);
                             } else {
-                                rvComment.setTextViewText(R.id.contentRowText, "[" + mContext.getResources().getString(R.string.text_writer_not_existed) + "]\n" + mContext.getResources().getString(R.string.text_comment_not_existed));
+                                rvComment.setTextViewText(R.id.contentRowText, "[" + res.getString(R.string.text_writer_not_existed) + "]\n" + res.getString(R.string.text_comment_not_existed));
                             }
                         }
                         rv.addView(R.id.contentRowCommentLayout, rvDivider);
@@ -201,24 +206,24 @@ public class ContentsFactory implements RemoteViewsService.RemoteViewsFactory {
                 break;
             
             case FAILED_IO_EXCEPTION :
-                rv.setTextViewText(R.id.contentRowTitleText, mContext.getResources().getString(R.string.text_failed_io_exception));
+                rv.setTextViewText(R.id.contentRowTitleText, res.getString(R.string.text_failed_io_exception));
                 break;
                 
             case FAILED_JSON_EXCEPTION :
-                rv.setTextViewText(R.id.contentRowTitleText, mContext.getResources().getString(R.string.text_failed_json_exception));
+                rv.setTextViewText(R.id.contentRowTitleText, res.getString(R.string.text_failed_json_exception));
                 break;
                 
             case FAILED_STACK_OVERFLOW :
-                rv.setTextViewText(R.id.contentRowTitleText, mContext.getResources().getString(R.string.text_failed_stack_overflow));
+                rv.setTextViewText(R.id.contentRowTitleText, res.getString(R.string.text_failed_stack_overflow));
                 break;
             
             case FAILED_OUT_OF_MEMORY :
-                rv.setTextViewText(R.id.contentRowTitleText, mContext.getResources().getString(R.string.text_failed_out_of_memory));
+                rv.setTextViewText(R.id.contentRowTitleText, res.getString(R.string.text_failed_out_of_memory));
                 break;
                
             case FAILED_UNKNOWN :
             default:
-                rv.setTextViewText(R.id.contentRowTitleText, mContext.getResources().getString(R.string.text_failed_unknown));
+                rv.setTextViewText(R.id.contentRowTitleText, res.getString(R.string.text_failed_unknown));
                 break;
         }
 
