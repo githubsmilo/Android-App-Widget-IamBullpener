@@ -330,27 +330,35 @@ public class ContentsFactory implements RemoteViewsService.RemoteViewsFactory {
             // Find the same pattern with <div class='w'>. This means the writer of this article.
             } else if (value != null && value.equals("w")) {
                 Segment seg = div.getContent();
-                boolean isAddWriter = false;
+                boolean isAddWriter = false, isFinished = false;
+                String itemWriter = "";
                 for (Iterator<Segment> nodeIterator = seg.getNodeIterator() ; nodeIterator.hasNext();) {
                     Segment nodeSeg = nodeIterator.next();
                     if (nodeSeg instanceof StartTag) {
-                        ;
-                    } else if (nodeSeg instanceof EndTag) {
-                        if (((Tag) nodeSeg).getName().equals("strong")) {
-                            isAddWriter = true;
+                        String tagName = ((Tag)nodeSeg).getName();
+                        if (tagName.equals("span")) {
+                            isAddWriter = false;
                         }
-                    } else if (nodeSeg instanceof CharacterReference) {
-                        ;
+                    } else if (nodeSeg instanceof EndTag) {
+                        String tagName = ((Tag)nodeSeg).getName();
+                        if (tagName.equals("strong")) {
+                            isAddWriter = true;
+                        } else if (tagName.equals("span")) {
+                            isFinished = true;
+                        }
+                    //} else if (nodeSeg instanceof CharacterReference) {
+                    //    ;
                     } else {
                         if (isAddWriter) {
-                            String itemWriter = nodeSeg.getTextExtractor().toString();
-                            //Log.i(TAG, "parseMLBParkHtmlDataMobileVer - parsed writer[" + itemWriter + "]");
-                            isAddWriter = false;
-                            
-                            // Put itemWriter to the 'obj' JSONObject.
-                            obj.put(JSON_WRITER, itemWriter);
-                            break;
+                            itemWriter += nodeSeg.getTextExtractor().toString();
                         }
+                    }
+                    
+                    if (isFinished) {
+                        // Put itemWriter to the 'obj' JSONObject.
+                        //Log.i(TAG, "parseMLBParkHtmlDataMobileVer - parsed writer[" + itemWriter + "]");
+                        obj.put(JSON_WRITER, itemWriter);
+                        break;
                     }
                 }
                 continue;
@@ -421,7 +429,7 @@ public class ContentsFactory implements RemoteViewsService.RemoteViewsFactory {
             // Find the same pattern with <div class='reply'>. This means the comment of this article.
             } else if (value != null && value.equals("reply")) {
                 Element ul = div.getFirstElement("ul");
-                boolean isAddNick = false, isAddComment = false, isFinished = false;
+                boolean isAddWriter = false, isAddComment = false, isFinished = false;
                 String tmpWriter = "", tmpComment = "";
                 for (Iterator<Segment> nodeIterator = ul.getNodeIterator() ; nodeIterator.hasNext();) {
                     Segment nodeSeg = nodeIterator.next();
@@ -434,7 +442,7 @@ public class ContentsFactory implements RemoteViewsService.RemoteViewsFactory {
                         } else if (tagName.equals("span")) {
                             String classAttr = ((StartTag) nodeSeg).getAttributeValue("class");
                             if (classAttr != null && classAttr.equals("ti")) {
-                                isAddNick = true;
+                                isAddWriter = true;
                             }
                         }
                     } else if (nodeSeg instanceof EndTag) {
@@ -442,17 +450,16 @@ public class ContentsFactory implements RemoteViewsService.RemoteViewsFactory {
                         if (tagName.equals("strong")) {
                             isAddComment = false;
                         } else if (tagName.equals("span")) {
-                            isAddNick = false;
+                            isAddWriter = false;
                         } else if (tagName.equals("li")) {
                             isFinished = true;
                         }
                     //} else if (nodeSeg instanceof CharacterReference) {
                     //    ;
-                    //
                     } else {
                         if (isAddComment) {
                             tmpComment += nodeSeg.getTextExtractor().toString();
-                        } else if (isAddNick) {
+                        } else if (isAddWriter) {
                             tmpWriter += nodeSeg.getTextExtractor().toString();
                         }
                     }
