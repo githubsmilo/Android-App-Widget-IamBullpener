@@ -51,7 +51,7 @@ public final class Utils {
         return INTERNET_CONNECTED_RESULT.FAILED;
     }
     
-    public static ExtraItems createExtraItemsFromIntent(Intent intent) {
+    public static ExtraItem createExtraItemFromIntent(Intent intent) {
         int appWidgetId = intent.getIntExtra(
                 AppWidgetManager.EXTRA_APPWIDGET_ID,  AppWidgetManager.INVALID_APPWIDGET_ID);
         int pageNum = intent.getIntExtra(
@@ -73,15 +73,25 @@ public final class Utils {
         String searchKeyword = intent.getStringExtra(
                 Constants.EXTRA_SEARCH_KEYWORD);
         
-        ExtraItems item = new ExtraItems(
+        ExtraItem item = new ExtraItem(
                 appWidgetId, pageNum, boardType, refreshTimeType, permitMobileConnectionType,
                 blackList, blockedWords, searchCategoryType, searchSubjectType, searchKeyword);
         
         return item;
     }
     
-    public static Intent createIntentFromExtraItems(
-            Context context, String className, String actionName, ExtraItems item, boolean isAddNewTask) {
+    public static ListItem createListItemFromIntent(Intent intent) {
+        String title = intent.getStringExtra(Constants.EXTRA_ITEM_TITLE);
+        String writer = intent.getStringExtra(Constants.EXTRA_ITEM_WRITER);
+        String url = intent.getStringExtra(Constants.EXTRA_ITEM_URL);
+        
+        ListItem item = new ListItem(title, writer, url);
+        
+        return item;
+    }
+    
+    public static Intent createIntentFromExtraItem(
+            Context context, String className, String actionName, ExtraItem item, boolean isAddNewTask) {
         Intent intent = new Intent();
         intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, item.getAppWidgetId());
         intent.putExtra(Constants.EXTRA_PAGE_NUM, item.getPageNum());

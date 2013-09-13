@@ -1,7 +1,7 @@
 
 package com.smilo.bullpen.services;
 
-import com.smilo.bullpen.ExtraItems;
+import com.smilo.bullpen.ExtraItem;
 import com.smilo.bullpen.R;
 import com.smilo.bullpen.Constants;
 import com.smilo.bullpen.Utils;
@@ -46,7 +46,7 @@ public class ContentsFactory implements RemoteViewsService.RemoteViewsFactory {
     private static final boolean DEBUG = Constants.DEBUG_MODE;
 
     private static Context mContext;
-    private static ExtraItems mItem = null;
+    private static ExtraItem mItem = null;
     private static JSONObject mParsedJSONObject = null;
     private static BroadcastReceiver mIntentListener;
     private static PARSING_RESULT mParsingResult = PARSING_RESULT.FAILED_UNKNOWN;
@@ -68,7 +68,7 @@ public class ContentsFactory implements RemoteViewsService.RemoteViewsFactory {
         mContext = context;
         
         // Get ExtraItems
-        mItem = Utils.createExtraItemsFromIntent(intent);
+        mItem = Utils.createExtraItemFromIntent(intent);
         
         mSelectedItemUrl = intent.getStringExtra(Constants.EXTRA_ITEM_URL);
         
@@ -528,7 +528,7 @@ public class ContentsFactory implements RemoteViewsService.RemoteViewsFactory {
                 @Override
                 public void onReceive(Context context, Intent intent) {
                     // Update mItem through Broadcast Intent.
-                    ExtraItems item = Utils.createExtraItemsFromIntent(intent);
+                    ExtraItem item = Utils.createExtraItemFromIntent(intent);
                     mItem.update(item);
                     mSelectedItemUrl = intent.getStringExtra(Constants.EXTRA_ITEM_URL);
                     if (DEBUG) Log.i(TAG, "onReceive - update mItem[" + mItem.toString() + "], mSelectedItemUrl[" + mSelectedItemUrl + "]");

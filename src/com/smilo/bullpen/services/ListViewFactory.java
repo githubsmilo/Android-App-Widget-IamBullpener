@@ -1,10 +1,11 @@
 
 package com.smilo.bullpen.services;
 
-import com.smilo.bullpen.ExtraItems;
-import com.smilo.bullpen.R;
 import com.smilo.bullpen.Constants;
 import com.smilo.bullpen.Constants.PARSING_RESULT;
+import com.smilo.bullpen.ExtraItem;
+import com.smilo.bullpen.ListItem;
+import com.smilo.bullpen.R;
 import com.smilo.bullpen.Utils;
 
 import net.htmlparser.jericho.CharacterReference;
@@ -38,29 +39,17 @@ public class ListViewFactory implements RemoteViewsService.RemoteViewsFactory {
     private static final boolean DEBUG = Constants.DEBUG_MODE;
 
     private static Context mContext;
-    private static ExtraItems mItem = null;
-    private static List<listItem> mListItems = new ArrayList<listItem>();
+    private static ExtraItem mItem = null;
+    private static List<ListItem> mListItems = new ArrayList<ListItem>();
     private static BroadcastReceiver mIntentListener;
     private static PARSING_RESULT mParsingResult = PARSING_RESULT.FAILED_UNKNOWN;
     private static int mAddedItemCount = 0;
-
-    private class listItem {
-        public String itemTitle;
-        public String itemWriter;
-        public String itemUrl;
-
-        listItem(String title, String writer, String url) {
-            itemTitle = title;
-            itemWriter = writer;
-            itemUrl = url;
-        }
-    }
 
     public ListViewFactory(Context context, Intent intent) {
         mContext = context;
         
         // Get ExtraItems
-        mItem = Utils.createExtraItemsFromIntent(intent);
+        mItem = Utils.createExtraItemFromIntent(intent);
         if (DEBUG) Log.i(TAG, "constructor - mItem[" + mItem.toString() + "]");
         
         setupIntentListener();
@@ -77,14 +66,17 @@ public class ListViewFactory implements RemoteViewsService.RemoteViewsFactory {
             case SUCCESS_FULL_BOARD :
             case SUCCESS_MOBILE_BOARD :
             case SUCCESS_MOBILE_TODAY_BEST :
-                rv.setTextViewText(R.id.listRowText, mListItems.get(position).itemTitle);
+                rv.setTextViewText(R.id.listRowText, mListItems.get(position).getTitle());
                 Intent fillInIntent = new Intent();
-                String itemUrl = mListItems.get(position).itemUrl;
-                String itemWriter = mListItems.get(position).itemWriter;
-                if (itemUrl != null && itemUrl.length() > 0)
-                    fillInIntent.putExtra(Constants.EXTRA_ITEM_URL, itemUrl);
+                String itemTitle = mListItems.get(position).getTitle();
+                String itemWriter = mListItems.get(position).getWriter();
+                String itemUrl = mListItems.get(position).getUrl();
+                if (itemTitle != null && itemTitle.length() > 0)
+                    fillInIntent.putExtra(Constants.EXTRA_ITEM_TITLE, itemTitle);
                 if (itemWriter != null && itemWriter.length() > 0)
                     fillInIntent.putExtra(Constants.EXTRA_ITEM_WRITER, itemWriter);
+                if (itemUrl != null && itemUrl.length() > 0)
+                    fillInIntent.putExtra(Constants.EXTRA_ITEM_URL, itemUrl);
                 rv.setOnClickFillInIntent(R.id.listRowText, fillInIntent);
                 break;
                 
@@ -245,7 +237,7 @@ public class ListViewFactory implements RemoteViewsService.RemoteViewsFactory {
                             // Add widget item array list
                             //Log.i(TAG, "parseMLBParkTodayBest - title[" + title + "],url[" + url + "]");
                             
-                            listItem item = new listItem(title, null, url);
+                            ListItem item = new ListItem(title, null, url);
                             mListItems.add(item);
                             title = null;
                             url = null;
@@ -400,7 +392,7 @@ public class ListViewFactory implements RemoteViewsService.RemoteViewsFactory {
                 // Add widget item array list
                 if (isSkipToAdd == false) {
                     Log.i(TAG, "parseMLBParkMobileBoard - title[" + title + "], writer[" + writer + "], url[" + url + "]");
-                    listItem item = new listItem(title, writer, url);
+                    ListItem item = new ListItem(title, writer, url);
                     mListItems.add(item);
                     mAddedItemCount++;
                 }
@@ -463,7 +455,7 @@ public class ListViewFactory implements RemoteViewsService.RemoteViewsFactory {
                 //Log.i(TAG, "parseMLBParkFullBoard - title[" + title + "], url[" + url + "]");
                 
                 // Add widget item to array list
-                listItem item = new listItem(title, null, url);
+                ListItem item = new ListItem(title, null, url);
                 mListItems.add(item);
                 addedItemCount++;
                 
@@ -483,7 +475,7 @@ public class ListViewFactory implements RemoteViewsService.RemoteViewsFactory {
                 @Override
                 public void onReceive(Context context, Intent intent) {
                     // Update mItem through Broadcast Intent.
-                    ExtraItems item = Utils.createExtraItemsFromIntent(intent);
+                    ExtraItem item = Utils.createExtraItemFromIntent(intent);
                     mItem.update(item);
                     if (DEBUG) Log.i(TAG, "onReceive - update mItem[" + mItem.toString() + "]");
                 }

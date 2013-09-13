@@ -50,6 +50,7 @@ public class WidgetProvider extends AppWidgetProvider {
         REQUEST_SETTING,
         REQUEST_EXPORT,
         REQUEST_ADDTOBLACKLIST,
+        REQUEST_SCRAP,
         REQUEST_UNKNOWN,
     };
     
@@ -59,87 +60,87 @@ public class WidgetProvider extends AppWidgetProvider {
 
         // Get ExtraItems.
         String action = intent.getAction();
-        ExtraItems item = Utils.createExtraItemsFromIntent(intent);
+        ExtraItem extraItem = Utils.createExtraItemFromIntent(intent);
+        ListItem listItem = Utils.createListItemFromIntent(intent);
         
         AppWidgetManager awm = AppWidgetManager.getInstance(context);
         int[] appWidgetIds = awm.getAppWidgetIds(new ComponentName(context, getClass()));
         if (DEBUG) Log.d(TAG, "onReceive - action[" + action + "], appWidgetsNum[" + appWidgetIds.length +
-                "], ExtraItems[" + item.toString() + "]");
+                "], ExtraItems[" + extraItem.toString() + "], ListItem[" + listItem.toString() + "]");
 
         for (int i = 0 ; i < appWidgetIds.length ; i++) {
             if (DEBUG) Log.d(TAG, "onReceive - current appWidgetId[" + appWidgetIds[i] + "]");
             
-            if (item.getAppWidgetId() == appWidgetIds[i]) {
+            if (extraItem.getAppWidgetId() == appWidgetIds[i]) {
 
                 // After setting configuration activity, this intent will be called.
                 if (action.equals(Constants.ACTION_INIT_LIST)) {
                     removePreviousAlarm();
                     
                     // Save configuration info.
-                    saveIntentItem(context, item);
+                    saveIntentItem(context, extraItem);
 
                     // Send broadcast intent to update some variables on the ListViewFactory.
-                    context.sendBroadcast(buildUpdateListInfoIntent(context, item));
+                    context.sendBroadcast(buildUpdateListInfoIntent(context, extraItem));
                     
                     // Broadcast ACTION_SHOW_LIST intent.
-                    context.sendBroadcast(buildShowListIntent(context, item));
+                    context.sendBroadcast(buildShowListIntent(context, extraItem));
 
                 // After setting search activity, this intent will be called.
-                } else if ((action.equals(Constants.ACTION_REFRESH_LIST)) ||
-                        (action.equals(Constants.ACTION_SEARCH))) {    
+                } else if (action.equals(Constants.ACTION_REFRESH_LIST)) {
                     removePreviousAlarm();
                     
                     // Send broadcast intent to update some variables on the ListViewFactory.
-                    context.sendBroadcast(buildUpdateListInfoIntent(context, item));
+                    context.sendBroadcast(buildUpdateListInfoIntent(context, extraItem));
                     
                     // Broadcast ACTION_SHOW_LIST intent.
-                    context.sendBroadcast(buildShowListIntent(context, item));
+                    context.sendBroadcast(buildShowListIntent(context, extraItem));
  
+                } else if (action.equals(Constants.ACTION_SCRAP_ITEM)) {
+                    // TODO : scrap!
+                    
                 // This intent(ACTION_APPWIDGET_UPDATE) will be called periodically.
                 // This intent(ACTION_SHOW_LIST) will be called when current item pressed.
                 } else if ((action.equals(Constants.ACTION_APPWIDGET_UPDATE)) ||
                                     (action.equals(Constants.ACTION_SHOW_LIST))) {
                     
                     // Check which the internet is connected or not.
-                    INTERNET_CONNECTED_RESULT result = Utils.isInternetConnected(context, item.getPermitMobileConnectionType());
+                    INTERNET_CONNECTED_RESULT result = Utils.isInternetConnected(context, extraItem.getPermitMobileConnectionType());
 
-                    refreshAlarmSetting(context, item, result);
+                    refreshAlarmSetting(context, extraItem, result);
                     
                     // Set proper remote view according to the result.
                     if (result == INTERNET_CONNECTED_RESULT.FAILED)
-                        setRemoteViewToShowLostInternetConnection(context, awm, item);
+                        setRemoteViewToShowLostInternetConnection(context, awm, extraItem);
                     else
-                        setRemoteViewToShowList(context, awm, item);
+                        setRemoteViewToShowList(context, awm, extraItem);
                     
                     // Save configuration info.
-                      saveIntentItem(context, item);
+                      saveIntentItem(context, extraItem);
 
                 // This intent will be called when some item selected.
                 // EXTRA_ITEM_URL was already filled in the ListViewFactory - getViewAt().
                 } else if (action.equals(Constants.ACTION_SHOW_ITEM)) {
                     removePreviousAlarm();
-                    
-                    String selectedItemUrl = intent.getStringExtra(Constants.EXTRA_ITEM_URL);
-                    String selectedItemWriter = intent.getStringExtra(Constants.EXTRA_ITEM_WRITER);
 
                     // Send broadcast intent to update some variables on the ContentsFactory.
-                    context.sendBroadcast(buildUpdateItemInfoIntent(context, item, selectedItemUrl, selectedItemWriter));
+                    context.sendBroadcast(buildUpdateItemInfoIntent(context, extraItem, listItem));
                     
                     // Check which internet is connected or net.
-                    INTERNET_CONNECTED_RESULT result = Utils.isInternetConnected(context, item.getPermitMobileConnectionType());
+                    INTERNET_CONNECTED_RESULT result = Utils.isInternetConnected(context, extraItem.getPermitMobileConnectionType());
                     
                     // Set proper remote view according to the result.
                     if (result == INTERNET_CONNECTED_RESULT.FAILED)
-                        setRemoteViewToShowLostInternetConnection(context, awm, item);
+                        setRemoteViewToShowLostInternetConnection(context, awm, extraItem);
                     else
-                        setRemoteViewToShowItem(context, awm, item, selectedItemUrl, selectedItemWriter);
+                        setRemoteViewToShowItem(context, awm, extraItem, listItem);
                 }
             }
         }
     }
 
-    private void setRemoteViewToShowLostInternetConnection(Context context, AppWidgetManager awm, ExtraItems item) {
-        if (DEBUG) Log.d(TAG, "setRemoteViewToShowLostInternetConnection - ExtraItems[" + item.toString() + "]");
+    private void setRemoteViewToShowLostInternetConnection(Context context, AppWidgetManager awm, ExtraItem extraItem) {
+        if (DEBUG) Log.d(TAG, "setRemoteViewToShowLostInternetConnection - ExtraItems[" + extraItem.toString() + "]");
         
         PendingIntent pi = null;
 
@@ -151,21 +152,21 @@ public class WidgetProvider extends AppWidgetProvider {
 
         // Set refresh button of the remoteViews.
         pi = PendingIntent.getBroadcast(context, PENDING_INTENT_REQUEST_CODE.REQUEST_REFRESH.ordinal(),
-                buildRefreshListIntent(context, item), PendingIntent.FLAG_UPDATE_CURRENT);
+                buildRefreshListIntent(context, extraItem), PendingIntent.FLAG_UPDATE_CURRENT);
         rv.setOnClickPendingIntent(R.id.btnLostInternetRefresh, pi);
         
         // Set setting button of the remoteViews.
         pi = PendingIntent.getActivity(context, PENDING_INTENT_REQUEST_CODE.REQUEST_SETTING.ordinal(),
-                buildConfigurationActivityIntent(context, item), PendingIntent.FLAG_UPDATE_CURRENT);
+                buildConfigurationActivityIntent(context, extraItem), PendingIntent.FLAG_UPDATE_CURRENT);
         rv.setOnClickPendingIntent(R.id.btnLostInternetSetting, pi);
         
         // Update widget.
         if (DEBUG) Log.d(TAG, "setRemoteViewToShowLostInternetConnection - updateAppWidget [LostInternetConnection]");
-        awm.updateAppWidget(item.getAppWidgetId(), rv);
+        awm.updateAppWidget(extraItem.getAppWidgetId(), rv);
     }
     
-    private void setRemoteViewToShowList(Context context, AppWidgetManager awm, ExtraItems item) {
-        if (DEBUG) Log.d(TAG, "setRemoteViewToShowList - ExtraItems[" + item.toString() + "]");
+    private void setRemoteViewToShowList(Context context, AppWidgetManager awm, ExtraItem extraItem) {
+        if (DEBUG) Log.d(TAG, "setRemoteViewToShowList - ExtraItems[" + extraItem.toString() + "]");
         
         PendingIntent pi = null;
 
@@ -173,14 +174,14 @@ public class WidgetProvider extends AppWidgetProvider {
         RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.list);
         
         // Set a remoteAdapter to the remoteViews.
-        Intent serviceIntent = buildListViewServiceIntent(context, item);
+        Intent serviceIntent = buildListViewServiceIntent(context, extraItem);
         rv.setRemoteAdapter(R.id.listView, serviceIntent); // For API14+
         //rv.setRemoteAdapter(item.getAppWidgetId(), R.id.listView, serviceIntent); // For API13-
         rv.setScrollPosition(R.id.listView, 0); // Scroll to top
 
-        if (Utils.isTodayBestBoardType(item.getBoardType())) {
+        if (Utils.isTodayBestBoardType(extraItem.getBoardType())) {
             // Set title of the remoteViews.
-            rv.setTextViewText(R.id.textListTitle, Utils.getBoardTitle(context, item.getBoardType()));
+            rv.setTextViewText(R.id.textListTitle, Utils.getBoardTitle(context, extraItem.getBoardType()));
             
             rv.setViewVisibility(R.id.btnListNavTop, View.GONE);
             rv.setViewVisibility(R.id.btnListNavPrev, View.GONE);
@@ -188,50 +189,50 @@ public class WidgetProvider extends AppWidgetProvider {
             rv.setViewVisibility(R.id.btnListSearch, View.GONE);
         } else {
             // Save pageNum.
-            int currentPageNum = item.getPageNum();
+            int currentPageNum = extraItem.getPageNum();
             
             // Set title of the remoteViews.
-            if (item.getSearchCategoryType() == Constants.DEFAULT_SEARCH_CATEGORY_TYPE)
-                rv.setTextViewText(R.id.textListTitle, (Utils.getBoardTitle(context, item.getBoardType()) + " - " + currentPageNum));
-            else if (item.getSearchCategoryType() == Constants.Specific.SEARCH_CATEGORY_TYPE_SUBJECT)
-                rv.setTextViewText(R.id.textListTitle, (Utils.getBoardTitle(context, item.getBoardType()) + " - " + currentPageNum +
-                        " [" + Utils.getSubjectTitle(context, item.getSearchSubjectType()) + "]"));
+            if (extraItem.getSearchCategoryType() == Constants.DEFAULT_SEARCH_CATEGORY_TYPE)
+                rv.setTextViewText(R.id.textListTitle, (Utils.getBoardTitle(context, extraItem.getBoardType()) + " - " + currentPageNum));
+            else if (extraItem.getSearchCategoryType() == Constants.Specific.SEARCH_CATEGORY_TYPE_SUBJECT)
+                rv.setTextViewText(R.id.textListTitle, (Utils.getBoardTitle(context, extraItem.getBoardType()) + " - " + currentPageNum +
+                        " [" + Utils.getSubjectTitle(context, extraItem.getSearchSubjectType()) + "]"));
             else
-                rv.setTextViewText(R.id.textListTitle, (Utils.getBoardTitle(context, item.getBoardType()) + " - " + currentPageNum + 
-                        " [" + item.getSearchKeyword() + "]"));
+                rv.setTextViewText(R.id.textListTitle, (Utils.getBoardTitle(context, extraItem.getBoardType()) + " - " + currentPageNum + 
+                        " [" + extraItem.getSearchKeyword() + "]"));
             
             // Set top button of the removeViews.
             rv.setViewVisibility(R.id.btnListNavTop, View.VISIBLE);
-            item.setPageNum(Constants.DEFAULT_PAGE_NUM);
+            extraItem.setPageNum(Constants.DEFAULT_PAGE_NUM);
             pi = PendingIntent.getBroadcast(context, PENDING_INTENT_REQUEST_CODE.REQUEST_TOP.ordinal(),
-                    buildRefreshListIntent(context, item), PendingIntent.FLAG_UPDATE_CURRENT);
+                    buildRefreshListIntent(context, extraItem), PendingIntent.FLAG_UPDATE_CURRENT);
               rv.setOnClickPendingIntent(R.id.btnListNavTop, pi);
               
             // Set prev button of the removeViews.
             rv.setViewVisibility(R.id.btnListNavPrev, View.VISIBLE);
             if (currentPageNum > Constants.DEFAULT_PAGE_NUM)
-                item.setPageNum(currentPageNum - 1);
+                extraItem.setPageNum(currentPageNum - 1);
             pi = PendingIntent.getBroadcast(context, PENDING_INTENT_REQUEST_CODE.REQUEST_PREV.ordinal(),
-                    buildRefreshListIntent(context, item), PendingIntent.FLAG_UPDATE_CURRENT);
+                    buildRefreshListIntent(context, extraItem), PendingIntent.FLAG_UPDATE_CURRENT);
             rv.setOnClickPendingIntent(R.id.btnListNavPrev, pi);
 
             // Set next button of the remoteViews.
             rv.setViewVisibility(R.id.btnListNavNext, View.VISIBLE);
-            item.setPageNum(currentPageNum + 1);
+            extraItem.setPageNum(currentPageNum + 1);
             pi = PendingIntent.getBroadcast(context, PENDING_INTENT_REQUEST_CODE.REQUEST_NEXT.ordinal(),
-                    buildRefreshListIntent(context, item), PendingIntent.FLAG_UPDATE_CURRENT);
+                    buildRefreshListIntent(context, extraItem), PendingIntent.FLAG_UPDATE_CURRENT);
             rv.setOnClickPendingIntent(R.id.btnListNavNext, pi);
             
             // Restore pageNum to the intent item.
-            item.setPageNum(currentPageNum);
+            extraItem.setPageNum(currentPageNum);
 
             // Set search button of the remoteViews.
-            if (Utils.isPredefinedBoardType(item.getBoardType())) {
+            if (Utils.isPredefinedBoardType(extraItem.getBoardType())) {
                 rv.setViewVisibility(R.id.btnListSearch, View.GONE);
             } else {
                 rv.setViewVisibility(R.id.btnListSearch, View.VISIBLE);
                 pi = PendingIntent.getActivity(context, PENDING_INTENT_REQUEST_CODE.REQUEST_SEARCH.ordinal(), 
-                        buildSearchActivityIntent(context, item), PendingIntent.FLAG_UPDATE_CURRENT);
+                        buildSearchActivityIntent(context, extraItem), PendingIntent.FLAG_UPDATE_CURRENT);
                 rv.setOnClickPendingIntent(R.id.btnListSearch, pi);
             }
         }
@@ -239,27 +240,27 @@ public class WidgetProvider extends AppWidgetProvider {
         // Set export button of the remoteViews.
         rv.setViewVisibility(R.id.btnListExport, View.VISIBLE);
         pi = PendingIntent.getActivity(context, PENDING_INTENT_REQUEST_CODE.REQUEST_EXPORT.ordinal(),
-                buildExportIntent(context, item, null), PendingIntent.FLAG_UPDATE_CURRENT);
+                buildExportIntent(context, extraItem, null), PendingIntent.FLAG_UPDATE_CURRENT);
         rv.setOnClickPendingIntent(R.id.btnListExport, pi);
         
         // Set refresh button of the remoteViews.
         pi = PendingIntent.getBroadcast(context, PENDING_INTENT_REQUEST_CODE.REQUEST_REFRESH.ordinal(),
-                buildRefreshListIntent(context, item), PendingIntent.FLAG_UPDATE_CURRENT);
+                buildRefreshListIntent(context, extraItem), PendingIntent.FLAG_UPDATE_CURRENT);
         rv.setOnClickPendingIntent(R.id.btnListRefresh, pi);
         
         // Set setting button of the remoteViews.
         pi = PendingIntent.getActivity(context, PENDING_INTENT_REQUEST_CODE.REQUEST_SETTING.ordinal(),
-                buildConfigurationActivityIntent(context, item), PendingIntent.FLAG_UPDATE_CURRENT);
+                buildConfigurationActivityIntent(context, extraItem), PendingIntent.FLAG_UPDATE_CURRENT);
         rv.setOnClickPendingIntent(R.id.btnListSetting, pi);
         
         // Set a pending intent for click event to the remoteViews.
         PendingIntent clickPi = PendingIntent.getBroadcast(context, 0, 
-                buildShowItemIntent(context, item, null), PendingIntent.FLAG_UPDATE_CURRENT);
+                buildShowItemIntent(context, extraItem, null), PendingIntent.FLAG_UPDATE_CURRENT);
         rv.setPendingIntentTemplate(R.id.listView, clickPi);
         
         // Update widget.
         if (DEBUG) Log.d(TAG, "setRemoteViewToShowList - updateAppWidget [BaseballListViewService]");
-        awm.updateAppWidget(item.getAppWidgetId(), rv);
+        awm.updateAppWidget(extraItem.getAppWidgetId(), rv);
         
         // On first call, we need not execute notifyAppWidgetViewDataChanged()
         // because onDataSetChanged() is called automatically after ListViewFactory is created.
@@ -267,14 +268,14 @@ public class WidgetProvider extends AppWidgetProvider {
             mIsSkipFirstCallListViewService = false;
         } else {
             if (DEBUG) Log.d(TAG, "setRemoteViewToShowList - notifyAppWidgetViewDataChanged [BaseballListViewService]");
-            awm.notifyAppWidgetViewDataChanged(item.getAppWidgetId(), R.id.listView);
+            awm.notifyAppWidgetViewDataChanged(extraItem.getAppWidgetId(), R.id.listView);
         }
     }
     
-    private void setRemoteViewToShowItem(Context context, AppWidgetManager awm, ExtraItems item,
-            String selectedItemUrl, String selectedItemWriter) {
-        if (DEBUG) Log.d(TAG, "setRemoteViewToShowItem - ExtraItems[" + item.toString() +
-                "], selectedItemUrl[" + selectedItemUrl + "], selectedItemWriter[" + selectedItemWriter + "]");
+    private void setRemoteViewToShowItem(Context context, AppWidgetManager awm,
+            ExtraItem extraItem, ListItem listItem) {
+        if (DEBUG) Log.d(TAG, "setRemoteViewToShowItem - " +
+            "ExtraItem[" + extraItem.toString() + "], ListItem[" + listItem.toString() + "]");
         
         PendingIntent pi = null;
         
@@ -282,46 +283,52 @@ public class WidgetProvider extends AppWidgetProvider {
         RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.content);
         
         // Set a remoteAdapter to the remoteViews.
-        Intent serviceIntent = buildContentServiceIntent(context, item, selectedItemUrl, selectedItemWriter);
+        Intent serviceIntent = buildContentServiceIntent(context, extraItem, listItem);
         rv.setRemoteAdapter(R.id.contentView, serviceIntent); // For API14+
         //rv.setRemoteAdapter(item.getAppWidgetId(), R.id.contentView, serviceIntent); // For API13-
 
         // Set title of the remoteViews.
-        rv.setTextViewText(R.id.textContentTitle, Utils.getBoardTitle(context, item.getBoardType()));
+        rv.setTextViewText(R.id.textContentTitle, Utils.getBoardTitle(context, extraItem.getBoardType()));
 
         // Set export button of the remoteViews.
         pi = PendingIntent.getActivity(context, PENDING_INTENT_REQUEST_CODE.REQUEST_EXPORT.ordinal(),
-                buildExportIntent(context, item, selectedItemUrl), PendingIntent.FLAG_UPDATE_CURRENT);
+                buildExportIntent(context, extraItem, listItem), PendingIntent.FLAG_UPDATE_CURRENT);
         rv.setOnClickPendingIntent(R.id.btnContentExport, pi);
         
         // Set addtoblacklist button of the remoteViews.
         pi = PendingIntent.getActivity(context, PENDING_INTENT_REQUEST_CODE.REQUEST_ADDTOBLACKLIST.ordinal(),
-                buildAddToBlackListIntent(context, item, selectedItemWriter), PendingIntent.FLAG_UPDATE_CURRENT);
+                buildAddToBlackListIntent(context, extraItem, listItem), PendingIntent.FLAG_UPDATE_CURRENT);
         rv.setOnClickPendingIntent(R.id.btnContentAddToBlacklist, pi);
+        /*
+        // Set scrap button of the remoteViews.
+        pi = PendingIntent.getActivity(context, PENDING_INTENT_REQUEST_CODE.REQUEST_SCRAP.ordinal(),
+                buildScrapItemIntent(context, extraItem, listItem), PendingIntent.FLAG_UPDATE_CURRENT);
+        rv.setOnClickPendingIntent(R.id.btnContentScrap, pi);
+        */
 
         // Set top button of the remoteViews.
         pi = PendingIntent.getBroadcast(context, PENDING_INTENT_REQUEST_CODE.REQUEST_TOP.ordinal(),
-                                        buildRefreshListIntent(context, item), PendingIntent.FLAG_UPDATE_CURRENT);
+                                        buildRefreshListIntent(context, extraItem), PendingIntent.FLAG_UPDATE_CURRENT);
         rv.setOnClickPendingIntent(R.id.btnContentNavTop, pi);
         
         // Set refresh button of the remoteViews.
         pi = PendingIntent.getBroadcast(context, PENDING_INTENT_REQUEST_CODE.REQUEST_REFRESH.ordinal(), 
-                                        buildShowItemIntent(context, item, selectedItemUrl), PendingIntent.FLAG_UPDATE_CURRENT);
+                                        buildShowItemIntent(context, extraItem, listItem), PendingIntent.FLAG_UPDATE_CURRENT);
         rv.setOnClickPendingIntent(R.id.btnContentRefresh, pi);
         
         // Set setting button of the remoteViews.
         pi = PendingIntent.getActivity(context, PENDING_INTENT_REQUEST_CODE.REQUEST_SETTING.ordinal(), 
-                                       buildConfigurationActivityIntent(context, item), PendingIntent.FLAG_UPDATE_CURRENT);
+                                       buildConfigurationActivityIntent(context, extraItem), PendingIntent.FLAG_UPDATE_CURRENT);
         rv.setOnClickPendingIntent(R.id.btnContentSetting, pi);
         
         // Set a pending intent for click event to the remoteViews.
         PendingIntent clickPi = PendingIntent.getBroadcast(context, 0, 
-                                       buildShowListIntent(context, item), PendingIntent.FLAG_UPDATE_CURRENT);
+                                       buildShowListIntent(context, extraItem), PendingIntent.FLAG_UPDATE_CURRENT);
         rv.setPendingIntentTemplate(R.id.contentView, clickPi);
     
         // Update widget.
         if (DEBUG) Log.d(TAG, "setRemoteViewToShowItem - updateAppWidget [BaseballContentService]");
-        awm.updateAppWidget(item.getAppWidgetId(), rv);
+        awm.updateAppWidget(extraItem.getAppWidgetId(), rv);
 
         // On first call, we need not execute notifyAppWidgetViewDataChanged()
         // because onDataSetChanged() is called automatically after ContentsFactory is created.
@@ -329,11 +336,11 @@ public class WidgetProvider extends AppWidgetProvider {
             mIsSkipFirstCallContentService = false;
         } else {
             if (DEBUG) Log.d(TAG, "setRemoteViewToShowItem - notifyAppWidgetViewDataChanged [BaseballContentService]");
-            awm.notifyAppWidgetViewDataChanged(item.getAppWidgetId(), R.id.contentView);
+            awm.notifyAppWidgetViewDataChanged(extraItem.getAppWidgetId(), R.id.contentView);
         }
     }
     
-    private void refreshAlarmSetting(Context context, ExtraItems item, INTERNET_CONNECTED_RESULT result) {
+    private void refreshAlarmSetting(Context context, ExtraItem item, INTERNET_CONNECTED_RESULT result) {
         // If user does not want to refresh, just remove alarm setting.
         // TODO : Consider INTERNET_CONNECTED_RESULT case here?
         if (item.getRefreshTimeType() == Constants.Specific.REFRESH_TIME_TYPE_STOP) {
@@ -346,7 +353,7 @@ public class WidgetProvider extends AppWidgetProvider {
         }
     }
     
-    private void setNewAlarm(Context context, ExtraItems item, boolean isUrgentMode) {
+    private void setNewAlarm(Context context, ExtraItem item, boolean isUrgentMode) {
         if (DEBUG) Log.d(TAG, "setNewAlarm");
 
         Resources res = context.getResources();
@@ -367,118 +374,139 @@ public class WidgetProvider extends AppWidgetProvider {
         }
     }
 
-    private Intent buildUpdateListInfoIntent(Context context, ExtraItems item) {
-        return Utils.createIntentFromExtraItems(
-                context, null, Constants.ACTION_UPDATE_LIST_INFO, item, false);
+    private Intent buildUpdateListInfoIntent(Context context, ExtraItem extraItem) {
+        return Utils.createIntentFromExtraItem(
+                context, null, Constants.ACTION_UPDATE_LIST_INFO, extraItem, false);
     }
     
-    private Intent buildUpdateItemInfoIntent(Context context, ExtraItems item,
-            String selectedItemUrl, String selectedItemWriter) {
-        Intent intent = Utils.createIntentFromExtraItems(
-                context, null, Constants.ACTION_UPDATE_ITEM_INFO, item, false);
-        if (selectedItemUrl != null && selectedItemUrl.length() > 0)
-            intent.putExtra(Constants.EXTRA_ITEM_URL, selectedItemUrl);
-        if (selectedItemWriter != null && selectedItemWriter.length() >0)
-            intent.putExtra(Constants.EXTRA_ITEM_WRITER, selectedItemWriter);
+    private Intent buildUpdateItemInfoIntent(Context context, ExtraItem extraItem, ListItem listItem) {
+        Intent intent = Utils.createIntentFromExtraItem(
+                context, null, Constants.ACTION_UPDATE_ITEM_INFO, extraItem, false);
+        if (listItem != null) {
+            String itemUrl = listItem.getUrl();
+            if (itemUrl != null && itemUrl.length() >0)
+                intent.putExtra(Constants.EXTRA_ITEM_URL, itemUrl);
+        }
         return intent;
     }
     
-    private Intent buildRefreshListIntent(Context context, ExtraItems item) {
-        return Utils.createIntentFromExtraItems(
-                context, WIDGET_PROVIDER_CLASS_NAME, Constants.ACTION_REFRESH_LIST, item, false);
+    private Intent buildRefreshListIntent(Context context, ExtraItem extraItem) {
+        return Utils.createIntentFromExtraItem(
+                context, WIDGET_PROVIDER_CLASS_NAME, Constants.ACTION_REFRESH_LIST, extraItem, false);
     }
     
-    private Intent buildShowListIntent(Context context, ExtraItems item) {
-        return Utils.createIntentFromExtraItems(
-                context, WIDGET_PROVIDER_CLASS_NAME, Constants.ACTION_SHOW_LIST, item, false);
+    private Intent buildShowListIntent(Context context, ExtraItem extraItem) {
+        return Utils.createIntentFromExtraItem(
+                context, WIDGET_PROVIDER_CLASS_NAME, Constants.ACTION_SHOW_LIST, extraItem, false);
     }
     
-    private Intent buildShowItemIntent(Context context, ExtraItems item,
-            String selectedItemUrl) {
-        Intent intent = Utils.createIntentFromExtraItems(
-                context, WIDGET_PROVIDER_CLASS_NAME, Constants.ACTION_SHOW_ITEM, item, false);
-        if (selectedItemUrl != null && selectedItemUrl.length() > 0)
-            intent.putExtra(Constants.EXTRA_ITEM_URL, selectedItemUrl);
+    private Intent buildShowItemIntent(Context context, ExtraItem extraItem, ListItem listItem) {
+        Intent intent = Utils.createIntentFromExtraItem(
+                context, WIDGET_PROVIDER_CLASS_NAME, Constants.ACTION_SHOW_ITEM, extraItem, false);
+        if (listItem != null) {
+            String itemUrl = listItem.getUrl();
+            if (itemUrl != null && itemUrl.length() > 0)
+                intent.putExtra(Constants.EXTRA_ITEM_URL, itemUrl);
+        }
         return intent;
     }
     
-    private Intent buildConfigurationActivityIntent(Context context, ExtraItems item) {
-        return Utils.createIntentFromExtraItems(
-                context, ConfigurationActivity.CONFIGURATION_ACTIVITY_CLASS_NAME, null, item, true);
+    private Intent buildConfigurationActivityIntent(Context context, ExtraItem extraItem) {
+        return Utils.createIntentFromExtraItem(
+                context, ConfigurationActivity.CONFIGURATION_ACTIVITY_CLASS_NAME, null, extraItem, true);
     }
     
-    private Intent buildSearchActivityIntent(Context context, ExtraItems item) {
-        return Utils.createIntentFromExtraItems(
-                context, SearchActivity.SEARCH_ACTIVITY_CLASS_NAME, null, item, true);
+    private Intent buildSearchActivityIntent(Context context, ExtraItem extraItem) {
+        return Utils.createIntentFromExtraItem(
+                context, SearchActivity.SEARCH_ACTIVITY_CLASS_NAME, null, extraItem, true);
     }
     
-    private Intent buildAddToBlackListIntent(Context context, ExtraItems item,
-            String selectedItemWriter) {
-        Intent intent = Utils.createIntentFromExtraItems(
-                context, AddToBlacklistActivity.ADDTOBLACKLIST_ACTIVITY_CLASS_NAME, null, item, true);
-        if (selectedItemWriter != null && selectedItemWriter.length() > 0)
-            intent.putExtra(Constants.EXTRA_ITEM_WRITER, selectedItemWriter);
+    private Intent buildAddToBlackListIntent(Context context, ExtraItem extraItem, ListItem listItem) {
+        Intent intent = Utils.createIntentFromExtraItem(
+                context, AddToBlacklistActivity.ADDTOBLACKLIST_ACTIVITY_CLASS_NAME, null, extraItem, true);
+        if (listItem != null) {
+            String itemWriter = listItem.getWriter();
+            if (itemWriter != null && itemWriter.length() > 0)
+                intent.putExtra(Constants.EXTRA_ITEM_WRITER, itemWriter);
+        }
         return intent;
     }
     
-    private Intent buildListViewServiceIntent(Context context, ExtraItems item) {
-        return Utils.createIntentFromExtraItems(
-                context, ListViewService.LISTVIEW_SERVICE_CLASS_NAME, null, item, false);
-    }
-    
-    private Intent buildContentServiceIntent(Context context, ExtraItems item,
-            String selectedItemUrl, String selectedItemWriter) {
-        Intent intent = Utils.createIntentFromExtraItems(
-                context, ContentsService.CONTENTS_SERVICE_CLASS_NAME, null, item, false);
-        if (selectedItemUrl != null && selectedItemUrl.length() > 0)
-            intent.putExtra(Constants.EXTRA_ITEM_URL, selectedItemUrl);
-        if (selectedItemWriter != null && selectedItemWriter.length() > 0)
-            intent.putExtra(Constants.EXTRA_ITEM_WRITER, selectedItemWriter);
+    private Intent buildScrapItemIntent(Context context, ExtraItem extraItem, ListItem listItem) {
+        Intent intent = Utils.createIntentFromExtraItem(
+                context, WIDGET_PROVIDER_CLASS_NAME, Constants.ACTION_SCRAP_ITEM, extraItem, false);
+        if (listItem != null) {
+            String itemTitle = listItem.getTitle();
+            String itemWriter = listItem.getWriter();
+            String itemUrl = listItem.getUrl();
+            if (itemTitle != null && itemTitle.length() > 0)
+                intent.putExtra(Constants.EXTRA_ITEM_TITLE, itemTitle);
+            if (itemWriter != null && itemWriter.length() > 0)
+                intent.putExtra(Constants.EXTRA_ITEM_WRITER, itemWriter);
+            if (itemUrl != null && itemUrl.length() > 0)
+                intent.putExtra(Constants.EXTRA_ITEM_URL, itemUrl);
+        }
         return intent;
     }
     
-    private Intent buildWidgetUpdateIntent(Context context, ExtraItems item) {
-        return Utils.createIntentFromExtraItems(
-                context, WIDGET_PROVIDER_CLASS_NAME, AppWidgetManager.ACTION_APPWIDGET_UPDATE, item, false);
+    private Intent buildListViewServiceIntent(Context context, ExtraItem extraItem) {
+        return Utils.createIntentFromExtraItem(
+                context, ListViewService.LISTVIEW_SERVICE_CLASS_NAME, null, extraItem, false);
     }
     
-    private Intent buildExportIntent(Context context, ExtraItems item, String selectedItemUrl) {
-        String url = null;
+    private Intent buildContentServiceIntent(Context context, ExtraItem extraItem, ListItem listItem) {
+        Intent intent = Utils.createIntentFromExtraItem(
+                context, ContentsService.CONTENTS_SERVICE_CLASS_NAME, null, extraItem, false);
+        if (listItem != null) {
+            String itemUrl = listItem.getUrl();
+            if (itemUrl != null && itemUrl.length() > 0)
+                intent.putExtra(Constants.EXTRA_ITEM_URL, itemUrl);
+        }
+        return intent;
+    }
+    
+    private Intent buildWidgetUpdateIntent(Context context, ExtraItem extraItem) {
+        return Utils.createIntentFromExtraItem(
+                context, WIDGET_PROVIDER_CLASS_NAME, AppWidgetManager.ACTION_APPWIDGET_UPDATE, extraItem, false);
+    }
+    
+    private Intent buildExportIntent(Context context, ExtraItem extraItem, ListItem listItem) {
+        String targetUrl = null;
         
-        if (selectedItemUrl == null) {
+        if (listItem == null) {
             try {
-                if (Utils.isTodayBestBoardType(item.getBoardType())) {
-                    url = Constants.Specific.URL_BASE;
+                if (Utils.isTodayBestBoardType(extraItem.getBoardType())) {
+                    targetUrl = Constants.Specific.URL_BASE;
                 } else {
-                    url = Utils.getMobileBoardUrl(context, item.getPageNum(), item.getBoardType(), 
-                            item.getSearchCategoryType(), item.getSearchSubjectType(), item.getSearchKeyword());
+                    targetUrl = Utils.getMobileBoardUrl(context, extraItem.getPageNum(), extraItem.getBoardType(), 
+                            extraItem.getSearchCategoryType(), extraItem.getSearchSubjectType(), extraItem.getSearchKeyword());
                 }
             } catch (UnsupportedEncodingException e) {
                 if (DEBUG) Log.e(TAG, "buildExportIntent - UnsupportedEncodingException![" + e.toString() + "]");
                 e.printStackTrace();
             }
         } else {
-            url = selectedItemUrl;
+            targetUrl = listItem.getUrl();
         }
         
-        Intent intent = Utils.createIntentFromExtraItems(
-                context, WebViewActivity.WEBVIEW_ACTIVITY_CLASS_NAME, null, item, true);
-        intent.putExtra(Constants.EXTRA_EXPORT_URL, url);
+        Intent intent = Utils.createIntentFromExtraItem(
+                context, WebViewActivity.WEBVIEW_ACTIVITY_CLASS_NAME, null, extraItem, true);
+        intent.putExtra(Constants.EXTRA_EXPORT_URL, targetUrl);
 
         return intent;
     }
 
-    private void saveIntentItem(Context context, ExtraItems item) {
+    private void saveIntentItem(Context context, ExtraItem extraItem) {
         if (DEBUG) Log.d(TAG, "saveIntentItem");
         
         SharedPreferences pref = context.getSharedPreferences(Constants.SHARED_PREFERENCE_NAME, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = pref.edit();
         editor.putBoolean(Constants.KEY_COMPLETE_TO_SETUP, true);
-        editor.putInt(Constants.KEY_BOARD_TYPE, item.getBoardType());
-        editor.putInt(Constants.KEY_REFRESH_TIME_TYPE, item.getRefreshTimeType());
-        editor.putBoolean(Constants.KEY_PERMIT_MOBILE_CONNECTION_TYPE, item.getPermitMobileConnectionType());
-        editor.putString(Constants.KEY_BLACK_LIST, item.getBlackList());
-        editor.putString(Constants.KEY_BLOCKED_WORDS, item.getBlockedWords());
+        editor.putInt(Constants.KEY_BOARD_TYPE, extraItem.getBoardType());
+        editor.putInt(Constants.KEY_REFRESH_TIME_TYPE, extraItem.getRefreshTimeType());
+        editor.putBoolean(Constants.KEY_PERMIT_MOBILE_CONNECTION_TYPE, extraItem.getPermitMobileConnectionType());
+        editor.putString(Constants.KEY_BLACK_LIST, extraItem.getBlackList());
+        editor.putString(Constants.KEY_BLOCKED_WORDS, extraItem.getBlockedWords());
         editor.commit();
     }
     
@@ -532,7 +560,7 @@ public class WidgetProvider extends AppWidgetProvider {
             int[] appWidgetIds = awm.getAppWidgetIds(new ComponentName(context, getClass()));
 
             for (int i = 0 ; i < appWidgetIds.length ; i++) {
-                ExtraItems item = new ExtraItems(appWidgetIds[i], Constants.DEFAULT_PAGE_NUM,
+                ExtraItem item = new ExtraItem(appWidgetIds[i], Constants.DEFAULT_PAGE_NUM,
                         boardType, refreshTimeType, permitMobileConnectionType, blackList, blockedWords,
                         Constants.DEFAULT_SEARCH_CATEGORY_TYPE, Constants.DEFAULT_SEARCH_SUBJECT_TYPE, null);
                 

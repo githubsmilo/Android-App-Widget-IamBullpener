@@ -71,7 +71,7 @@
     
     <!-- AddToBlacklist activity -->
     <string name="title_activity_add_to_black_list">차단 목록에 추가하시겠습니까?</string>
-    <string name="text_add_to_black_list_msg">님이 차단 목록에 추가되었습니다.</string>
+    <string name="text_add_to_black_list_msg">님을 차단 목록에 추가했습니다.</string>
 
     <!-- Search category parameter -->
     <string name="text_category_parameter_title">stt</string>

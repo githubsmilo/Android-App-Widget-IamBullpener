@@ -16,7 +16,7 @@ public final class Constants {
     public static final String ACTION_SHOW_ITEM = Specific.PACKAGE_NAME + ".SHOW_ITEM";
     public static final String ACTION_UPDATE_ITEM_INFO = Specific.PACKAGE_NAME + ".UPDATE_ITEM_INFO";
     public static final String ACTION_UPDATE_LIST_INFO = Specific.PACKAGE_NAME + ".UPDATE_LIST_INFO";
-    public static final String ACTION_SEARCH = Specific.PACKAGE_NAME + ".SEARCH";
+    public static final String ACTION_SCRAP_ITEM = Specific.PACKAGE_NAME + ".SCRAP_ITEM"; 
     
     // Extras define by appWidget
     public static final String EXTRA_PAGE_NUM = Specific.PACKAGE_NAME + ".EXTRA_PAGE_NUM";
@@ -25,8 +25,9 @@ public final class Constants {
     public static final String EXTRA_PERMIT_MOBILE_CONNECTION_TYPE = Specific.PACKAGE_NAME + ".PERMIT_MOBILE_CONNECTION";
     public static final String EXTRA_BLACK_LIST = Specific.PACKAGE_NAME + ".BLACK_LIST";
     public static final String EXTRA_BLOCKED_WORDS = Specific.PACKAGE_NAME + ".BLOCKED_WORDS";
-    public static final String EXTRA_ITEM_URL = Specific.PACKAGE_NAME + ".EXTRA_ITEM_URL";
+    public static final String EXTRA_ITEM_TITLE = Specific.PACKAGE_NAME + ".EXTRA_ITEM_TITLE";
     public static final String EXTRA_ITEM_WRITER = Specific.PACKAGE_NAME + ".EXTRA_ITEM_WRITER";
+    public static final String EXTRA_ITEM_URL = Specific.PACKAGE_NAME + ".EXTRA_ITEM_URL";
     public static final String EXTRA_SEARCH_CATEGORY_TYPE = Specific.PACKAGE_NAME + ".SEARCH_CATEGORY_TYPE";
     public static final String EXTRA_SEARCH_SUBJECT_TYPE = Specific.PACKAGE_NAME + ".SEARCH_SUBJECT_TYPE";
     public static final String EXTRA_SEARCH_KEYWORD = Specific.PACKAGE_NAME + ".SEARCH_KEYWORD";

@@ -2,7 +2,7 @@
 package com.smilo.bullpen.activities;
 
 import com.smilo.bullpen.Constants;
-import com.smilo.bullpen.ExtraItems;
+import com.smilo.bullpen.ExtraItem;
 import com.smilo.bullpen.Utils;
 import com.smilo.bullpen.WidgetProvider;
 import com.smilo.bullpen.R;
@@ -27,7 +27,7 @@ public class SearchActivity extends Activity {
     private static final boolean DEBUG = Constants.DEBUG_MODE;
     public static final String SEARCH_ACTIVITY_CLASS_NAME = Constants.Specific.PACKAGE_NAME + ".activities." + TAG;
 
-    private static ExtraItems mItem = null;
+    private static ExtraItem mItem = null;
 
     private LinearLayout mLayoutSearchWord;
     private LinearLayout mLayoutSearchSubject;
@@ -46,7 +46,7 @@ public class SearchActivity extends Activity {
         
         // Get ExtraItems.
         Intent intent = getIntent();
-        mItem = Utils.createExtraItemsFromIntent(intent);
+        mItem = Utils.createExtraItemFromIntent(intent);
         if (mItem.getAppWidgetId() == AppWidgetManager.INVALID_APPWIDGET_ID) {
             if (DEBUG) Log.e(TAG, "Invalid appWidget Id[" + mItem.getAppWidgetId() + "]");
             finish();
@@ -114,8 +114,8 @@ public class SearchActivity extends Activity {
             mItem.setPageNum(Constants.DEFAULT_PAGE_NUM);
             
             // Create intent and broadcast it!
-            Intent intent = Utils.createIntentFromExtraItems(
-                    context, WidgetProvider.WIDGET_PROVIDER_CLASS_NAME, Constants.ACTION_SEARCH, mItem, false);
+            Intent intent = Utils.createIntentFromExtraItem(
+                    context, WidgetProvider.WIDGET_PROVIDER_CLASS_NAME, Constants.ACTION_REFRESH_LIST, mItem, false);
             context.sendBroadcast(intent);
 
             // set return intent.

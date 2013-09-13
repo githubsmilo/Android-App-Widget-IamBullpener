@@ -52,7 +52,17 @@
             android:layout_centerVertical="true"
             android:background="@drawable/add_to_blacklist_button_selector"
             android:contentDescription="@string/btn_addtoblacklist" />
-                
+        <!-- 
+        <ImageButton
+            android:id="@+id/btnContentScrap"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@+id/btnContentAddToBlacklist"
+            android:background="@drawable/add_to_blacklist_button_selector"
+            android:contentDescription="@string/btn_addtoblacklist" />
+             -->
+        
         <ImageButton
             android:id="@+id/btnContentNavTop"
             android:layout_width="wrap_content"

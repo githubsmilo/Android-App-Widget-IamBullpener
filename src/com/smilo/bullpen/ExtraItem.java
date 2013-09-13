@@ -2,7 +2,7 @@ package com.smilo.bullpen;
 
 import android.appwidget.AppWidgetManager;
 
-public final class ExtraItems {
+public final class ExtraItem {
 
     private int widgetId = AppWidgetManager.INVALID_APPWIDGET_ID;
     private int pageNum = Constants.DEFAULT_PAGE_NUM;
@@ -15,7 +15,7 @@ public final class ExtraItems {
     private int searchSubjectType = Constants.DEFAULT_SEARCH_SUBJECT_TYPE;
     private String searchKeyword = null;
 
-    ExtraItems(int widgetId,
+    public ExtraItem(int widgetId,
                                 int pageNum,
                                 int boardType,
                                 int refreshType,
@@ -117,7 +117,7 @@ public final class ExtraItems {
         this.searchKeyword = searchKeyword;
     }
 
-    public void update(ExtraItems newItem) {
+    public void update(ExtraItem newItem) {
         widgetId = newItem.getAppWidgetId();
         pageNum = newItem.getPageNum();
         boardType = newItem.getBoardType();
