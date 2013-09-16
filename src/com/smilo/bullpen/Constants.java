@@ -17,6 +17,7 @@ public final class Constants {
     public static final String ACTION_UPDATE_ITEM_INFO = Specific.PACKAGE_NAME + ".UPDATE_ITEM_INFO";
     public static final String ACTION_UPDATE_LIST_INFO = Specific.PACKAGE_NAME + ".UPDATE_LIST_INFO";
     public static final String ACTION_SCRAP_ITEM = Specific.PACKAGE_NAME + ".SCRAP_ITEM"; 
+    public static final String ACTION_DELETE_SCRAPPED_ITEM = Specific.PACKAGE_NAME + ".DELETE_SCRAPPED_ITEM";
     
     // Extras define by appWidget
     public static final String EXTRA_PAGE_NUM = Specific.PACKAGE_NAME + ".EXTRA_PAGE_NUM";
@@ -25,9 +26,11 @@ public final class Constants {
     public static final String EXTRA_PERMIT_MOBILE_CONNECTION_TYPE = Specific.PACKAGE_NAME + ".PERMIT_MOBILE_CONNECTION";
     public static final String EXTRA_BLACK_LIST = Specific.PACKAGE_NAME + ".BLACK_LIST";
     public static final String EXTRA_BLOCKED_WORDS = Specific.PACKAGE_NAME + ".BLOCKED_WORDS";
+    public static final String EXTRA_ITEM_TITLE_PREFIX = Specific.PACKAGE_NAME + ".EXTRA_ITEM_TITLE_PREFIX";
     public static final String EXTRA_ITEM_TITLE = Specific.PACKAGE_NAME + ".EXTRA_ITEM_TITLE";
     public static final String EXTRA_ITEM_WRITER = Specific.PACKAGE_NAME + ".EXTRA_ITEM_WRITER";
     public static final String EXTRA_ITEM_URL = Specific.PACKAGE_NAME + ".EXTRA_ITEM_URL";
+    public static final String EXTRA_ITEM_COMMENT_NUM = Specific.PACKAGE_NAME + ".EXTRA_ITEM_COMMENT_NUM";
     public static final String EXTRA_SEARCH_CATEGORY_TYPE = Specific.PACKAGE_NAME + ".SEARCH_CATEGORY_TYPE";
     public static final String EXTRA_SEARCH_SUBJECT_TYPE = Specific.PACKAGE_NAME + ".SEARCH_SUBJECT_TYPE";
     public static final String EXTRA_SEARCH_KEYWORD = Specific.PACKAGE_NAME + ".SEARCH_KEYWORD";
@@ -43,7 +46,7 @@ public final class Constants {
     public static final String KEY_BLACK_LIST = "key_black_list";
     public static final String KEY_BLOCKED_WORDS = "key_blocked_words";
     
-    // Intentitem default values
+    // ExtraItem default values
     public static final int DEFAULT_PAGE_NUM = 1;
     public static final int DEFAULT_BOARD_TYPE = Specific.BOARD_TYPE_MLB_TOWN;
     public static final int DEFAULT_REFRESH_TIME_TYPE = Specific.REFRESH_TIME_TYPE_1_MIN;
@@ -53,13 +56,21 @@ public final class Constants {
     public static final int DEFAULT_SEARCH_CATEGORY_TYPE = Specific.SEARCH_CATEGORY_TYPE_DEFAULT;
     public static final int DEFAULT_SEARCH_SUBJECT_TYPE = Specific.SEARCH_SUBJECT_TYPE_DEFAULT;
     
+    // ListItem default values
+    public static final String DEFAULT_TITLE_PREFIX = "";
+    public static final String DEFAULT_TITLE = null;
+    public static final String DEFAULT_WRITER = null;
+    public static final String DEFAULT_URL = null;
+    public static final int DEFAULT_COMMENT_NUM = 0;
+    
     public static final String DELIMITER_BLACK_LIST = ",";
     public static final String DELIMITER_BLOCKED_WORDS = ",";
-    
+
     public enum PARSING_RESULT {
         SUCCESS_FULL_BOARD,
         SUCCESS_MOBILE_BOARD,
         SUCCESS_MOBILE_TODAY_BEST,
+        SUCCESS_SCRAP_LIST,
         FAILED_IO_EXCEPTION,
         FAILED_JSON_EXCEPTION,
         FAILED_STACK_OVERFLOW,
@@ -78,6 +89,7 @@ public final class Constants {
         public static final String PACKAGE_NAME = "com.smilo.bullpen";
 
         public static final String URL_BASE = "http://mlbpark.donga.com";
+        public static final String URL_SCRAP = URL_BASE + "/SCRAP";
         public static final String URL_MLB_TOWN = "http://mlbpark.donga.com/mbs/articleL.php?mbsC=mlbtown&cpage=";
         public static final String URL_KBO_TOWN = "http://mlbpark.donga.com/mbs/articleL.php?mbsC=kbotown&cpage=";
         public static final String URL_BULLPEN = "http://mlbpark.donga.com/mbs/articleL.php?mbsC=bullpen&cpage=";
@@ -93,15 +105,16 @@ public final class Constants {
         public static final String URL_PARAMETER_SEARCH_CATEGORY = "&mbsW=search&select=";
         public static final String URL_PARAMETER_SEARCH_KEYWORD = "&keyword=";
 
-        public static final int BOARD_TYPE_MLB_TOWN = 0;
-        public static final int BOARD_TYPE_KBO_TOWN = 1;
-        public static final int BOARD_TYPE_BULLPEN  = 2;
-        public static final int BOARD_TYPE_MLB_TOWN_TODAY_BEST = 3;
-        public static final int BOARD_TYPE_KBO_TOWN_TODAY_BEST = 4;
-        public static final int BOARD_TYPE_BULLPEN_TODAY_BEST  = 5;
-        public static final int BOARD_TYPE_BULLPEN_1000 = 6;
-        public static final int BOARD_TYPE_BULLPEN_2000 = 7;
-        public static final int BOARD_TYPE_NEWS = 8;
+        public static final int BOARD_TYPE_SCRAP = 0;
+        public static final int BOARD_TYPE_MLB_TOWN = 1;
+        public static final int BOARD_TYPE_KBO_TOWN = 2;
+        public static final int BOARD_TYPE_BULLPEN  = 3;
+        public static final int BOARD_TYPE_MLB_TOWN_TODAY_BEST = 4;
+        public static final int BOARD_TYPE_KBO_TOWN_TODAY_BEST = 5;
+        public static final int BOARD_TYPE_BULLPEN_TODAY_BEST  = 6;
+        public static final int BOARD_TYPE_BULLPEN_1000 = 7;
+        public static final int BOARD_TYPE_BULLPEN_2000 = 8;
+        public static final int BOARD_TYPE_NEWS = 9;
 
         public static final int REFRESH_TIME_TYPE_1_MIN  = 0;
         public static final int REFRESH_TIME_TYPE_5_MIN  = 1;

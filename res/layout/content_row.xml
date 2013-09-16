@@ -4,36 +4,42 @@
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:gravity="center_vertical"
         android:padding="@dimen/widget_margin" >
         
     <!--  [writer] title -->
+
     <TextView
-            android:id="@+id/contentRowTitleText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:gravity="center_vertical"
-            android:paddingBottom="10dp"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp" />
-    
-    <!-- body (text + image) applied 30% alpha -->
-    <LinearLayout
-        android:id="@+id/contentRowBodyLayout"
-        android:orientation="vertical"
+        android:id="@+id/contentRowTitleText"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:gravity="center_vertical"
+        android:paddingBottom="10dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+    
+    <!-- body (text + image) applied 30% alpha -->
+
+    <LinearLayout
+        android:id="@+id/contentRowBodyLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:background="#4D000000"
+        android:orientation="vertical"
         android:paddingBottom="5dp" >
+
         <!-- Add dynamic view here -->
     </LinearLayout>
     
     <!-- comment -->
+
     <LinearLayout
         android:id="@+id/contentRowCommentLayout"
-        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" >
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
+
         <!-- Add dynamic view here -->
     </LinearLayout>
 

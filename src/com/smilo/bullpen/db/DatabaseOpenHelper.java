@@ -24,8 +24,7 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
                     ScrapArticleColumns._ID + " INTEGER PRIMARY KEY, " +
                     ScrapArticleColumns.TITLE + " TEXT, " +
                     ScrapArticleColumns.WRITER + " TEXT, " +
-                    ScrapArticleColumns.URL + " TEXT, " +
-                    ScrapArticleColumns.STARRED + " INTEGER)";
+                    ScrapArticleColumns.URL + " TEXT)";
     private static final String DROP_SCRAP_LIST_TABLE =
             "DROP TABLE IF EXISTS " + SCRAP_LIST_TABLE_NAME;
     
@@ -57,20 +56,17 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
         public static final String TITLE = "title";
         public static final String WRITER = "writer";
         public static final String URL = "url";
-        public static final String STARRED = "starred"; 
         
         public static final String[] PROJECTION = {
            BaseColumns._ID,
            TITLE,
            WRITER,
-           URL,
-           STARRED
+           URL
         };
         
         public static final int ID_INDEX = 0;
         public static final int TITLE_INDEX = 1;
         public static final int WRITER_INDEX = 2;
         public static final int URL_INDEX = 3;
-        public static final int STARRED_INDEX = 4;
     }
 }

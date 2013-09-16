@@ -10,6 +10,7 @@
     </string-array>
     
     <string-array name="board">
+        <item>스크랩 목록</item>
         <item>MLB 타운</item>
         <item>한국야구 타운</item>
         <item>BULLPEN</item>

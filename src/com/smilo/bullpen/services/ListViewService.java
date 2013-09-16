@@ -17,5 +17,4 @@ public class ListViewService extends RemoteViewsService {
         return (new ListViewFactory(this.getApplicationContext(),
                 intent));
     }
-
 }

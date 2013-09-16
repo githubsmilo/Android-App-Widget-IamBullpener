@@ -7,6 +7,8 @@ import com.smilo.bullpen.ExtraItem;
 import com.smilo.bullpen.ListItem;
 import com.smilo.bullpen.R;
 import com.smilo.bullpen.Utils;
+import com.smilo.bullpen.db.DatabaseHandler;
+import com.smilo.bullpen.db.DatabaseOpenHelper.ScrapArticleColumns;
 
 import net.htmlparser.jericho.CharacterReference;
 import net.htmlparser.jericho.Element;
@@ -23,7 +25,9 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.database.Cursor;
 import android.util.Log;
+import android.view.View;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
@@ -66,17 +70,32 @@ public class ListViewFactory implements RemoteViewsService.RemoteViewsFactory {
             case SUCCESS_FULL_BOARD :
             case SUCCESS_MOBILE_BOARD :
             case SUCCESS_MOBILE_TODAY_BEST :
-                rv.setTextViewText(R.id.listRowText, mListItems.get(position).getTitle());
+            case SUCCESS_SCRAP_LIST :
+                if (position >= mAddedItemCount) {
+                    if (DEBUG) Log.e(TAG, "Illegal position number![" + position + "]");
+                    return null;
+                }
+                
+                ListItem item = mListItems.get(position);
+                String itemTitlePrefix = item.getTitlePrefix();
+                String itemTitle = item.getTitle();
+                String itemWriter = item.getWriter();
+                String itemUrl = item.getUrl();
+                int itemCommentNum = item.getCommentNum();
+                if (itemCommentNum == Constants.DEFAULT_COMMENT_NUM)
+                    rv.setTextViewText(R.id.listRowText, itemTitlePrefix + itemTitle);
+                else
+                    rv.setTextViewText(R.id.listRowText, itemTitlePrefix + itemTitle + " [" + itemCommentNum + "]");
+                
                 Intent fillInIntent = new Intent();
-                String itemTitle = mListItems.get(position).getTitle();
-                String itemWriter = mListItems.get(position).getWriter();
-                String itemUrl = mListItems.get(position).getUrl();
                 if (itemTitle != null && itemTitle.length() > 0)
                     fillInIntent.putExtra(Constants.EXTRA_ITEM_TITLE, itemTitle);
                 if (itemWriter != null && itemWriter.length() > 0)
                     fillInIntent.putExtra(Constants.EXTRA_ITEM_WRITER, itemWriter);
                 if (itemUrl != null && itemUrl.length() > 0)
                     fillInIntent.putExtra(Constants.EXTRA_ITEM_URL, itemUrl);
+                if (itemCommentNum != Constants.DEFAULT_COMMENT_NUM)
+                    fillInIntent.putExtra(Constants.EXTRA_ITEM_COMMENT_NUM, itemCommentNum);
                 rv.setOnClickFillInIntent(R.id.listRowText, fillInIntent);
                 break;
                 
@@ -107,7 +126,9 @@ public class ListViewFactory implements RemoteViewsService.RemoteViewsFactory {
 
         // Parse MLBPark html data and add items to the widget item array list.
         try {
-            if (Utils.isTodayBestBoardType(mItem.getBoardType())) {
+            if (Utils.isScrapBoardType(mItem.getBoardType())) {
+                mParsingResult = loadScrapListFromDb();
+            } else if (Utils.isTodayBestBoardType(mItem.getBoardType())) {
                 mParsingResult = parseMLBParkTodayBest(Utils.getBoardUrl(mItem.getBoardType()));
             } else {
                 mParsingResult = parseMLBParkMobileBoard(Utils.getMobileBoardUrl(
@@ -135,7 +156,8 @@ public class ListViewFactory implements RemoteViewsService.RemoteViewsFactory {
         
         if (mParsingResult == PARSING_RESULT.SUCCESS_FULL_BOARD ||
             mParsingResult == PARSING_RESULT.SUCCESS_MOBILE_BOARD ||
-            mParsingResult == PARSING_RESULT.SUCCESS_MOBILE_TODAY_BEST) {
+            mParsingResult == PARSING_RESULT.SUCCESS_MOBILE_TODAY_BEST ||
+            mParsingResult == PARSING_RESULT.SUCCESS_SCRAP_LIST) {
             return mAddedItemCount;
         } else {
               return 1;
@@ -172,6 +194,31 @@ public class ListViewFactory implements RemoteViewsService.RemoteViewsFactory {
         teardownIntentListener();
     }
     
+    private PARSING_RESULT loadScrapListFromDb() {
+        // Initialize widget item array list here.
+        mListItems.clear();
+        
+        // Initialize item count.
+        mAddedItemCount = 0;
+        
+        DatabaseHandler handler = DatabaseHandler.open(mContext);
+        
+        Cursor c = handler.selectAll();
+        while (c.moveToNext()) {
+            String title = c.getString(ScrapArticleColumns.TITLE_INDEX);
+            String writer = c.getString(ScrapArticleColumns.WRITER_INDEX);
+            String url = c.getString(ScrapArticleColumns.URL_INDEX);
+            ListItem item = new ListItem(Constants.DEFAULT_TITLE_PREFIX, title, writer, url, Constants.DEFAULT_COMMENT_NUM);
+            mListItems.add(item);
+            mAddedItemCount++;
+            if (DEBUG) Log.d(TAG, "loadScrapListFromDb - new ListItem[" + item.toString() + "]");
+        }
+        handler.close();
+        
+        if (DEBUG) Log.i(TAG, "loadScrapListFromDb - done!");
+        return PARSING_RESULT.SUCCESS_SCRAP_LIST;
+    }
+    
     private PARSING_RESULT parseMLBParkTodayBest(String urlAddress) throws IOException, JSONException, StackOverflowError {
         // Initialize widget item array list here.
         mListItems.clear();
@@ -206,7 +253,7 @@ public class ListViewFactory implements RemoteViewsService.RemoteViewsFactory {
             
             for (int i = 0 ; i < ols.size() ; i++) {
                 Segment seg = ols.get(i).getContent();
-                String title = null, url = null;
+                String titlePrefix = null, title = null, url = null;
                 boolean isStartLiTag = false, isAddTitle = false;
                 int itemNum = 1;
                 //Log.i(TAG, "seg[" + seg.toString() + "]");
@@ -235,7 +282,7 @@ public class ListViewFactory implements RemoteViewsService.RemoteViewsFactory {
                             // Add widget item array list
                             //Log.i(TAG, "parseMLBParkTodayBest - title[" + title + "],url[" + url + "]");
                             
-                            ListItem item = new ListItem(title, null, url);
+                            ListItem item = new ListItem(titlePrefix, title, Constants.DEFAULT_WRITER, url, Constants.DEFAULT_COMMENT_NUM);
                             mListItems.add(item);
                             title = null;
                             url = null;
@@ -252,10 +299,10 @@ public class ListViewFactory implements RemoteViewsService.RemoteViewsFactory {
                     // If plain text, add it to title.
                     } else {
                         if (isAddTitle) {
-                            if (i == 0) title = "[추천] " + itemNum++ + ". ";
-                            else if (i == 1) title = "[조회] " + itemNum++ + ". ";
-                            else if (i == 2) title = "[리플] " + itemNum++ + ". ";
-                            title += nodeSeg.getTextExtractor().toString();
+                            if (i == 0) titlePrefix = "[추천] " + itemNum++ + ". ";
+                            else if (i == 1) titlePrefix = "[조회] " + itemNum++ + ". ";
+                            else if (i == 2) titlePrefix = "[리플] " + itemNum++ + ". ";
+                            title = nodeSeg.getTextExtractor().toString();
                             isAddTitle = false;
                         }
                         
@@ -276,13 +323,13 @@ public class ListViewFactory implements RemoteViewsService.RemoteViewsFactory {
         // Initialize widget item array list here.
         mListItems.clear();
 
-        // Parse black list
+        // Parse black list.
         String[] blackList = null;
         if (mItem.getBlackList() != null) {
             blackList = mItem.getBlackList().split(Constants.DELIMITER_BLACK_LIST);
         }
         
-        // Parse blocked words
+        // Parse blocked words.
         String[] blockedWords = null;
         if (mItem.getBlockedWords() != null) {
             blockedWords = mItem.getBlockedWords().split(Constants.DELIMITER_BLOCKED_WORDS);
@@ -309,7 +356,7 @@ public class ListViewFactory implements RemoteViewsService.RemoteViewsFactory {
             
             for (int i = 0 ; i < lis.size() ; i++) {
                 Segment seg = lis.get(i).getContent();
-                String title = "", writer = null, url = null;
+                String title = "", writer = null, url = null, commentNum = "0";
                 boolean isAddTitle = false, isAddWriter = false, isAddCommentNum = false, isSkipToAdd = false;
                 //Log.i(TAG, "seg[" + seg.toString() + "]");
 
@@ -381,7 +428,7 @@ public class ListViewFactory implements RemoteViewsService.RemoteViewsFactory {
                                 }
                             }
                         } else if (isAddCommentNum && !isSkipToAdd) {
-                            title += (" [" + nodeSeg.getTextExtractor().toString() + "]");
+                            commentNum = nodeSeg.getTextExtractor().toString();
                             isAddCommentNum = false;
                         }
                     }
@@ -389,8 +436,8 @@ public class ListViewFactory implements RemoteViewsService.RemoteViewsFactory {
 
                 // Add widget item array list
                 if (isSkipToAdd == false) {
-                    Log.i(TAG, "parseMLBParkMobileBoard - title[" + title + "], writer[" + writer + "], url[" + url + "]");
-                    ListItem item = new ListItem(title, writer, url);
+                    ListItem item = new ListItem(Constants.DEFAULT_TITLE_PREFIX, title, writer, url, Integer.parseInt(commentNum));
+                    if (DEBUG) Log.i(TAG, "parseMLBParkMobileBoard - ListItem[" + item.toString() + "]");
                     mListItems.add(item);
                     mAddedItemCount++;
                 }
@@ -453,7 +500,7 @@ public class ListViewFactory implements RemoteViewsService.RemoteViewsFactory {
                 //Log.i(TAG, "parseMLBParkFullBoard - title[" + title + "], url[" + url + "]");
                 
                 // Add widget item to array list
-                ListItem item = new ListItem(title, null, url);
+                ListItem item = new ListItem(Constants.DEFAULT_TITLE_PREFIX, title, Constants.DEFAULT_WRITER, url, Constants.DEFAULT_COMMENT_NUM);
                 mListItems.add(item);
                 addedItemCount++;
                 

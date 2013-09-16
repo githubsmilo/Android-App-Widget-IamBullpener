@@ -31,27 +31,29 @@ public class DatabaseHandler {
         }
     }
     
-    public void insert(String title, String writer, String url, int starred) {
+    public void insert(String title, String writer, String url) {
         ContentValues values = new ContentValues();
         values.put(ScrapArticleColumns.TITLE, title);
         values.put(ScrapArticleColumns.WRITER, writer);
         values.put(ScrapArticleColumns.URL, url);
-        values.put(ScrapArticleColumns.STARRED, starred);
         mDb.insert(mHelper.getScrapListTableName(), null, values);
-    }
-    
-    public void update(String url, int starred) {
-        ContentValues values = new ContentValues();
-        values.put(ScrapArticleColumns.STARRED, starred);
-        mDb.update(mHelper.getScrapListTableName(), values, ScrapArticleColumns.URL + "=?", new String[]{url});
     }
     
     public void delete(String url) {
         mDb.delete(mHelper.getScrapListTableName(), ScrapArticleColumns.URL + "=?", new String[]{url});
     }
     
-    public Cursor select() {
-        Cursor c = mDb.query(mHelper.getScrapListTableName(), null, null, null, null, null, null);
+    public void star(String url) {
+        
+    }
+    
+    public Cursor selectAll() {
+        Cursor c = mDb.query(mHelper.getScrapListTableName(), null, null, null, null, null, ScrapArticleColumns._ID + " DESC");
+        return c;
+    }
+    
+    public Cursor selectUrl(String url) {
+        Cursor c = mDb.query(mHelper.getScrapListTableName(), null, ScrapArticleColumns.URL + "=?", new String[]{url}, null, null, null);
         return c;
     }
 }

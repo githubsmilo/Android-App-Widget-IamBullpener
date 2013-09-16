@@ -1,7 +1,14 @@
 
 package com.smilo.bullpen;
 
-import java.io.UnsupportedEncodingException;
+import com.smilo.bullpen.Constants.INTERNET_CONNECTED_RESULT;
+import com.smilo.bullpen.activities.AddToBlacklistActivity;
+import com.smilo.bullpen.activities.ConfigurationActivity;
+import com.smilo.bullpen.activities.SearchActivity;
+import com.smilo.bullpen.activities.WebViewActivity;
+import com.smilo.bullpen.db.DatabaseHandler;
+import com.smilo.bullpen.services.ContentsService;
+import com.smilo.bullpen.services.ListViewService;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -13,17 +20,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.database.Cursor;
 import android.util.Log;
 import android.view.View;
 import android.widget.RemoteViews;
+import android.widget.Toast;
 
-import com.smilo.bullpen.Constants.INTERNET_CONNECTED_RESULT;
-import com.smilo.bullpen.activities.AddToBlacklistActivity;
-import com.smilo.bullpen.activities.ConfigurationActivity;
-import com.smilo.bullpen.activities.SearchActivity;
-import com.smilo.bullpen.activities.WebViewActivity;
-import com.smilo.bullpen.services.ContentsService;
-import com.smilo.bullpen.services.ListViewService;
+import java.io.UnsupportedEncodingException;
 
 public class WidgetProvider extends AppWidgetProvider {
 
@@ -51,6 +54,7 @@ public class WidgetProvider extends AppWidgetProvider {
         REQUEST_EXPORT,
         REQUEST_ADDTOBLACKLIST,
         REQUEST_SCRAP,
+        REQUEST_DELETESCRAP,
         REQUEST_UNKNOWN,
     };
     
@@ -97,7 +101,13 @@ public class WidgetProvider extends AppWidgetProvider {
                     context.sendBroadcast(buildShowListIntent(context, extraItem));
  
                 } else if (action.equals(Constants.ACTION_SCRAP_ITEM)) {
-                    // TODO : scrap!
+                    saveScrappedItem(context, listItem);
+                    
+                } else if (action.equals(Constants.ACTION_DELETE_SCRAPPED_ITEM)) {
+                    deleteScrappedItem(context, listItem);
+                    
+                    // Broadcast ACTION_SHOW_LIST intent.
+                    context.sendBroadcast(buildShowListIntent(context, extraItem));
                     
                 // This intent(ACTION_APPWIDGET_UPDATE) will be called periodically.
                 // This intent(ACTION_SHOW_LIST) will be called when current item pressed.
@@ -116,7 +126,7 @@ public class WidgetProvider extends AppWidgetProvider {
                         setRemoteViewToShowList(context, awm, extraItem);
                     
                     // Save configuration info.
-                      saveIntentItem(context, extraItem);
+                    saveIntentItem(context, extraItem);
 
                 // This intent will be called when some item selected.
                 // EXTRA_ITEM_URL was already filled in the ListViewFactory - getViewAt().
@@ -179,14 +189,14 @@ public class WidgetProvider extends AppWidgetProvider {
         //rv.setRemoteAdapter(item.getAppWidgetId(), R.id.listView, serviceIntent); // For API13-
         rv.setScrollPosition(R.id.listView, 0); // Scroll to top
 
-        if (Utils.isTodayBestBoardType(extraItem.getBoardType())) {
+        if (Utils.isTodayBestBoardType(extraItem.getBoardType()) ||
+            Utils.isScrapBoardType(extraItem.getBoardType())) {
             // Set title of the remoteViews.
             rv.setTextViewText(R.id.textListTitle, Utils.getBoardTitle(context, extraItem.getBoardType()));
             
             rv.setViewVisibility(R.id.btnListNavTop, View.GONE);
             rv.setViewVisibility(R.id.btnListNavPrev, View.GONE);
             rv.setViewVisibility(R.id.btnListNavNext, View.GONE);
-            rv.setViewVisibility(R.id.btnListSearch, View.GONE);
         } else {
             // Save pageNum.
             int currentPageNum = extraItem.getPageNum();
@@ -225,28 +235,39 @@ public class WidgetProvider extends AppWidgetProvider {
             
             // Restore pageNum to the intent item.
             extraItem.setPageNum(currentPageNum);
-
-            // Set search button of the remoteViews.
-            if (Utils.isPredefinedBoardType(extraItem.getBoardType())) {
-                rv.setViewVisibility(R.id.btnListSearch, View.GONE);
-            } else {
-                rv.setViewVisibility(R.id.btnListSearch, View.VISIBLE);
-                pi = PendingIntent.getActivity(context, PENDING_INTENT_REQUEST_CODE.REQUEST_SEARCH.ordinal(), 
-                        buildSearchActivityIntent(context, extraItem), PendingIntent.FLAG_UPDATE_CURRENT);
-                rv.setOnClickPendingIntent(R.id.btnListSearch, pi);
-            }
         }
         
-        // Set export button of the remoteViews.
-        rv.setViewVisibility(R.id.btnListExport, View.VISIBLE);
-        pi = PendingIntent.getActivity(context, PENDING_INTENT_REQUEST_CODE.REQUEST_EXPORT.ordinal(),
-                buildExportIntent(context, extraItem, null), PendingIntent.FLAG_UPDATE_CURRENT);
-        rv.setOnClickPendingIntent(R.id.btnListExport, pi);
+        if (Utils.isTodayBestBoardType(extraItem.getBoardType()) ||
+            Utils.isPredefinedBoardType(extraItem.getBoardType()) ||
+            Utils.isScrapBoardType(extraItem.getBoardType())) {
+            rv.setViewVisibility(R.id.btnListSearch, View.GONE);
+        } else {
+         // Set search button of the remoteViews.
+            rv.setViewVisibility(R.id.btnListSearch, View.VISIBLE);
+            pi = PendingIntent.getActivity(context, PENDING_INTENT_REQUEST_CODE.REQUEST_SEARCH.ordinal(), 
+                    buildSearchActivityIntent(context, extraItem), PendingIntent.FLAG_UPDATE_CURRENT);
+            rv.setOnClickPendingIntent(R.id.btnListSearch, pi);
+        }
         
-        // Set refresh button of the remoteViews.
-        pi = PendingIntent.getBroadcast(context, PENDING_INTENT_REQUEST_CODE.REQUEST_REFRESH.ordinal(),
-                buildRefreshListIntent(context, extraItem), PendingIntent.FLAG_UPDATE_CURRENT);
-        rv.setOnClickPendingIntent(R.id.btnListRefresh, pi);
+        if (Utils.isScrapBoardType(extraItem.getBoardType())) {
+            rv.setViewVisibility(R.id.btnListEmpty, View.VISIBLE);
+            rv.setViewVisibility(R.id.btnListExport, View.GONE);
+            rv.setViewVisibility(R.id.btnListRefresh, View.GONE);
+        } else {
+            rv.setViewVisibility(R.id.btnListEmpty, View.GONE);
+            
+            // Set export button of the remoteViews.
+            rv.setViewVisibility(R.id.btnListExport, View.VISIBLE);
+            pi = PendingIntent.getActivity(context, PENDING_INTENT_REQUEST_CODE.REQUEST_EXPORT.ordinal(),
+                    buildExportIntent(context, extraItem, null), PendingIntent.FLAG_UPDATE_CURRENT);
+            rv.setOnClickPendingIntent(R.id.btnListExport, pi);
+            
+            // Set refresh button of the remoteViews.
+            rv.setViewVisibility(R.id.btnListRefresh, View.VISIBLE);
+            pi = PendingIntent.getBroadcast(context, PENDING_INTENT_REQUEST_CODE.REQUEST_REFRESH.ordinal(),
+                    buildRefreshListIntent(context, extraItem), PendingIntent.FLAG_UPDATE_CURRENT);
+            rv.setOnClickPendingIntent(R.id.btnListRefresh, pi);
+        }
         
         // Set setting button of the remoteViews.
         pi = PendingIntent.getActivity(context, PENDING_INTENT_REQUEST_CODE.REQUEST_SETTING.ordinal(),
@@ -295,35 +316,51 @@ public class WidgetProvider extends AppWidgetProvider {
                 buildExportIntent(context, extraItem, listItem), PendingIntent.FLAG_UPDATE_CURRENT);
         rv.setOnClickPendingIntent(R.id.btnContentExport, pi);
         
-        // Set addtoblacklist button of the remoteViews.
-        pi = PendingIntent.getActivity(context, PENDING_INTENT_REQUEST_CODE.REQUEST_ADDTOBLACKLIST.ordinal(),
-                buildAddToBlackListIntent(context, extraItem, listItem), PendingIntent.FLAG_UPDATE_CURRENT);
-        rv.setOnClickPendingIntent(R.id.btnContentAddToBlacklist, pi);
-        /*
-        // Set scrap button of the remoteViews.
-        pi = PendingIntent.getActivity(context, PENDING_INTENT_REQUEST_CODE.REQUEST_SCRAP.ordinal(),
-                buildScrapItemIntent(context, extraItem, listItem), PendingIntent.FLAG_UPDATE_CURRENT);
-        rv.setOnClickPendingIntent(R.id.btnContentScrap, pi);
-        */
+        if (Utils.isScrapBoardType(extraItem.getBoardType())) {
+            rv.setViewVisibility(R.id.btnContentAddToBlacklist, View.GONE);
+            rv.setViewVisibility(R.id.btnContentScrap, View.GONE);
+
+            // Set delete_scrap button of the remoteViews.
+            rv.setViewVisibility(R.id.btnContentDeleteScrap, View.VISIBLE);
+            pi = PendingIntent.getBroadcast(context, PENDING_INTENT_REQUEST_CODE.REQUEST_DELETESCRAP.ordinal(),
+                    buildDeleteScrappedItemIntent(context, extraItem, listItem), PendingIntent.FLAG_UPDATE_CURRENT);
+            rv.setOnClickPendingIntent(R.id.btnContentDeleteScrap, pi);
+            
+        } else {
+            // Set addtoblacklist button of the remoteViews.
+            rv.setViewVisibility(R.id.btnContentAddToBlacklist, View.VISIBLE);
+            pi = PendingIntent.getActivity(context, PENDING_INTENT_REQUEST_CODE.REQUEST_ADDTOBLACKLIST.ordinal(),
+                    buildAddToBlackListIntent(context, extraItem, listItem), PendingIntent.FLAG_UPDATE_CURRENT);
+            rv.setOnClickPendingIntent(R.id.btnContentAddToBlacklist, pi);
+        
+            // Set scrap button of the remoteViews.
+            rv.setViewVisibility(R.id.btnContentScrap, View.VISIBLE);
+            pi = PendingIntent.getBroadcast(context, PENDING_INTENT_REQUEST_CODE.REQUEST_SCRAP.ordinal(),
+                    buildScrapItemIntent(context, extraItem, listItem), PendingIntent.FLAG_UPDATE_CURRENT);
+            rv.setOnClickPendingIntent(R.id.btnContentScrap, pi);
+            
+            //rv.setViewVisibility(R.id.btnContentStarScrap, View.GONE);
+            rv.setViewVisibility(R.id.btnContentDeleteScrap, View.GONE);
+        }
 
         // Set top button of the remoteViews.
         pi = PendingIntent.getBroadcast(context, PENDING_INTENT_REQUEST_CODE.REQUEST_TOP.ordinal(),
-                                        buildRefreshListIntent(context, extraItem), PendingIntent.FLAG_UPDATE_CURRENT);
+                buildRefreshListIntent(context, extraItem), PendingIntent.FLAG_UPDATE_CURRENT);
         rv.setOnClickPendingIntent(R.id.btnContentNavTop, pi);
         
         // Set refresh button of the remoteViews.
-        pi = PendingIntent.getBroadcast(context, PENDING_INTENT_REQUEST_CODE.REQUEST_REFRESH.ordinal(), 
-                                        buildShowItemIntent(context, extraItem, listItem), PendingIntent.FLAG_UPDATE_CURRENT);
+        pi = PendingIntent.getBroadcast(context, PENDING_INTENT_REQUEST_CODE.REQUEST_REFRESH.ordinal(),
+                buildShowItemIntent(context, extraItem, listItem), PendingIntent.FLAG_UPDATE_CURRENT);
         rv.setOnClickPendingIntent(R.id.btnContentRefresh, pi);
         
         // Set setting button of the remoteViews.
-        pi = PendingIntent.getActivity(context, PENDING_INTENT_REQUEST_CODE.REQUEST_SETTING.ordinal(), 
-                                       buildConfigurationActivityIntent(context, extraItem), PendingIntent.FLAG_UPDATE_CURRENT);
+        pi = PendingIntent.getActivity(context, PENDING_INTENT_REQUEST_CODE.REQUEST_SETTING.ordinal(),
+                buildConfigurationActivityIntent(context, extraItem), PendingIntent.FLAG_UPDATE_CURRENT);
         rv.setOnClickPendingIntent(R.id.btnContentSetting, pi);
         
         // Set a pending intent for click event to the remoteViews.
         PendingIntent clickPi = PendingIntent.getBroadcast(context, 0, 
-                                       buildShowListIntent(context, extraItem), PendingIntent.FLAG_UPDATE_CURRENT);
+                buildShowListIntent(context, extraItem), PendingIntent.FLAG_UPDATE_CURRENT);
         rv.setPendingIntentTemplate(R.id.contentView, clickPi);
     
         // Update widget.
@@ -340,16 +377,20 @@ public class WidgetProvider extends AppWidgetProvider {
         }
     }
     
-    private void refreshAlarmSetting(Context context, ExtraItem item, INTERNET_CONNECTED_RESULT result) {
+    private void refreshAlarmSetting(Context context, ExtraItem extraItem, INTERNET_CONNECTED_RESULT result) {
         // If user does not want to refresh, just remove alarm setting.
         // TODO : Consider INTERNET_CONNECTED_RESULT case here?
-        if (item.getRefreshTimeType() == Constants.Specific.REFRESH_TIME_TYPE_STOP) {
+        if (extraItem.getRefreshTimeType() == Constants.Specific.REFRESH_TIME_TYPE_STOP) {
             removePreviousAlarm();
-            
+        
+        // If scrap board type, remove alarm.
+        } else if (extraItem.getBoardType() == Constants.Specific.BOARD_TYPE_SCRAP) {
+            removePreviousAlarm();
+        
         // If user wants to refresh, set new alarm.
         } else {
             removePreviousAlarm();
-            setNewAlarm(context, item, false);
+            setNewAlarm(context, extraItem, false);
         }
     }
     
@@ -449,6 +490,17 @@ public class WidgetProvider extends AppWidgetProvider {
         return intent;
     }
     
+    private Intent buildDeleteScrappedItemIntent(Context context, ExtraItem extraItem, ListItem listItem) {
+        Intent intent = Utils.createIntentFromExtraItem(
+                context, WIDGET_PROVIDER_CLASS_NAME, Constants.ACTION_DELETE_SCRAPPED_ITEM, extraItem, false);
+        if (listItem != null) {
+            String itemUrl = listItem.getUrl();
+            if (itemUrl != null && itemUrl.length() > 0)
+                intent.putExtra(Constants.EXTRA_ITEM_URL, itemUrl);
+        }
+        return intent;
+    }
+    
     private Intent buildListViewServiceIntent(Context context, ExtraItem extraItem) {
         return Utils.createIntentFromExtraItem(
                 context, ListViewService.LISTVIEW_SERVICE_CLASS_NAME, null, extraItem, false);
@@ -496,6 +548,58 @@ public class WidgetProvider extends AppWidgetProvider {
         return intent;
     }
 
+    private void saveScrappedItem(Context context, ListItem listItem) {
+        if (DEBUG) Log.d(TAG, "saveScrappedItem - ListItem[" + listItem + "]");
+        
+        DatabaseHandler handler = DatabaseHandler.open(context);
+        
+        Cursor c = handler.selectUrl(listItem.getUrl());
+        if (c == null) {
+            if (DEBUG) Log.e(TAG, "saveScrappedItem - cursor is null!");
+
+        // Check duplicated item.
+        } else if (c.getCount() > 0) {
+            if (DEBUG) Log.d(TAG, "saveScrappedItem - Duplicated item!");
+            Toast.makeText(context, context.getResources().getString(R.string.text_duplicated_scrap_item),
+                    Toast.LENGTH_SHORT).show();
+
+        // Insert item.
+        } else {
+            handler.insert(listItem.getTitle(), listItem.getWriter(), listItem.getUrl());
+            if (DEBUG) Log.d(TAG, "saveScrappedItem - completed to insert item!");
+            Toast.makeText(context, context.getResources().getString(R.string.text_completed_to_scrap_item),
+                    Toast.LENGTH_SHORT).show();
+        }
+        
+        handler.close();
+    }
+
+    private void deleteScrappedItem(Context context, ListItem listItem) {
+        if (DEBUG) Log.d(TAG, "deleteScrappedItem - ListItem[" + listItem + "]");
+        
+        DatabaseHandler handler = DatabaseHandler.open(context);
+        
+        Cursor c = handler.selectUrl(listItem.getUrl());
+        if (c == null) {
+            if (DEBUG) Log.e(TAG, "deleteScrappedItem - cursor is null!");
+
+        // Check duplicated item.
+        } else if (c.getCount() == 0) {
+            if (DEBUG) Log.d(TAG, "deleteScrappedItem - item is not existed!");
+            Toast.makeText(context, context.getResources().getString(R.string.text_not_existed_item),
+                    Toast.LENGTH_SHORT).show();
+
+        // Delete item.
+        } else {
+            handler.delete(listItem.getUrl());
+            if (DEBUG) Log.d(TAG, "deleteScrappedItem - completed to delete scrapped item!");
+            Toast.makeText(context, context.getResources().getString(R.string.text_completed_to_delete_scrapped_item),
+                    Toast.LENGTH_SHORT).show();
+        }
+        
+        handler.close();
+    }
+    
     private void saveIntentItem(Context context, ExtraItem extraItem) {
         if (DEBUG) Log.d(TAG, "saveIntentItem");
         

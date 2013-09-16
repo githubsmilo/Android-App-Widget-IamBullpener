@@ -81,11 +81,13 @@ public final class Utils {
     }
     
     public static ListItem createListItemFromIntent(Intent intent) {
+        String titlePrefix = intent.getStringExtra(Constants.EXTRA_ITEM_TITLE_PREFIX);
         String title = intent.getStringExtra(Constants.EXTRA_ITEM_TITLE);
         String writer = intent.getStringExtra(Constants.EXTRA_ITEM_WRITER);
         String url = intent.getStringExtra(Constants.EXTRA_ITEM_URL);
+        int commentNum = intent.getIntExtra(Constants.EXTRA_ITEM_COMMENT_NUM, Constants.DEFAULT_COMMENT_NUM);
         
-        ListItem item = new ListItem(title, writer, url);
+        ListItem item = new ListItem(titlePrefix, title, writer, url, commentNum);
         
         return item;
     }
@@ -136,6 +138,13 @@ public final class Utils {
             return false;
     }
     
+    public static boolean isScrapBoardType(int boardType) {
+        if (boardType == Constants.Specific.BOARD_TYPE_SCRAP)
+            return true;
+        else
+            return false;
+    }
+    
     public static boolean isPredefinedBoardType(int boardType) {
         if ((boardType == Constants.Specific.BOARD_TYPE_BULLPEN_1000) ||
             (boardType == Constants.Specific.BOARD_TYPE_BULLPEN_2000))
@@ -167,6 +176,8 @@ public final class Utils {
     public static String getBoardTitle(Context context, int boardType) {
         Resources res = context.getResources();
         switch (boardType) {
+            case Constants.Specific.BOARD_TYPE_SCRAP:
+                return res.getString(R.string.remoteViewTitle_Scrap);
             case Constants.Specific.BOARD_TYPE_MLB_TOWN :
                 return res.getString(R.string.remoteViewTitle_MlbTown);
             case Constants.Specific.BOARD_TYPE_KBO_TOWN :
@@ -250,6 +261,8 @@ public final class Utils {
     
     public static String getBoardUrl(int boardType) {
         switch (boardType) {
+            case Constants.Specific.BOARD_TYPE_SCRAP:
+                return Constants.Specific.URL_SCRAP;
             case Constants.Specific.BOARD_TYPE_MLB_TOWN :
                 return Constants.Specific.URL_MLB_TOWN;
             case Constants.Specific.BOARD_TYPE_KBO_TOWN :
