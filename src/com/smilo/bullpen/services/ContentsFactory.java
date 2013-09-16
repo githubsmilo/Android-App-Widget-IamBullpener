@@ -275,9 +275,7 @@ public class ContentsFactory implements RemoteViewsService.RemoteViewsFactory {
 
     @Override
     public RemoteViews getLoadingView() {
-        RemoteViews rv = new RemoteViews(mContext.getPackageName(), R.layout.content_row_text);
-        rv.setTextViewText(R.id.contentRowText, mContext.getResources().getString(R.string.text_loadingView));
-
+        RemoteViews rv = new RemoteViews(mContext.getPackageName(), R.layout.preview_content);
         return rv;
     }
     

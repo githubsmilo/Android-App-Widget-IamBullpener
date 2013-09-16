@@ -148,9 +148,7 @@ public class ListViewFactory implements RemoteViewsService.RemoteViewsFactory {
     }
     @Override
     public RemoteViews getLoadingView() {
-        RemoteViews rv = new RemoteViews(mContext.getPackageName(), R.layout.list_row);
-        rv.setTextViewText(R.id.listRowText, mContext.getResources().getString(R.string.text_loadingView));
-
+        RemoteViews rv = new RemoteViews(mContext.getPackageName(), R.layout.preview_list);
         return rv;
     }
 
