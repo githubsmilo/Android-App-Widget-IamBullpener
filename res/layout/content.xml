@@ -68,7 +68,7 @@
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_alignParentLeft="true"
-            android:background="@drawable/scrap_delete_button_selector"
+            android:background="@drawable/delete_button_selector"
             android:contentDescription="@string/btn_delete" />
         
         <ImageButton
