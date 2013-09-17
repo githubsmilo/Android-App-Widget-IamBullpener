@@ -27,7 +27,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
 import android.util.Log;
-import android.view.View;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
@@ -408,7 +407,7 @@ public class ListViewFactory implements RemoteViewsService.RemoteViewsFactory {
                             title += (nodeSeg.getTextExtractor().toString() + " ");
                             if (blockedWords != null) {
                                 for(String s : blockedWords) {
-                                    if (title.contains(s)) {
+                                    if (title.toLowerCase().contains(s.toLowerCase())) {
                                         if (DEBUG) Log.d(TAG, "parseMLBParkMobileBoard - Skip title[" + title + "]");
                                         isSkipToAdd = true;
                                         break;
