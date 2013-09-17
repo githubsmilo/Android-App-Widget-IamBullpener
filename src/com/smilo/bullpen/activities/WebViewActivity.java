@@ -98,7 +98,7 @@ public class WebViewActivity extends Activity {
             @Override
             public void onReceivedError(WebView view, int errorCode,
                     String description, String failingUrl) {
-                if (mProgress.isShowing()) {
+                if (mProgress != null && mProgress.isShowing()) {
                     mProgress.dismiss();
                     mProgress = null;
                 }
@@ -107,7 +107,7 @@ public class WebViewActivity extends Activity {
 
             @Override
             public void onPageFinished(WebView view, String url) {
-                if (mProgress.isShowing()) {
+                if (mProgress != null && mProgress.isShowing()) {
                     mProgress.dismiss();
                     mProgress = null;
                 }
