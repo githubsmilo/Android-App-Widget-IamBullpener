@@ -4,6 +4,7 @@ package com.smilo.bullpen.activities;
 import com.smilo.bullpen.Constants;
 import com.smilo.bullpen.R;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -70,8 +71,10 @@ public class WebViewActivity extends Activity {
         }
     }
 
+    @SuppressLint("SetJavaScriptEnabled")
     private void initializeWebView() {
         mWebView = (WebView)findViewById(R.id.webViewExport);
+        mWebView.getSettings().setJavaScriptEnabled(true);
         mWebView.getSettings().setBuiltInZoomControls(true);
         mWebView.setBackgroundColor(0);
         mWebView.setWebViewClient(new WebViewClient() {
