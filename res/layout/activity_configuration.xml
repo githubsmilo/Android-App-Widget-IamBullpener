@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
+    android:layout_width="320dp"
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
@@ -15,171 +15,230 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical" >
-            
+
             <LinearLayout
-		        android:layout_width="match_parent"
-		        android:layout_height="wrap_content"
-		        android:layout_marginBottom="10dp"
-		        android:layout_marginLeft="10dp"
-		        android:layout_marginRight="10dp"
-		        android:gravity="center_vertical"
-		        android:orientation="horizontal" >
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal" >
 
-		        <TextView
-		            android:id="@+id/textPermitMobileConnection"
-		            android:layout_width="match_parent"
-		            android:layout_height="wrap_content"
-		            android:layout_weight="1"
-		            android:text="@string/text_permitMobileConnection" />
-		
-		        <CheckBox
-		            android:id="@+id/cbMobileConnection"
-		            android:layout_width="match_parent"
-		            android:layout_height="wrap_content"
-		            android:layout_weight="0.5"
-		            android:checked="true" />
-		    </LinearLayout>
-    
-		    <LinearLayout
-		        android:layout_width="match_parent"
-		        android:layout_height="wrap_content"
-		        android:layout_marginBottom="10dp"
-		        android:layout_marginLeft="10dp"
-		        android:layout_marginRight="10dp"
-		        android:gravity="center_vertical"
-		        android:orientation="horizontal" >
-		
-		        <TextView
-		            android:id="@+id/textRefreshTime"
-		            android:layout_width="match_parent"
-		            android:layout_height="wrap_content"
-		            android:layout_weight="1"
-		            android:text="@string/text_refreshTime" />
-		                
-		        <Spinner
-		            android:id="@+id/spinRefreshTime"
-		            android:layout_width="match_parent"
-		            android:layout_height="wrap_content"
-		            android:drawSelectorOnTop="true"
-		            android:layout_weight="0.5"
-		            android:prompt="@string/prompt_refreshTime" />
-		    </LinearLayout>
+                <TextView
+                    android:id="@+id/textPermitMobileConnection"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/text_permitMobileConnection" />
 
-		    <LinearLayout
-		        android:layout_width="match_parent"
-		        android:layout_height="wrap_content"
-		        android:layout_marginBottom="10dp"
-		        android:layout_marginLeft="10dp"
-		        android:layout_marginRight="10dp"
-		        android:gravity="center_vertical"
-		        android:orientation="horizontal" >
-		        
-		        <TextView
-		            android:id="@+id/textBoard"
-		            android:layout_width="match_parent"
-		            android:layout_height="wrap_content"
-		            android:layout_weight="1"
-		            android:text="@string/text_board" />
-		                
-		        <Spinner
-		            android:id="@+id/spinBoard"
-		            android:layout_width="match_parent"
-		            android:layout_height="wrap_content"
-		            android:drawSelectorOnTop="true"
-		            android:layout_weight="0.5"
-		            android:prompt="@string/prompt_board" />
-		    </LinearLayout>
+                <CheckBox
+                    android:id="@+id/cbMobileConnection"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.35"
+                    android:checked="true" />
+            </LinearLayout>
 
-		    <LinearLayout
-		        android:layout_width="match_parent"
-		        android:layout_height="wrap_content"
-		        android:layout_marginBottom="10dp"
-		        android:layout_marginLeft="10dp"
-		        android:layout_marginRight="10dp"
-		        android:gravity="center_vertical"
-		        android:orientation="horizontal" >
-		        
-		        <TextView
-		            android:id="@+id/textBlackList"
-		            android:layout_width="match_parent"
-		            android:layout_height="wrap_content"
-		            android:layout_weight="1"
-		            android:text="@string/text_blackList" />
-		
-		        <EditText
-		            android:id="@+id/editBlackList"
-		            android:layout_width="match_parent"
-		            android:layout_height="wrap_content"
-		            android:drawSelectorOnTop="true"
-		            android:layout_weight="0.5"
-		            android:inputType="text"
-		            android:hint="@string/text_blackList_empty"
-		            android:ems="10" >
-		            <requestFocus />
-		        </EditText>
-		    </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal" >
 
-		    <LinearLayout
-		        android:layout_width="match_parent"
-		        android:layout_height="wrap_content"
-		        android:layout_marginBottom="10dp"
-		        android:layout_marginLeft="10dp"
-		        android:layout_marginRight="10dp"
-		        android:gravity="center_vertical"
-		        android:orientation="horizontal" >
-		        
-		        <TextView
-		            android:id="@+id/textBlockedWords"
-		            android:layout_width="match_parent"
-		            android:layout_height="wrap_content"
-		            android:layout_weight="1"
-		            android:text="@string/text_blockedWords" />
-		
-		        <EditText
-		            android:id="@+id/editBlockedWords"
-		            android:layout_width="match_parent"
-		            android:layout_height="wrap_content"
-		            android:drawSelectorOnTop="true"
-		            android:layout_weight="0.5"
-		            android:inputType="text"
-		            android:hint="@string/text_blockedWords_empty"
-		            android:ems="10" >
-		            <requestFocus />
-		        </EditText>
-		    </LinearLayout>
-    
-		    <LinearLayout
-		        android:layout_width="match_parent"
-		        android:layout_height="wrap_content"
-		        android:layout_marginLeft="10dp"
-		        android:layout_marginRight="10dp"
-		        android:gravity="center_vertical"
-		        android:orientation="horizontal" >
-		        
-		        <TextView
-		            android:id="@+id/textAppInfo"
-		            android:layout_width="match_parent"
-		            android:layout_height="wrap_content"
-		            android:layout_weight="1"
-		            android:text="@string/text_appInfo" />
-		                
-		        <TextView
-		            android:id="@+id/appInfo"
-		            android:layout_width="match_parent"
-		            android:layout_height="wrap_content"
-		            android:layout_weight="0.5"
-		            android:text="@string/appInfo" />
-		    </LinearLayout>
+                <TextView
+                    android:id="@+id/textRefreshTime"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/text_refreshTime" />
+
+                <Spinner
+                    android:id="@+id/spinRefreshTime"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.35"
+                    android:drawSelectorOnTop="true"
+                    android:prompt="@string/prompt_refreshTime" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal" >
+
+                <TextView
+                    android:id="@+id/textBoard"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/text_board" />
+
+                <Spinner
+                    android:id="@+id/spinBoard"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.35"
+                    android:drawSelectorOnTop="true"
+                    android:prompt="@string/prompt_board" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal" >
+
+                <TextView
+                    android:id="@+id/textBlackList"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/text_blackList" />
+
+                <EditText
+                    android:id="@+id/editBlackList"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.35"
+                    android:drawSelectorOnTop="true"
+                    android:ems="10"
+                    android:hint="@string/text_blackList_empty"
+                    android:inputType="text" >
+
+                    <requestFocus />
+                </EditText>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal" >
+
+                <TextView
+                    android:id="@+id/textBlockedWords"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/text_blockedWords" />
+
+                <EditText
+                    android:id="@+id/editBlockedWords"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.35"
+                    android:drawSelectorOnTop="true"
+                    android:ems="10"
+                    android:hint="@string/text_blockedWords_empty"
+                    android:inputType="text" >
+
+                    <requestFocus />
+                </EditText>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal" >
+
+                <TextView
+                    android:id="@+id/textBackgroundImage"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/text_backgroundImage" />
+
+                <HorizontalScrollView
+                    android:id="@+id/horizontalScrollViewBackgroundImage"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.35" >
+                </HorizontalScrollView>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal" >
+
+                <TextView
+                    android:id="@+id/textSettingText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/text_settingText" />
+ 
+                <LinearLayout 
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.35"
+                    android:orientation="horizontal" >
+
+                <Spinner
+                    android:id="@+id/spinTextSize"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:drawSelectorOnTop="true"
+                    android:prompt="@string/prompt_textSize" />
+            
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal" >
+
+                <TextView
+                    android:id="@+id/textAppInfo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/text_appInfo" />
+
+                <TextView
+                    android:id="@+id/appInfo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.35"
+                    android:text="@string/appInfo" />
+            </LinearLayout>
+
         </LinearLayout>
     </ScrollView>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
         android:layout_marginBottom="10dp"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
+        android:layout_marginTop="10dp"
         android:orientation="horizontal" >
 
         <Button

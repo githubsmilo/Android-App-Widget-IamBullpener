@@ -3,9 +3,9 @@ package com.smilo.bullpen.activities;
 
 import com.smilo.bullpen.Constants;
 import com.smilo.bullpen.ExtraItem;
+import com.smilo.bullpen.R;
 import com.smilo.bullpen.Utils;
 import com.smilo.bullpen.WidgetProvider;
-import com.smilo.bullpen.R;
 
 import android.app.Activity;
 import android.appwidget.AppWidgetManager;
@@ -15,10 +15,14 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.HorizontalScrollView;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 
 public class ConfigurationActivity extends Activity {
@@ -85,6 +89,7 @@ public class ConfigurationActivity extends Activity {
         initializeRadioButton(isPermitMobileConnection);
         initializeSpinners(refreshTimeType, boardType);
         initializeEditText(blackList, blockedWords);
+        initializeHorizontalScrollView();
         initializeButtons();
     }
 
@@ -107,6 +112,13 @@ public class ConfigurationActivity extends Activity {
         spinBoard.setAdapter(adapterBoard);
         spinBoard.setOnItemSelectedListener(mSpinBoardSelectedListener);
         spinBoard.setSelection(boardType);
+        
+        Spinner spinTextSize = (Spinner)findViewById(R.id.spinTextSize);
+        ArrayAdapter<CharSequence> adapterTextSize = ArrayAdapter.createFromResource(this, R.array.textSize, android.R.layout.simple_spinner_item);
+        adapterTextSize.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinTextSize.setAdapter(adapterTextSize);
+        spinTextSize.setOnItemSelectedListener(mSpinTextSizeSelectedListener);
+        spinTextSize.setSelection(0);
     }
 
     private void initializeEditText(String blackList, String blockedWords) {
@@ -128,6 +140,32 @@ public class ConfigurationActivity extends Activity {
         findViewById(R.id.btnConfigurationCancel).setOnClickListener(mBtnCancelOnClickListener);
     }
 
+    private void initializeHorizontalScrollView() {
+        HorizontalScrollView scrollView = (HorizontalScrollView) findViewById(R.id.horizontalScrollViewBackgroundImage);
+        
+        LinearLayout topLinearLayout = new LinearLayout(this);
+        topLinearLayout.setOrientation(LinearLayout.HORIZONTAL); 
+        
+        for (int i = 0; i < 10; i++){
+            final ImageView imageView = new ImageView (this);
+            imageView.setTag(i);
+            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(80, 80);
+            imageView.setLayoutParams(layoutParams);
+            imageView.setImageResource(R.drawable.baseball_field_grass_design);
+            topLinearLayout.addView(imageView);
+            imageView.setOnClickListener(new OnClickListener()
+            {
+                @Override
+                public void onClick(View v)
+                {
+                    Log.e("Tag",""+imageView.getTag());
+                }
+            });
+        }
+
+        scrollView.addView(topLinearLayout);
+    }
+    
     View.OnClickListener mBtnOkOnClickListener = new View.OnClickListener() {
         public void onClick(View v) {
             if (DEBUG) Log.i(TAG, "Button OK clicked");
@@ -198,6 +236,16 @@ public class ConfigurationActivity extends Activity {
     Spinner.OnItemSelectedListener mSpinBoardSelectedListener = new AdapterView.OnItemSelectedListener() {
         public void onItemSelected(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
             mItem.setBoardType(arg2);
+        }
+
+        public void onNothingSelected(AdapterView<?> arg0) {
+            // Do nothing
+        }
+    };
+    
+    Spinner.OnItemSelectedListener mSpinTextSizeSelectedListener = new AdapterView.OnItemSelectedListener() {
+        public void onItemSelected(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
+            // TODO
         }
 
         public void onNothingSelected(AdapterView<?> arg0) {
