@@ -1,9 +1,6 @@
 
 package com.smilo.bullpen.activities;
 
-import com.smilo.bullpen.Constants;
-import com.smilo.bullpen.R;
-
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -13,6 +10,9 @@ import android.os.Bundle;
 import android.util.Log;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+
+import com.smilo.bullpen.R;
+import com.smilo.bullpen.definitions.Constants;
 
 public class WebViewActivity extends Activity {
 

@@ -11,8 +11,11 @@ import android.content.res.Resources;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
-import com.smilo.bullpen.Constants.INTERNET_CONNECTED_RESULT;
-import com.smilo.bullpen.Constants.PARSING_RESULT;
+import com.smilo.bullpen.definitions.Constants;
+import com.smilo.bullpen.definitions.Constants.INTERNET_CONNECTED_RESULT;
+import com.smilo.bullpen.definitions.Constants.PARSING_RESULT;
+import com.smilo.bullpen.definitions.ExtraItem;
+import com.smilo.bullpen.definitions.ListItem;
 
 public final class Utils {
 
@@ -72,10 +75,15 @@ public final class Utils {
                 Constants.EXTRA_SEARCH_SUBJECT_TYPE, Constants.DEFAULT_SEARCH_SUBJECT_TYPE);
         String searchKeyword = intent.getStringExtra(
                 Constants.EXTRA_SEARCH_KEYWORD);
+        int bgImageType = intent.getIntExtra(
+                Constants.EXTRA_BG_IMAGE_TYPE, Constants.DEFAULT_BG_IMAGE_TYPE);
+        int textSizeType = intent.getIntExtra(
+                Constants.EXTRA_TEXT_SIZE_TYPE, Constants.DEFAULT_TEXT_SIZE_TYPE);
         
         ExtraItem item = new ExtraItem(
                 appWidgetId, pageNum, boardType, refreshTimeType, permitMobileConnectionType,
-                blackList, blockedWords, searchCategoryType, searchSubjectType, searchKeyword);
+                blackList, blockedWords, searchCategoryType, searchSubjectType, searchKeyword,
+                bgImageType, textSizeType);
         
         return item;
     }
@@ -90,29 +98,6 @@ public final class Utils {
         ListItem item = new ListItem(titlePrefix, title, writer, url, commentNum);
         
         return item;
-    }
-    
-    public static Intent createIntentFromExtraItem(
-            Context context, String className, String actionName, ExtraItem item, boolean isAddNewTask) {
-        Intent intent = new Intent();
-        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, item.getAppWidgetId());
-        intent.putExtra(Constants.EXTRA_PAGE_NUM, item.getPageNum());
-        intent.putExtra(Constants.EXTRA_BOARD_TYPE, item.getBoardType());
-        intent.putExtra(Constants.EXTRA_REFRESH_TIME_TYPE, item.getRefreshTimeType());
-        intent.putExtra(Constants.EXTRA_PERMIT_MOBILE_CONNECTION_TYPE, item.getPermitMobileConnectionType());
-        intent.putExtra(Constants.EXTRA_BLACK_LIST, item.getBlackList());
-        intent.putExtra(Constants.EXTRA_BLOCKED_WORDS, item.getBlockedWords());
-        intent.putExtra(Constants.EXTRA_SEARCH_CATEGORY_TYPE, item.getSearchCategoryType());
-        intent.putExtra(Constants.EXTRA_SEARCH_SUBJECT_TYPE, item.getSearchSubjectType());
-        intent.putExtra(Constants.EXTRA_SEARCH_KEYWORD, item.getSearchKeyword());
-        if (className != null)
-            intent.setClassName(context, className);
-        if (actionName != null)
-            intent.setAction(actionName);
-        if (isAddNewTask)
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        
-        return intent;
     }
     
     public static String getMobileBoardUrl(Context context, int pageNum, int boardType,

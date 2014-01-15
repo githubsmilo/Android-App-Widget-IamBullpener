@@ -1,12 +1,6 @@
 
 package com.smilo.bullpen.activities;
 
-import com.smilo.bullpen.Constants;
-import com.smilo.bullpen.ExtraItem;
-import com.smilo.bullpen.R;
-import com.smilo.bullpen.Utils;
-import com.smilo.bullpen.WidgetProvider;
-
 import android.app.Activity;
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
@@ -24,6 +18,13 @@ import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
+
+import com.smilo.bullpen.R;
+import com.smilo.bullpen.Utils;
+import com.smilo.bullpen.WidgetProvider;
+import com.smilo.bullpen.definitions.Constants;
+import com.smilo.bullpen.definitions.ExtraItem;
+import com.smilo.bullpen.helpers.BuildIntentHelper;
 
 public class ConfigurationActivity extends Activity {
 
@@ -141,7 +142,7 @@ public class ConfigurationActivity extends Activity {
     }
 
     private void initializeHorizontalScrollView() {
-        HorizontalScrollView scrollView = (HorizontalScrollView) findViewById(R.id.horizontalScrollViewBackgroundImage);
+        HorizontalScrollView scrollView = (HorizontalScrollView) findViewById(R.id.horizontalScrollViewBgImage);
         
         LinearLayout topLinearLayout = new LinearLayout(this);
         topLinearLayout.setOrientation(LinearLayout.HORIZONTAL); 
@@ -199,8 +200,7 @@ public class ConfigurationActivity extends Activity {
             mItem.setSearchKeyword(null);
             
             // Create intent and broadcast it!
-            Intent intent = Utils.createIntentFromExtraItem(
-                    context, WidgetProvider.WIDGET_PROVIDER_CLASS_NAME, Constants.ACTION_INIT_LIST, mItem, false);
+            Intent intent = BuildIntentHelper.buildInitListIntent(context, mItem, WidgetProvider.WIDGET_PROVIDER_CLASS_NAME);
             context.sendBroadcast(intent);
 
             // set return intent.

@@ -1,14 +1,11 @@
 
 package com.smilo.bullpen.services;
 
-import com.smilo.bullpen.Constants;
-import com.smilo.bullpen.Constants.PARSING_RESULT;
-import com.smilo.bullpen.ExtraItem;
-import com.smilo.bullpen.ListItem;
-import com.smilo.bullpen.R;
-import com.smilo.bullpen.Utils;
-import com.smilo.bullpen.db.DatabaseHandler;
-import com.smilo.bullpen.db.DatabaseOpenHelper.ScrapArticleColumns;
+import java.io.IOException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 import net.htmlparser.jericho.CharacterReference;
 import net.htmlparser.jericho.Element;
@@ -30,11 +27,14 @@ import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
-import java.io.IOException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import com.smilo.bullpen.R;
+import com.smilo.bullpen.Utils;
+import com.smilo.bullpen.db.Database.ScrapArticleColumns;
+import com.smilo.bullpen.definitions.Constants;
+import com.smilo.bullpen.definitions.Constants.PARSING_RESULT;
+import com.smilo.bullpen.definitions.ExtraItem;
+import com.smilo.bullpen.definitions.ListItem;
+import com.smilo.bullpen.helpers.DatabaseHelper;
 
 public class ListViewFactory implements RemoteViewsService.RemoteViewsFactory {
 
@@ -200,9 +200,9 @@ public class ListViewFactory implements RemoteViewsService.RemoteViewsFactory {
         // Initialize item count.
         mAddedItemCount = 0;
         
-        DatabaseHandler handler = DatabaseHandler.open(mContext);
+        DatabaseHelper helper = DatabaseHelper.open(mContext);
         
-        Cursor c = handler.selectAll();
+        Cursor c = helper.selectAll();
         while (c.moveToNext()) {
             String title = c.getString(ScrapArticleColumns.TITLE_INDEX);
             String writer = c.getString(ScrapArticleColumns.WRITER_INDEX);
@@ -212,7 +212,7 @@ public class ListViewFactory implements RemoteViewsService.RemoteViewsFactory {
             mAddedItemCount++;
             if (DEBUG) Log.d(TAG, "loadScrapListFromDb - new ListItem[" + item.toString() + "]");
         }
-        handler.close();
+        helper.close();
         
         if (DEBUG) Log.i(TAG, "loadScrapListFromDb - done!");
         return PARSING_RESULT.SUCCESS_SCRAP_LIST;

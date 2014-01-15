@@ -1,10 +1,10 @@
 
 package com.smilo.bullpen.services;
 
-import com.smilo.bullpen.Constants;
-
 import android.content.Intent;
 import android.widget.RemoteViewsService;
+
+import com.smilo.bullpen.definitions.Constants;
 
 public class ListViewService extends RemoteViewsService {
 

@@ -160,14 +160,14 @@
                 android:orientation="horizontal" >
 
                 <TextView
-                    android:id="@+id/textBackgroundImage"
+                    android:id="@+id/textBgImage"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="@string/text_backgroundImage" />
+                    android:text="@string/text_bgImage" />
 
                 <HorizontalScrollView
-                    android:id="@+id/horizontalScrollViewBackgroundImage"
+                    android:id="@+id/horizontalScrollViewBgImage"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="0.35" >

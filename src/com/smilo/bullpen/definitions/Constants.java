@@ -1,5 +1,5 @@
 
-package com.smilo.bullpen;
+package com.smilo.bullpen.definitions;
 
 public final class Constants {
 
@@ -19,7 +19,7 @@ public final class Constants {
     public static final String ACTION_SCRAP_ITEM = Specific.PACKAGE_NAME + ".SCRAP_ITEM"; 
     public static final String ACTION_DELETE_SCRAPPED_ITEM = Specific.PACKAGE_NAME + ".DELETE_SCRAPPED_ITEM";
     
-    // Extras define by appWidget
+    // Extras defined by appWidget
     public static final String EXTRA_PAGE_NUM = Specific.PACKAGE_NAME + ".EXTRA_PAGE_NUM";
     public static final String EXTRA_BOARD_TYPE = Specific.PACKAGE_NAME + ".BOARD_TYPE";
     public static final String EXTRA_REFRESH_TIME_TYPE = Specific.PACKAGE_NAME + ".REFRESH_TIME_TYPE";
@@ -34,6 +34,8 @@ public final class Constants {
     public static final String EXTRA_SEARCH_CATEGORY_TYPE = Specific.PACKAGE_NAME + ".SEARCH_CATEGORY_TYPE";
     public static final String EXTRA_SEARCH_SUBJECT_TYPE = Specific.PACKAGE_NAME + ".SEARCH_SUBJECT_TYPE";
     public static final String EXTRA_SEARCH_KEYWORD = Specific.PACKAGE_NAME + ".SEARCH_KEYWORD";
+    public static final String EXTRA_BG_IMAGE_TYPE = Specific.PACKAGE_NAME + ".BG_IMAGE_TYPE";
+    public static final String EXTRA_TEXT_SIZE_TYPE = Specific.PACKAGE_NAME + ".TEXT_SIZE_TYPE";
     public static final String EXTRA_EXPORT_URL = Specific.PACKAGE_NAME + ".EXPORT_URL";
     public static final String EXTRA_INTERNET_CONNECTED_RESULT = Specific.PACKAGE_NAME + ".INTERNET_CONNECTED_RESULT";
     
@@ -45,6 +47,8 @@ public final class Constants {
     public static final String KEY_BOARD_TYPE = "key_board_type";
     public static final String KEY_BLACK_LIST = "key_black_list";
     public static final String KEY_BLOCKED_WORDS = "key_blocked_words";
+    public static final String KEY_BG_IMAGE_TYPE = "key_bg_image_type";
+    public static final String KEY_TEXT_SIZE_TYPE = "key_text_size_type";
     
     // ExtraItem default values
     public static final int DEFAULT_PAGE_NUM = 1;
@@ -55,6 +59,8 @@ public final class Constants {
     public static final String DEFAULT_BLOCKED_WORDS = null;
     public static final int DEFAULT_SEARCH_CATEGORY_TYPE = Specific.SEARCH_CATEGORY_TYPE_DEFAULT;
     public static final int DEFAULT_SEARCH_SUBJECT_TYPE = Specific.SEARCH_SUBJECT_TYPE_DEFAULT;
+    public static final int DEFAULT_BG_IMAGE_TYPE = Specific.BG_IMAGE_TYPE_1;
+    public static final int DEFAULT_TEXT_SIZE_TYPE = Specific.TEXT_SIZE_TYPE_MEDIUM;
     
     // ListItem default values
     public static final String DEFAULT_TITLE_PREFIX = "";
@@ -157,5 +163,13 @@ public final class Constants {
         public static final int SEARCH_SUBJECT_TYPE_23 = 22; // 짤방
         public static final int SEARCH_SUBJECT_TYPE_24 = 23; // 경제
         public static final int SEARCH_SUBJECT_TYPE_25 = 24; // 아이돌
+        
+        public static final int BG_IMAGE_TYPE_1 = 1;
+        public static final int BG_IMAGE_TYPE_2 = 2;
+        public static final int BG_IMAGE_TYPE_3 = 3;
+        
+        public static final int TEXT_SIZE_TYPE_SMALL = 0;
+        public static final int TEXT_SIZE_TYPE_MEDIUM = 1;
+        public static final int TEXT_SIZE_TYPE_LARGE = 2;
     }
 }

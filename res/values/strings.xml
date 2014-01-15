@@ -56,7 +56,7 @@
     <string name="text_board">게시판</string>
     <string name="text_blackList">글쓴이 차단</string>
     <string name="text_blockedWords">제목 차단</string>
-    <string name="text_backgroundImage">배경 화면</string>
+    <string name="text_bgImage">배경 화면</string>
     <string name="text_settingText">글자 설정</string>
     <string name="text_appInfo">만든이</string>
     <string name="btn_ok">OK</string>

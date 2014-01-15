@@ -1,4 +1,4 @@
-package com.smilo.bullpen;
+package com.smilo.bullpen.definitions;
 
 public final class ListItem {
 

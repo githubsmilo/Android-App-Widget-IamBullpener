@@ -1,12 +1,6 @@
 
 package com.smilo.bullpen.activities;
 
-import com.smilo.bullpen.Constants;
-import com.smilo.bullpen.ExtraItem;
-import com.smilo.bullpen.Utils;
-import com.smilo.bullpen.WidgetProvider;
-import com.smilo.bullpen.R;
-
 import android.app.Activity;
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
@@ -20,6 +14,13 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.Toast;
+
+import com.smilo.bullpen.R;
+import com.smilo.bullpen.Utils;
+import com.smilo.bullpen.WidgetProvider;
+import com.smilo.bullpen.definitions.Constants;
+import com.smilo.bullpen.definitions.ExtraItem;
+import com.smilo.bullpen.helpers.BuildIntentHelper;
 
 public class SearchActivity extends Activity {
 
@@ -114,8 +115,8 @@ public class SearchActivity extends Activity {
             mItem.setPageNum(Constants.DEFAULT_PAGE_NUM);
             
             // Create intent and broadcast it!
-            Intent intent = Utils.createIntentFromExtraItem(
-                    context, WidgetProvider.WIDGET_PROVIDER_CLASS_NAME, Constants.ACTION_REFRESH_LIST, mItem, false);
+            Intent intent = BuildIntentHelper.buildRefreshListIntent(
+                    context, mItem, WidgetProvider.WIDGET_PROVIDER_CLASS_NAME);
             context.sendBroadcast(intent);
 
             // set return intent.

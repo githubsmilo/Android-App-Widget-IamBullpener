@@ -1,11 +1,13 @@
 
 package com.smilo.bullpen.services;
 
-import com.smilo.bullpen.Constants;
-import com.smilo.bullpen.Constants.PARSING_RESULT;
-import com.smilo.bullpen.ExtraItem;
-import com.smilo.bullpen.R;
-import com.smilo.bullpen.Utils;
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.net.URLConnection;
+import java.util.Iterator;
+import java.util.List;
 
 import net.htmlparser.jericho.CharacterReference;
 import net.htmlparser.jericho.Element;
@@ -33,13 +35,11 @@ import android.view.WindowManager;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.net.URLConnection;
-import java.util.Iterator;
-import java.util.List;
+import com.smilo.bullpen.R;
+import com.smilo.bullpen.Utils;
+import com.smilo.bullpen.definitions.Constants;
+import com.smilo.bullpen.definitions.Constants.PARSING_RESULT;
+import com.smilo.bullpen.definitions.ExtraItem;
 
 public class ContentsFactory implements RemoteViewsService.RemoteViewsFactory {
 

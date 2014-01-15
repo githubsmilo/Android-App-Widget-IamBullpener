@@ -1,7 +1,5 @@
 package com.smilo.bullpen.db;
 
-import com.smilo.bullpen.Constants;
-
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteDatabase.CursorFactory;
@@ -9,7 +7,9 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.provider.BaseColumns;
 import android.util.Log;
 
-public class DatabaseOpenHelper extends SQLiteOpenHelper {
+import com.smilo.bullpen.definitions.Constants;
+
+public class Database extends SQLiteOpenHelper {
 
     private static final String TAG = "DatabaseOpenHelper";
     private static final boolean DEBUG = Constants.DEBUG_MODE;
@@ -28,7 +28,7 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
     private static final String DROP_SCRAP_LIST_TABLE =
             "DROP TABLE IF EXISTS " + SCRAP_LIST_TABLE_NAME;
     
-    public DatabaseOpenHelper(Context context, String name, CursorFactory factory, int version) {
+    public Database(Context context, String name, CursorFactory factory, int version) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 

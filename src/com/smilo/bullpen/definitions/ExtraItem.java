@@ -1,4 +1,4 @@
-package com.smilo.bullpen;
+package com.smilo.bullpen.definitions;
 
 import android.appwidget.AppWidgetManager;
 
@@ -14,6 +14,8 @@ public final class ExtraItem {
     private int searchCategoryType = Constants.DEFAULT_SEARCH_CATEGORY_TYPE;
     private int searchSubjectType = Constants.DEFAULT_SEARCH_SUBJECT_TYPE;
     private String searchKeyword = null;
+    private int bgImageType = Constants.DEFAULT_BG_IMAGE_TYPE;
+    private int textSizeType = Constants.DEFAULT_TEXT_SIZE_TYPE;
 
     public ExtraItem(int widgetId,
                                 int pageNum,
@@ -24,7 +26,9 @@ public final class ExtraItem {
                                 String blockedWords,
                                 int searchCategoryType,
                                 int searchSubjectType,
-                                String searchKeyword) {
+                                String searchKeyword,
+                                int bgImageType,
+                                int textSizeType) {
         this.widgetId = widgetId;
         this.pageNum = pageNum;
         this.boardType = boardType;
@@ -35,6 +39,8 @@ public final class ExtraItem {
         this.searchCategoryType = searchCategoryType;
         this.searchSubjectType = searchSubjectType;
         this.searchKeyword = searchKeyword;
+        this.bgImageType = bgImageType;
+        this.textSizeType = textSizeType;
     }
     
     public int getAppWidgetId() {
@@ -77,6 +83,14 @@ public final class ExtraItem {
         return searchKeyword;
     }
     
+    public int getBgImageType() {
+        return bgImageType;
+    }
+    
+    public int getTextSizeType() {
+        return textSizeType;
+    }
+    
     public void setAppWidgetId(int widgetId) {
         this.widgetId = widgetId;
     }
@@ -116,18 +130,28 @@ public final class ExtraItem {
     public void setSearchKeyword(String searchKeyword) {
         this.searchKeyword = searchKeyword;
     }
+    
+    public void setBgImageType(int bgImageType) {
+        this.bgImageType = bgImageType;
+    }
+    
+    public void setTextSizeType(int textSizeType) {
+        this.textSizeType = textSizeType;
+    }
 
     public void update(ExtraItem newItem) {
-        widgetId = newItem.getAppWidgetId();
-        pageNum = newItem.getPageNum();
-        boardType = newItem.getBoardType();
-        refreshType = newItem.getRefreshTimeType();
-        isPermitMobileConnection = newItem.getPermitMobileConnectionType();
-        blackList = newItem.getBlackList();
-        blockedWords = newItem.getBlockedWords();
-        searchCategoryType = newItem.getSearchCategoryType();
-        searchSubjectType = newItem.getSearchSubjectType();
-        searchKeyword = newItem.getSearchKeyword();
+        this.widgetId = newItem.getAppWidgetId();
+        this.pageNum = newItem.getPageNum();
+        this.boardType = newItem.getBoardType();
+        this.refreshType = newItem.getRefreshTimeType();
+        this.isPermitMobileConnection = newItem.getPermitMobileConnectionType();
+        this.blackList = newItem.getBlackList();
+        this.blockedWords = newItem.getBlockedWords();
+        this.searchCategoryType = newItem.getSearchCategoryType();
+        this.searchSubjectType = newItem.getSearchSubjectType();
+        this.searchKeyword = newItem.getSearchKeyword();
+        this.bgImageType = newItem.getBgImageType();
+        this.textSizeType = newItem.getTextSizeType();
     }
     
     public String toString() {
@@ -135,6 +159,6 @@ public final class ExtraItem {
                 "], refreshTimeType[" + refreshType + "], isPermitMobileConnectionType[" + isPermitMobileConnection +
                 "], blackList[" + blackList + "], blockedWords[" + blockedWords + 
                 "], searchCategoryType[" + searchCategoryType + "], searchSubjectType[" + searchSubjectType +
-                "], searchKeyword[" + searchKeyword + "]");
+                "], searchKeyword[" + searchKeyword + "], bgImageType[" + bgImageType + "], textSizeType[" + textSizeType + "]");
     }
 }
