@@ -114,12 +114,14 @@ public class ConfigurationActivity extends Activity {
         spinBoard.setOnItemSelectedListener(mSpinBoardSelectedListener);
         spinBoard.setSelection(boardType);
         
+        /*
         Spinner spinTextSize = (Spinner)findViewById(R.id.spinTextSize);
         ArrayAdapter<CharSequence> adapterTextSize = ArrayAdapter.createFromResource(this, R.array.textSize, android.R.layout.simple_spinner_item);
         adapterTextSize.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinTextSize.setAdapter(adapterTextSize);
         spinTextSize.setOnItemSelectedListener(mSpinTextSizeSelectedListener);
         spinTextSize.setSelection(0);
+        */
     }
 
     private void initializeEditText(String blackList, String blockedWords) {
@@ -142,6 +144,7 @@ public class ConfigurationActivity extends Activity {
     }
 
     private void initializeHorizontalScrollView() {
+        /*
         HorizontalScrollView scrollView = (HorizontalScrollView) findViewById(R.id.horizontalScrollViewBgImage);
         
         LinearLayout topLinearLayout = new LinearLayout(this);
@@ -165,6 +168,7 @@ public class ConfigurationActivity extends Activity {
         }
 
         scrollView.addView(topLinearLayout);
+        */
     }
     
     View.OnClickListener mBtnOkOnClickListener = new View.OnClickListener() {
