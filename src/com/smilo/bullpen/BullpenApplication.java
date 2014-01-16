@@ -12,6 +12,7 @@ public class BullpenApplication extends Application {
 		
 		// Create global configuration and initialize ImageLoader with this configuration
         ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(getApplicationContext())
+            .threadPoolSize(1)
             .build();
         ImageLoader.getInstance().init(config);
 	}

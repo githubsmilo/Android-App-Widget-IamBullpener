@@ -4,6 +4,7 @@ package com.smilo.bullpen.services;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.ImageScaleType;
+import com.nostra13.universalimageloader.core.assist.ImageSize;
 import com.smilo.bullpen.R;
 import com.smilo.bullpen.Utils;
 import com.smilo.bullpen.definitions.Constants;
@@ -63,6 +64,7 @@ public class ContentsFactory implements RemoteViewsService.RemoteViewsFactory {
     private static final String JSON_COMMENT_TEXT = "commentText";
     
     private static int mDisplayWidth;
+    private static int mDisplayHeight;
     
     private ImageLoader mImageLoader;
 
@@ -76,9 +78,10 @@ public class ContentsFactory implements RemoteViewsService.RemoteViewsFactory {
         
         Display display = ((WindowManager)mContext.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
         mDisplayWidth = display.getWidth();
+        mDisplayHeight = display.getHeight();
 
         if (DEBUG) Log.i(TAG, "constructor - mItem[" + mItem.toString() + "], mSelectedItemUrl[" + mSelectedItemUrl +
-                "], mDisplayWidth[" + mDisplayWidth + "]");
+                "], mDisplayWidth[" + mDisplayWidth + "], mDisplayHeight[" + mDisplayHeight +"]");
         
         setupIntentListener();
         
@@ -130,7 +133,7 @@ public class ContentsFactory implements RemoteViewsService.RemoteViewsFactory {
                         }
                         String bodyText = obj.optString(JSON_BODY_TEXT);
                         if (bodyText != null && bodyText.length() > 0) {
-                            //Log.i(TAG, "getViewAt - text[" + bodyText + "]");
+                            //if (DEBUG) Log.i(TAG, "getViewAt - text[" + bodyText + "]");
                             RemoteViews rvBodyText = new RemoteViews(mContext.getPackageName(), R.layout.content_row_text);
                             rvBodyText.setTextViewText(R.id.contentRowText, bodyText);
                             rv.addView(R.id.contentRowBodyLayout, rvBodyText);
@@ -139,17 +142,41 @@ public class ContentsFactory implements RemoteViewsService.RemoteViewsFactory {
                         String bodyImage = obj.optString(JSON_BODY_IMAGE);
                         if (bodyImage != null && bodyImage.length() > 0) {
                             if (DEBUG) Log.i(TAG, "getViewAt - image[" + bodyImage + "]");
-                            
+                            final RemoteViews rvBodyImage = new RemoteViews(mContext.getPackageName(), R.layout.content_row_image);
+
+                            // Load given image synchronously.
                             // NOTE :
                             // I don't use AsyncTask method to load given image file,
                             // because the job to update specific remoteViews MUST update widget entirely to refresh.
                             // This is very expensive job! :(
-                            final RemoteViews rvBodyImage = new RemoteViews(mContext.getPackageName(), R.layout.content_row_image);
                             DisplayImageOptions options = new DisplayImageOptions.Builder()
-                            	.imageScaleType(ImageScaleType.EXACTLY_STRETCHED)
-                            	.build();
-                            Bitmap bitmap = mImageLoader.loadImageSync(bodyImage, options);
-                            rvBodyImage.setImageViewBitmap(R.id.contentRowImage, bitmap);
+                                .imageScaleType(ImageScaleType.EXACTLY)
+                                .bitmapConfig(Bitmap.Config.RGB_565)
+                                .build();
+                            ImageSize imageSize = new ImageSize(mDisplayWidth, mDisplayHeight);
+                            Bitmap bitmap = mImageLoader.loadImageSync(bodyImage, imageSize, options);
+                            
+                            // Check image size. If too large, scale it.
+                            int bitmapWidth = bitmap.getWidth();
+                            int bitmapHeight = bitmap.getHeight();
+                            Bitmap resizeBitmap = null;
+                            if ((bitmapWidth > bitmapHeight) && (bitmapWidth > mDisplayWidth)) {
+                                resizeBitmap = Bitmap.createScaledBitmap(
+                                        bitmap, mDisplayWidth, (bitmapHeight * mDisplayWidth)/bitmapWidth, true);
+                                bitmap.recycle();
+                                rvBodyImage.setImageViewBitmap(R.id.contentRowImage, resizeBitmap);
+                                if (DEBUG) Log.d(TAG, "bitmap width[" + resizeBitmap.getWidth() + "] height[" + resizeBitmap.getHeight() + "]");
+                            } else if ((bitmapWidth < bitmapHeight) && (bitmapHeight > mDisplayHeight)) {
+                                resizeBitmap = Bitmap.createScaledBitmap(
+                                        bitmap, (bitmapWidth * mDisplayWidth)/bitmapHeight, mDisplayWidth, true);
+                                bitmap.recycle();
+                                rvBodyImage.setImageViewBitmap(R.id.contentRowImage, resizeBitmap);
+                                if (DEBUG) Log.d(TAG, "bitmap width[" + resizeBitmap.getWidth() + "] height[" + resizeBitmap.getHeight() + "]");
+                            } else {
+                                rvBodyImage.setImageViewBitmap(R.id.contentRowImage, bitmap);
+                                if (DEBUG) Log.d(TAG, "bitmap width[" + bitmap.getWidth() + "] height[" + bitmap.getHeight() + "]");
+                            }
+                            
                             rv.addView(R.id.contentRowBodyLayout, rvBodyImage);
                         }
                     }
@@ -498,7 +525,6 @@ public class ContentsFactory implements RemoteViewsService.RemoteViewsFactory {
             mIntentListener = null;
         }
     }
-    
     /*
     private Bitmap getImageBitmap(String url) throws IOException, RuntimeException, OutOfMemoryError { 
         Bitmap bitmap = null; 
@@ -541,7 +567,6 @@ public class ContentsFactory implements RemoteViewsService.RemoteViewsFactory {
         }
     } 
     */
-    
     /*
     static class BitmapWorkerTask extends AsyncTask<String, Void, Bitmap> {
         private final RemoteViews rv;
