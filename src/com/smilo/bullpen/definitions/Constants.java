@@ -95,6 +95,8 @@ public final class Constants {
         public static final String PACKAGE_NAME = "com.smilo.bullpen";
 
         public static final String URL_BASE = "http://mlbpark.donga.com";
+        public static final String URL_FAKE_IMG_BASE = "http://imgpark.donga.com/mbs/fileUpload";
+        public static final String URL_CORRECT_IMG_BASE = "http://image.donga.com/mlbpark/fileUpload";
         public static final String URL_SCRAP = URL_BASE + "/SCRAP";
         public static final String URL_MLB_TOWN = "http://mlbpark.donga.com/mbs/articleL.php?mbsC=mlbtown&cpage=";
         public static final String URL_KBO_TOWN = "http://mlbpark.donga.com/mbs/articleL.php?mbsC=kbotown&cpage=";

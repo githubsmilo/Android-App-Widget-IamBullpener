@@ -1,13 +1,14 @@
 
 package com.smilo.bullpen.services;
 
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.net.URLConnection;
-import java.util.Iterator;
-import java.util.List;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.assist.ImageScaleType;
+import com.smilo.bullpen.R;
+import com.smilo.bullpen.Utils;
+import com.smilo.bullpen.definitions.Constants;
+import com.smilo.bullpen.definitions.Constants.PARSING_RESULT;
+import com.smilo.bullpen.definitions.ExtraItem;
 
 import net.htmlparser.jericho.CharacterReference;
 import net.htmlparser.jericho.Element;
@@ -28,18 +29,16 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.util.Log;
 import android.view.Display;
 import android.view.WindowManager;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
-import com.smilo.bullpen.R;
-import com.smilo.bullpen.Utils;
-import com.smilo.bullpen.definitions.Constants;
-import com.smilo.bullpen.definitions.Constants.PARSING_RESULT;
-import com.smilo.bullpen.definitions.ExtraItem;
+import java.io.IOException;
+import java.net.URL;
+import java.util.Iterator;
+import java.util.List;
 
 public class ContentsFactory implements RemoteViewsService.RemoteViewsFactory {
 
@@ -64,6 +63,8 @@ public class ContentsFactory implements RemoteViewsService.RemoteViewsFactory {
     private static final String JSON_COMMENT_TEXT = "commentText";
     
     private static int mDisplayWidth;
+    
+    private ImageLoader mImageLoader;
 
     public ContentsFactory(Context context, Intent intent) {
         mContext = context;
@@ -80,6 +81,8 @@ public class ContentsFactory implements RemoteViewsService.RemoteViewsFactory {
                 "], mDisplayWidth[" + mDisplayWidth + "]");
         
         setupIntentListener();
+        
+        mImageLoader = ImageLoader.getInstance();
     }
 
     @Override
@@ -141,35 +144,12 @@ public class ContentsFactory implements RemoteViewsService.RemoteViewsFactory {
                             // I don't use AsyncTask method to load given image file,
                             // because the job to update specific remoteViews MUST update widget entirely to refresh.
                             // This is very expensive job! :(
-                            /*
-                            RemoteViews rvBodyImage = new RemoteViews(mContext.getPackageName(), R.layout.content_row_image);
-                            BitmapWorkerTask task = new BitmapWorkerTask(rvBodyImage, mContext, mAppWidgetId, R.id.contentRowImage);
-                            task.execute(bodyImage);
-                            */
-                            
-                            // TODO : manage bitmap
-                            RemoteViews rvBodyImage = new RemoteViews(mContext.getPackageName(), R.layout.content_row_image);
-                            Bitmap bitmap = null;
-                            try {
-                                bitmap = getImageBitmap(bodyImage);
-                                if (bitmap == null) {
-                                    rvBodyImage.setImageViewBitmap(R.id.contentRowImage, null);
-                                } else {
-                                    rvBodyImage.setImageViewBitmap(R.id.contentRowImage, bitmap);
-                                }
-                            } catch (IOException e) {
-                                if (DEBUG) Log.e(TAG, "getViewAt - getImageBitmap - IOException![" + e.toString() + "]");
-                                e.printStackTrace();
-                                rvBodyImage.setImageViewBitmap(R.id.contentRowImage, null);
-                            } catch (RuntimeException e) {
-                                if (DEBUG) Log.e(TAG, "getViewAt - getImageBitmap - RuntimeException![" + e.toString() + "]");
-                                e.printStackTrace();
-                                rvBodyImage.setImageViewBitmap(R.id.contentRowImage, null);
-                            } catch (OutOfMemoryError e) {
-                                if (DEBUG) Log.e(TAG, "getViewAt - getImageBitmap - OutOfMemoryError![" + e.toString() + "]");
-                                e.printStackTrace();
-                                rvBodyImage.setImageViewBitmap(R.id.contentRowImage, null);
-                            }
+                            final RemoteViews rvBodyImage = new RemoteViews(mContext.getPackageName(), R.layout.content_row_image);
+                            DisplayImageOptions options = new DisplayImageOptions.Builder()
+                            	.imageScaleType(ImageScaleType.EXACTLY_STRETCHED)
+                            	.build();
+                            Bitmap bitmap = mImageLoader.loadImageSync(bodyImage, options);
+                            rvBodyImage.setImageViewBitmap(R.id.contentRowImage, bitmap);
                             rv.addView(R.id.contentRowBodyLayout, rvBodyImage);
                         }
                     }
@@ -396,6 +376,9 @@ public class ContentsFactory implements RemoteViewsService.RemoteViewsFactory {
                                 strBuf.append(Constants.Specific.URL_BASE);
                                 strBuf.append(itemImgUrl);
                                 itemImgUrl = strBuf.toString();
+                            } else if (itemImgUrl.startsWith(Constants.Specific.URL_FAKE_IMG_BASE)) {
+                            	itemImgUrl = itemImgUrl.replaceFirst(
+                            			Constants.Specific.URL_FAKE_IMG_BASE, Constants.Specific.URL_CORRECT_IMG_BASE);
                             }
                             
                             // Put itemImgUrl to the 'body' JSONArray.
@@ -490,7 +473,33 @@ public class ContentsFactory implements RemoteViewsService.RemoteViewsFactory {
         
         return PARSING_RESULT.SUCCESS_MOBILE_BOARD;
     }
+
+    private void setupIntentListener() {
+        if (mIntentListener == null) {
+            mIntentListener = new BroadcastReceiver() {
+                @Override
+                public void onReceive(Context context, Intent intent) {
+                    // Update mItem through Broadcast Intent.
+                    ExtraItem item = Utils.createExtraItemFromIntent(intent);
+                    mItem.update(item);
+                    mSelectedItemUrl = intent.getStringExtra(Constants.EXTRA_ITEM_URL);
+                    if (DEBUG) Log.i(TAG, "onReceive - update mItem[" + mItem.toString() + "], mSelectedItemUrl[" + mSelectedItemUrl + "]");
+                }
+            };
+            IntentFilter filter = new IntentFilter();
+            filter.addAction(Constants.ACTION_UPDATE_ITEM_INFO);
+            mContext.registerReceiver(mIntentListener, filter);
+        }
+    }
+
+    private void teardownIntentListener() {
+        if (mIntentListener != null) {
+            mContext.unregisterReceiver(mIntentListener);
+            mIntentListener = null;
+        }
+    }
     
+    /*
     private Bitmap getImageBitmap(String url) throws IOException, RuntimeException, OutOfMemoryError { 
         Bitmap bitmap = null; 
         URL aURL = new URL(url); 
@@ -531,31 +540,7 @@ public class ContentsFactory implements RemoteViewsService.RemoteViewsFactory {
             }
         }
     } 
-    
-    private void setupIntentListener() {
-        if (mIntentListener == null) {
-            mIntentListener = new BroadcastReceiver() {
-                @Override
-                public void onReceive(Context context, Intent intent) {
-                    // Update mItem through Broadcast Intent.
-                    ExtraItem item = Utils.createExtraItemFromIntent(intent);
-                    mItem.update(item);
-                    mSelectedItemUrl = intent.getStringExtra(Constants.EXTRA_ITEM_URL);
-                    if (DEBUG) Log.i(TAG, "onReceive - update mItem[" + mItem.toString() + "], mSelectedItemUrl[" + mSelectedItemUrl + "]");
-                }
-            };
-            IntentFilter filter = new IntentFilter();
-            filter.addAction(Constants.ACTION_UPDATE_ITEM_INFO);
-            mContext.registerReceiver(mIntentListener, filter);
-        }
-    }
-
-    private void teardownIntentListener() {
-        if (mIntentListener != null) {
-            mContext.unregisterReceiver(mIntentListener);
-            mIntentListener = null;
-        }
-    }
+    */
     
     /*
     static class BitmapWorkerTask extends AsyncTask<String, Void, Bitmap> {

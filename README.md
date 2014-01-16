@@ -4,5 +4,6 @@ This repository contains Android AppWidget IamBullpener sources. This app-widget
 
 - Above Android 4.0 (API 14)
 - Used Jericho HTML parser (http://jericho.htmlparser.net/docs/index.html)
+- Used Android Universal Image Loader (https://github.com/nostra13/Android-Universal-Image-Loader)
 - Founded on Google Play (https://play.google.com/store/apps/details?id=com.smilo.bullpen)
 - Apache V2 license (http://www.apache.org/licenses/LICENSE-2.0)
