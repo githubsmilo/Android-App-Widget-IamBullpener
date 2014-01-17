@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.smilo.bullpen"
     android:versionCode="6"
-    android:versionName="1.21" >
+    android:versionName="1.22" >
 
     <uses-sdk
         android:minSdkVersion="14"
@@ -52,6 +52,7 @@
             android:launchMode="singleTop"
             android:taskAffinity=""
             android:excludeFromRecents="true"
+            android:exported="true"
             android:theme="@android:style/Theme.Dialog" >
         </activity>
         <activity
@@ -59,13 +60,15 @@
             android:launchMode="singleTop"
             android:taskAffinity=""
             android:excludeFromRecents="true"
+            android:exported="true"
             android:theme="@android:style/Theme.Dialog" >
         </activity>
         <activity
             android:name="com.smilo.bullpen.activities.WebViewActivity"
             android:launchMode="singleTop"
             android:taskAffinity=""
-            android:excludeFromRecents="true" 
+            android:excludeFromRecents="true"
+            android:exported="true"
             android:theme="@android:style/Theme.NoTitleBar" >
         </activity>
     </application>
