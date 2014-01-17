@@ -3,7 +3,7 @@ package com.smilo.bullpen.definitions;
 
 public final class Constants {
 
-    public static final boolean DEBUG_MODE = true;
+    public static final boolean DEBUG_MODE = false;
     
     // Actions predefined by Google
     public static final String ACTION_APPWIDGET_ENABLD = "android.appwidget.action.APPWIDGET_ENABLED";
