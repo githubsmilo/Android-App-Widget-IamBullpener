@@ -81,7 +81,6 @@ public class WebViewActivity extends Activity {
     private void initializeWebView() {
         mWebView = (WebView)findViewById(R.id.webViewExport);
         mWebView.getSettings().setJavaScriptEnabled(true);
-        mWebView.getSettings().setBuiltInZoomControls(true);
         mWebView.setBackgroundColor(0);
         mWebView.setWebViewClient(new WebViewClient() {
             @Override
