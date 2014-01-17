@@ -49,6 +49,12 @@ public class WebViewActivity extends Activity {
     }
 
     @Override
+    protected void onDestroy() {
+        mWebView.destroy();
+	    super.onDestroy();
+    }
+
+    @Override
     protected void onNewIntent(Intent intent) {
         if (DEBUG) Log.i(TAG, "onNewIntent");
         String exportUrl = intent.getStringExtra(Constants.EXTRA_EXPORT_URL);
