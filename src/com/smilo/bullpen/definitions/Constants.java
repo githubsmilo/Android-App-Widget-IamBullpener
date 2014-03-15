@@ -99,13 +99,13 @@ public final class Constants {
         public static final String URL_CORRECT_IMG_BASE = "http://image.donga.com/mlbpark/fileUpload";
         public static final String URL_SCRAP = URL_BASE + "/SCRAP";
         public static final String URL_MLB_TOWN = "http://mlbpark.donga.com/mbs/articleL.php?mbsC=mlbtown&cpage=";
-        public static final String URL_KBO_TOWN = "http://mlbpark.donga.com/mbs/articleL.php?mbsC=kbotown&cpage=";
-        public static final String URL_BULLPEN = "http://mlbpark.donga.com/mbs/articleL.php?mbsC=bullpen&cpage=";
+        public static final String URL_KBO_TOWN = "http://mlbpark.donga.com/mbs/articleL.php?mbsC=kbotown2&cpage=";
+        public static final String URL_BULLPEN = "http://mlbpark.donga.com/mbs/articleL.php?mbsC=bullpen2&cpage=";
         public static final String URL_MLB_TOWN_TODAY_BEST = URL_BASE + "/MLBTOWN_TODAYBEST";
         public static final String URL_KBO_TOWN_TODAY_BEST = URL_BASE + "/KBOTOWN_TODAYBEST";
         public static final String URL_BULLPEN_TODAY_BEST = URL_BASE + "/BULLPEN_TODAYBEST";
-        public static final String URL_BULLPEN_1000 = "http://mlbpark.donga.com/mbs/articleL.php?mbsC=bullpen&mbsW=search&select=hit&opt=1&keyword=1000&cpage=";
-        public static final String URL_BULLPEN_2000 = "http://mlbpark.donga.com/mbs/articleL.php?mbsC=bullpen&mbsW=search&select=hit&opt=1&keyword=2000&cpage=";
+        public static final String URL_BULLPEN_1000 = "http://mlbpark.donga.com/mbs/articleL.php?mbsC=bullpen2&mbsW=search&select=hit&opt=1&keyword=1000&cpage=";
+        public static final String URL_BULLPEN_2000 = "http://mlbpark.donga.com/mbs/articleL.php?mbsC=bullpen2&mbsW=search&select=hit&opt=1&keyword=2000&cpage=";
         public static final String URL_NEWS = "http://mlbpark.donga.com/bbs/list.php?bbs=mpark_kpb_news&cpage=";
         
         public static final int LISTVIEW_MAX_ITEM_COUNT = 20;
